@@ -1,4 +1,4 @@
-package global
+package take1
 
 import (
 	l "github.com/muzudho/go-logger"

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	l "github.com/muzudho/go-logger"
-	g "github.com/muzudho/kifuwarabe-shogi2021/take1/global"
 )
 
 // MainLoop - 開始。
@@ -23,9 +22,13 @@ func MainLoop() {
 
 	// コマンドライン引数登録
 	workdir := flag.String("workdir", dwd, "Working directory path.")
+	// コマンドライン引数解析
+	flag.Parse()
+
+	engineConfPath := filepath.Join(*workdir, "input/take1/engine.conf.toml")
 
 	// グローバル変数の作成
-	g.G = *new(g.Variables)
+	G = *new(Variables)
 
 	tracePath := filepath.Join(*workdir, "output/trace.log")
 	debugPath := filepath.Join(*workdir, "output/debug.log")
@@ -38,7 +41,7 @@ func MainLoop() {
 
 	// ロガーの作成。
 	// TODO ディレクトリが存在しなければ、強制終了します。
-	g.G.Log = *l.NewLogger(
+	G.Log = *l.NewLogger(
 		tracePath,
 		debugPath,
 		infoPath,
@@ -49,29 +52,42 @@ func MainLoop() {
 		printPath)
 
 	// 既存のログ・ファイルを削除
-	g.G.Log.RemoveAllOldLogs()
+	G.Log.RemoveAllOldLogs()
 
 	// ログ・ファイルの開閉
-	err = g.G.Log.OpenAllLogs()
+	err = G.Log.OpenAllLogs()
 	if err != nil {
 		// ログ・ファイルを開くのに失敗したのだから、ログ・ファイルへは書き込めません
 		panic(err)
 	}
-	defer g.G.Log.CloseAllLogs()
+	defer G.Log.CloseAllLogs()
 
-	g.G.Log.Trace("Start Take1\n")
+	G.Log.Trace("Start Take1\n")
+	G.Log.Trace("engineConfPath=%s\n", engineConfPath)
+
+	// チャッターの作成。 標準出力とロガーを一緒にしただけです。
+	G.Chat = *l.NewChatter(G.Log)
+	G.StderrChat = *l.NewStderrChatter(G.Log)
+
+	// 設定ファイル読込。ファイルが存在しなければ強制終了してしまうので注意！
+	config, err := LoadEngineConf(engineConfPath)
+	if err != nil {
+		panic(G.Log.Fatal(fmt.Sprintf("engineConfPath=[%s] err=[%s]", engineConfPath, err)))
+	}
 
 	// 何か標準入力しろだぜ☆（＾～＾）
 	scanner := bufio.NewScanner(os.Stdin)
 
 MainLoop:
 	for scanner.Scan() {
-		g.G.Log.FlushAllLogs()
+		G.Log.FlushAllLogs()
 
 		command := scanner.Text()
 		tokens := strings.Split(command, " ")
 		switch tokens[0] {
 		case "usi":
+			G.Chat.Print("id name %s\n", config.Profile.Name)
+			G.Chat.Print("id author %s\n", config.Profile.Author)
 		case "isready":
 		case "usinewgame":
 		case "position":
@@ -81,6 +97,6 @@ MainLoop:
 		}
 	}
 
-	g.G.Log.Trace("Finished\n")
-	g.G.Log.FlushAllLogs()
+	G.Log.Trace("Finished\n")
+	G.Log.FlushAllLogs()
 }
