@@ -1,8 +1,26 @@
 package take1
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
-// Start - 開始。
-func Start() {
+// MainLoop - 開始。
+func MainLoop() {
 	fmt.Println("Take 1")
+
+	// 何か標準入力しろだぜ☆（＾～＾）
+	scanner := bufio.NewScanner(os.Stdin)
+
+MainLoop:
+	for scanner.Scan() {
+		command := scanner.Text()
+		tokens := strings.Split(command, " ")
+		switch tokens[0] {
+		case "quit":
+			break MainLoop
+		}
+	}
 }
