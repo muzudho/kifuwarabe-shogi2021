@@ -8,5 +8,5 @@ type Position struct {
 
 // ReadPosition - 局面を読み取ります
 func ReadPosition(command string) {
-
+	G.Log.Trace("command=%s\n", command)
 }

@@ -78,10 +78,10 @@ func MainLoop() {
 	// 何か標準入力しろだぜ☆（＾～＾）
 	scanner := bufio.NewScanner(os.Stdin)
 
+	G.Log.FlushAllLogs()
+
 MainLoop:
 	for scanner.Scan() {
-		G.Log.FlushAllLogs()
-
 		command := scanner.Text()
 		tokens := strings.Split(command, " ")
 		switch tokens[0] {
@@ -100,6 +100,8 @@ MainLoop:
 		case "quit":
 			break MainLoop
 		}
+
+		G.Log.FlushAllLogs()
 	}
 
 	G.Log.Trace("Finished\n")
