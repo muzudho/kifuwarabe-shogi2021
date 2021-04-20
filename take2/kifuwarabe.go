@@ -80,7 +80,7 @@ func MainLoop() {
 
 	G.Log.FlushAllLogs()
 
-	var pos = new(Position)
+	var pos = NewPosition()
 
 MainLoop:
 	for scanner.Scan() {

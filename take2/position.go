@@ -12,6 +12,41 @@ type Position struct {
 	Board []string
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
+	// 先手が1、後手が2（＾～＾）
+	Phase int
+	// 何手目か（＾～＾）
+	MovesNum int
+}
+
+func NewPosition() *Position {
+	var ins = new(Position)
+	ins.ResetToStartpos()
+	return ins
+}
+
+// ResetToStartpos - 初期局面にします。
+func (pos *Position) ResetToStartpos() {
+	// 初期局面にします
+	pos.Board = []string{
+		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
+		"1", "l", "", "p", "", "", "", "P", "", "L",
+		"2", "n", "b", "p", "", "", "", "P", "R", "N",
+		"3", "s", "", "p", "", "", "", "P", "", "S",
+		"4", "g", "", "p", "", "", "", "P", "", "G",
+		"5", "k", "", "p", "", "", "", "P", "", "K",
+		"6", "g", "", "p", "", "", "", "P", "", "G",
+		"7", "s", "", "p", "", "", "", "P", "", "S",
+		"8", "n", "r", "p", "", "", "", "P", "B", "N",
+		"9", "l", "", "p", "", "", "", "P", "", "L",
+	}
+	// 持ち駒の数
+	pos.Hands = []int{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}
+	// 先手の局面
+	pos.Phase = 1
+	// 何手目か
+	pos.MovesNum = 1
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -19,31 +54,20 @@ func (pos *Position) ReadPosition(command string) {
 	G.Log.Trace("command=%s\n", command)
 
 	if strings.HasPrefix(command, "position startpos") {
-		// 初期局面にします
-		pos.Board = []string{
-			"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
-			"1", "l", "", "p", "", "", "", "P", "", "L",
-			"2", "n", "b", "p", "", "", "", "P", "R", "N",
-			"3", "s", "", "p", "", "", "", "P", "", "S",
-			"4", "g", "", "p", "", "", "", "P", "", "G",
-			"5", "k", "", "p", "", "", "", "P", "", "K",
-			"6", "g", "", "p", "", "", "", "P", "", "G",
-			"7", "s", "", "p", "", "", "", "P", "", "S",
-			"8", "n", "r", "p", "", "", "", "P", "B", "N",
-			"9", "l", "", "p", "", "", "", "P", "", "L",
-		}
-		// 持ち駒の数
-		pos.Hands = []int{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		}
+		pos.ResetToStartpos()
 	}
 }
 
 // Print - 局面出力（＾ｑ＾）
 func (pos *Position) Sprint() string {
+	var phase_str = "First"
+	if pos.Phase == 2 {
+		phase_str = "Second"
+	}
+
 	return "\n" +
 		//
-		fmt.Sprintf("[? moves / First / ? repeats]\n") +
+		fmt.Sprintf("[%d moves / %s / ? repeats]\n", pos.MovesNum, phase_str) +
 		//
 		"\n" +
 		//
