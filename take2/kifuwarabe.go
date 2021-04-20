@@ -80,6 +80,8 @@ func MainLoop() {
 
 	G.Log.FlushAllLogs()
 
+	var pos = new(Position)
+
 MainLoop:
 	for scanner.Scan() {
 		command := scanner.Text()
@@ -94,11 +96,14 @@ MainLoop:
 		case "usinewgame":
 		case "position":
 			// TODO position うわっ、大変だ（＾～＾）
-			ReadPosition(command)
+			pos.ReadPosition(command)
 		case "go":
 			G.Chat.Print("bestmove resign\n")
 		case "quit":
 			break MainLoop
+		case "pos":
+			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
+			G.Chat.Debug(pos.Sprint())
 		}
 
 		G.Log.FlushAllLogs()
