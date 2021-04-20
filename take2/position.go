@@ -3,6 +3,7 @@ package take2
 import (
 	"fmt"
 	"strings"
+	"unsafe"
 )
 
 // Position - 局面
@@ -16,6 +17,8 @@ type Position struct {
 	Phase int
 	// 何手目か（＾～＾）
 	MovesNum int
+	// 指し手のリスト（＾～＾）
+	Moves []string
 }
 
 func NewPosition() *Position {
@@ -47,6 +50,8 @@ func (pos *Position) ResetToStartpos() {
 	pos.Phase = 1
 	// 何手目か
 	pos.MovesNum = 1
+	// 指し手のリスト
+	pos.Moves = []string{}
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -65,7 +70,7 @@ func (pos *Position) Sprint() string {
 		phase_str = "Second"
 	}
 
-	return "\n" +
+	var s1 = "\n" +
 		//
 		fmt.Sprintf("[%d moves / %s / ? repeats]\n", pos.MovesNum, phase_str) +
 		//
@@ -129,5 +134,14 @@ func (pos *Position) Sprint() string {
 		//
 		"      +--+--+--+--+--+--+--+\n" +
 		//
-		"\n"
+		"\n" +
+		//
+		"moves "
+
+	moves_list := make([]byte, 0, 512*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
+	for _, move := range pos.Moves {
+		moves_list = append(moves_list, move...)
+	}
+
+	return s1 + *(*string)(unsafe.Pointer(&moves_list)) + "\n"
 }
