@@ -2,8 +2,8 @@ package take2
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
-	"unsafe"
 )
 
 // Position - 局面
@@ -60,6 +60,55 @@ func (pos *Position) ReadPosition(command string) {
 
 	if strings.HasPrefix(command, "position startpos") {
 		pos.ResetToStartpos()
+		return
+	}
+
+	// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
+	var i = 14
+	var rank = 1
+	var file = 9
+
+BoardLoop:
+	for {
+		switch pc := command[i]; pc {
+		case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
+			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
+			pos.Board[file*10+rank] = string(pc)
+			file -= 1
+			i += 1
+		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
+			var spaces, _ = strconv.Atoi(string(pc))
+			fmt.Printf("[%s]=%d spaces\n", string(pc), spaces)
+			for sp := 0; sp < spaces; sp += 1 {
+				pos.Board[file*10+rank] = ""
+			}
+			file -= spaces
+			i += 1
+		case '+':
+			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
+			i += 1
+			switch pc2 := command[i]; pc2 {
+			case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
+				fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
+				pos.Board[file*10+rank] = "+" + string(pc2)
+				file -= 1
+				i += 1
+			default:
+				panic("Undefined sfen board+")
+			}
+		case '/':
+			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
+			file = 9
+			rank += 1
+			i += 1
+		case ' ':
+			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
+			i += 1
+			break BoardLoop
+		default:
+			panic("Undefined sfen board")
+		}
 	}
 }
 
@@ -143,5 +192,7 @@ func (pos *Position) Sprint() string {
 		moves_list = append(moves_list, move...)
 	}
 
-	return s1 + *(*string)(unsafe.Pointer(&moves_list)) + "\n"
+	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
+	// return s1 + *(*string)(unsafe.Pointer(&moves_list)) + "\n"
+	return s1 + string(moves_list) + "\n"
 }
