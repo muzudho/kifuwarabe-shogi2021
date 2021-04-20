@@ -82,8 +82,8 @@ BoardLoop:
 			fmt.Printf("[%s]=%d spaces\n", string(pc), spaces)
 			for sp := 0; sp < spaces; sp += 1 {
 				pos.Board[file*10+rank] = ""
+				file -= 1
 			}
-			file -= spaces
 			i += 1
 		case '+':
 			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
