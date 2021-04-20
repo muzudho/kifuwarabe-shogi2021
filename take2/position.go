@@ -8,8 +8,10 @@ import (
 // Position - 局面
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
-	// [19] は １九、 [91] は ９一（＾～＾）時計回りに９０°回転バロック・ダイアゴナルを軸に反転した将棋盤を想像しろだぜ（＾～＾）
+	// [19] は １九、 [91] は ９一（＾～＾）反時計回りに９０°回転した将棋盤の状態で入ってるぜ（＾～＾）想像しろだぜ（＾～＾）
 	Board []string
+	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
+	Hands []int
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -30,6 +32,10 @@ func (pos *Position) ReadPosition(command string) {
 			"8", "", "", "", "", "", "", "", "", "",
 			"9", "", "", "", "", "", "", "", "", "",
 		}
+		// 持ち駒の数
+		pos.Hands = []int{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		}
 	}
 }
 
@@ -38,6 +44,15 @@ func (pos *Position) Sprint() string {
 	return "\n" +
 		//
 		fmt.Sprintf("[? moves / First / ? repeats]\n") +
+		//
+		"\n" +
+		//
+		"  r  b  g  s  n  l  p\n" +
+		"+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pos.Hands[7], pos.Hands[8], pos.Hands[9], pos.Hands[10], pos.Hands[11], pos.Hands[12], pos.Hands[13]) +
+		//
+		"+--+--+--+--+--+--+--+\n" +
 		//
 		"\n" +
 		//
@@ -80,6 +95,15 @@ func (pos *Position) Sprint() string {
 		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[99], pos.Board[89], pos.Board[79], pos.Board[69], pos.Board[59], pos.Board[49], pos.Board[39], pos.Board[29], pos.Board[19], pos.Board[9]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		"\n" +
+		//
+		"        R  B  G  S  N  L  P\n" +
+		"      +--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pos.Hands[0], pos.Hands[1], pos.Hands[2], pos.Hands[3], pos.Hands[4], pos.Hands[5], pos.Hands[6]) +
+		//
+		"      +--+--+--+--+--+--+--+\n" +
 		//
 		"\n"
 }
