@@ -13,6 +13,41 @@ const (
 	SECOND
 )
 
+// 駒
+const (
+	PIECE_EMPTY = ""
+	PIECE_K1    = "K"
+	PIECE_R1    = "R"
+	PIECE_B1    = "B"
+	PIECE_G1    = "G"
+	PIECE_S1    = "S"
+	PIECE_N1    = "N"
+	PIECE_L1    = "L"
+	PIECE_P1    = "P"
+	PIECE_PR1   = "+R"
+	PIECE_PB1   = "+B"
+	PIECE_PG1   = "+G"
+	PIECE_PS1   = "+S"
+	PIECE_PN1   = "+N"
+	PIECE_PL1   = "+L"
+	PIECE_PP1   = "+P"
+	PIECE_K2    = "k"
+	PIECE_R2    = "r"
+	PIECE_B2    = "b"
+	PIECE_G2    = "g"
+	PIECE_S2    = "s"
+	PIECE_N2    = "n"
+	PIECE_L2    = "l"
+	PIECE_P2    = "p"
+	PIECE_PR2   = "+r"
+	PIECE_PB2   = "+b"
+	PIECE_PG2   = "+g"
+	PIECE_PS2   = "+s"
+	PIECE_PN2   = "+n"
+	PIECE_PL2   = "+l"
+	PIECE_PP2   = "+p"
+)
+
 // Position - 局面
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
@@ -63,8 +98,11 @@ func (pos *Position) ResetToStartpos() {
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
 func (pos *Position) ReadPosition(command string) {
+	// めんどくさいんで、初期化の代わりに 平手初期局面をセットするぜ（＾～＾） 盤面は あとで上書きされるから大丈夫（＾～＾）
+	pos.ResetToStartpos()
+
 	if strings.HasPrefix(command, "position startpos") {
-		pos.ResetToStartpos()
+		// 平手初期局面が指定されたら、さっき初期化したんで、そのまま終了だぜ（＾～＾）
 		return
 	}
 
@@ -135,15 +173,42 @@ BoardLoop:
 		}
 		i += 1
 	} else {
-	MoveLoop:
+	HandLoop:
 		for {
-			var piece_type = command[i]
-			switch piece_type {
-			case 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'r', 'b', 'g', 's', 'n', 'l', 'p':
-
+			var drop_index int
+			var piece = command[i]
+			switch piece {
+			case 'R':
+				drop_index = DROP_R1
+			case 'B':
+				drop_index = DROP_B1
+			case 'G':
+				drop_index = DROP_G1
+			case 'S':
+				drop_index = DROP_S1
+			case 'N':
+				drop_index = DROP_N1
+			case 'L':
+				drop_index = DROP_L1
+			case 'P':
+				drop_index = DROP_P1
+			case 'r':
+				drop_index = DROP_R2
+			case 'b':
+				drop_index = DROP_B2
+			case 'g':
+				drop_index = DROP_G2
+			case 's':
+				drop_index = DROP_S2
+			case 'n':
+				drop_index = DROP_N2
+			case 'l':
+				drop_index = DROP_L2
+			case 'p':
+				drop_index = DROP_P2
 			case ' ':
 				i += 1
-				break MoveLoop
+				break HandLoop
 			default:
 				panic("Fatal: 知らん持ち駒（＾～＾）")
 			}
@@ -162,11 +227,13 @@ BoardLoop:
 					number += num
 				case ' ':
 					i += 1
-					break MoveLoop
+					break HandLoop
 				default:
 					break NumberLoop
 				}
 			}
+
+			pos.Hands[drop_index] = number
 		}
 	}
 
@@ -452,5 +519,127 @@ func (pos *Position) DoMove(command string) {
 		i += 3
 	} else {
 		fmt.Printf("Error: 知らないコマンドだぜ（＾～＾） command=%s", command)
+	}
+
+	// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
+	var move, err = ParseMove(command, &i, pos.Phase)
+	if err != nil {
+		fmt.Println(pos.Sprint())
+		panic(err)
+	}
+
+	switch move.Squares[0] {
+	case DROP_R1:
+		pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_R1
+	case DROP_B1:
+		pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_B1
+	case DROP_G1:
+		pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_G1
+	case DROP_S1:
+		pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_S1
+	case DROP_N1:
+		pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_N1
+	case DROP_L1:
+		pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_L1
+	case DROP_P1:
+		pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_P1
+	case DROP_R2:
+		pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_R2
+	case DROP_B2:
+		pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_B2
+	case DROP_G2:
+		pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_G2
+	case DROP_S2:
+		pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_S2
+	case DROP_N2:
+		pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_N2
+	case DROP_L2:
+		pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_L2
+	case DROP_P2:
+		pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+		pos.Board[move.Squares[1]] = PIECE_P2
+	default:
+		// あれば、取った駒
+		captured := pos.Board[move.Squares[1]]
+		pos.Board[move.Squares[1]] = pos.Board[move.Squares[0]]
+		pos.Board[move.Squares[0]] = PIECE_EMPTY
+		switch captured {
+		case PIECE_EMPTY: // Ignored
+		case PIECE_K1: // Second player win
+			// Lost first king
+		case PIECE_R1:
+			pos.Hands[DROP_R2-DROP_ORIGIN] += 1
+		case PIECE_B1:
+			pos.Hands[DROP_B2-DROP_ORIGIN] += 1
+		case PIECE_G1:
+			pos.Hands[DROP_G2-DROP_ORIGIN] += 1
+		case PIECE_S1:
+			pos.Hands[DROP_S2-DROP_ORIGIN] += 1
+		case PIECE_N1:
+			pos.Hands[DROP_N2-DROP_ORIGIN] += 1
+		case PIECE_L1:
+			pos.Hands[DROP_L2-DROP_ORIGIN] += 1
+		case PIECE_P1:
+			pos.Hands[DROP_P2-DROP_ORIGIN] += 1
+		case PIECE_PR1:
+			pos.Hands[DROP_R2-DROP_ORIGIN] += 1
+		case PIECE_PB1:
+			pos.Hands[DROP_B2-DROP_ORIGIN] += 1
+		case PIECE_PG1:
+			pos.Hands[DROP_G2-DROP_ORIGIN] += 1
+		case PIECE_PS1:
+			pos.Hands[DROP_S2-DROP_ORIGIN] += 1
+		case PIECE_PN1:
+			pos.Hands[DROP_N2-DROP_ORIGIN] += 1
+		case PIECE_PL1:
+			pos.Hands[DROP_L2-DROP_ORIGIN] += 1
+		case PIECE_PP1:
+			pos.Hands[DROP_P2-DROP_ORIGIN] += 1
+		case PIECE_K2: // First player win
+			// Lost second king
+		case PIECE_R2:
+			pos.Hands[DROP_R1-DROP_ORIGIN] += 1
+		case PIECE_B2:
+			pos.Hands[DROP_B1-DROP_ORIGIN] += 1
+		case PIECE_G2:
+			pos.Hands[DROP_G1-DROP_ORIGIN] += 1
+		case PIECE_S2:
+			pos.Hands[DROP_S1-DROP_ORIGIN] += 1
+		case PIECE_N2:
+			pos.Hands[DROP_N1-DROP_ORIGIN] += 1
+		case PIECE_L2:
+			pos.Hands[DROP_L1-DROP_ORIGIN] += 1
+		case PIECE_P2:
+			pos.Hands[DROP_P1-DROP_ORIGIN] += 1
+		case PIECE_PR2:
+			pos.Hands[DROP_R1-DROP_ORIGIN] += 1
+		case PIECE_PB2:
+			pos.Hands[DROP_B1-DROP_ORIGIN] += 1
+		case PIECE_PG2:
+			pos.Hands[DROP_G1-DROP_ORIGIN] += 1
+		case PIECE_PS2:
+			pos.Hands[DROP_S1-DROP_ORIGIN] += 1
+		case PIECE_PN2:
+			pos.Hands[DROP_N1-DROP_ORIGIN] += 1
+		case PIECE_PL2:
+			pos.Hands[DROP_L1-DROP_ORIGIN] += 1
+		case PIECE_PP2:
+			pos.Hands[DROP_P1-DROP_ORIGIN] += 1
+		default:
+			fmt.Printf("Error: 知らん駒を取ったぜ（＾～＾） captured=[%s]", captured)
+		}
 	}
 }

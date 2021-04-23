@@ -17,6 +17,7 @@ const (
 	DROP_N2
 	DROP_L2
 	DROP_P2
+	DROP_ORIGIN = DROP_R1
 )
 
 // Move - 指し手
