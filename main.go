@@ -1,9 +1,17 @@
 package main
 
-import "github.com/muzudho/kifuwarabe-shogi2021/take6"
+import (
+	"math/rand"
+	"time"
+
+	"github.com/muzudho/kifuwarabe-shogi2021/take6"
+)
 
 // main - 最初に実行されます
 func main() {
+	// ゲーム向けの軽い乱数のタネ
+	rand.Seed(time.Now().UnixNano())
+
 	// fmt.Println("Hello, world!")
 	// take1.MainLoop()
 	// take2.MainLoop()
