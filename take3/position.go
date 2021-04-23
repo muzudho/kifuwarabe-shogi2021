@@ -281,6 +281,11 @@ MovesNumLoop:
 		}
 		pos.Moves = append(pos.Moves, move)
 	}
+
+	// 読込んだ Move を全て実行します
+	for _, move := range pos.Moves {
+		pos.DoMove(move)
+	}
 }
 
 // ParseMove
@@ -513,21 +518,7 @@ func (pos *Position) Sprint() string {
 }
 
 // DoMove - 一手指すぜ（＾～＾）
-func (pos *Position) DoMove(command string) {
-	var i = 0
-	if strings.HasPrefix(command, "do ") {
-		i += 3
-	} else {
-		fmt.Printf("Error: 知らないコマンドだぜ（＾～＾） command=%s", command)
-	}
-
-	// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
-	var move, err = ParseMove(command, &i, pos.Phase)
-	if err != nil {
-		fmt.Println(pos.Sprint())
-		panic(err)
-	}
-
+func (pos *Position) DoMove(move Move) {
 	switch move.Squares[0] {
 	case DROP_R1:
 		pos.Hands[DROP_R1-DROP_ORIGIN] -= 1

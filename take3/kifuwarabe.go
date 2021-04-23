@@ -107,8 +107,16 @@ MainLoop:
 			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
 			G.Chat.Debug(pos.Sprint())
 		case "do":
-			// １手指すぜ
-			pos.DoMove(command)
+			// １手指すぜ（＾～＾）
+			// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
+			i := 3
+			var move, err = ParseMove(command, &i, pos.Phase)
+			if err != nil {
+				fmt.Println(pos.Sprint())
+				panic(err)
+			}
+
+			pos.DoMove(move)
 		}
 
 		G.Log.FlushAllLogs()
