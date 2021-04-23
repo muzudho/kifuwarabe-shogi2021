@@ -102,7 +102,7 @@ func (pos *Position) ResetToStartpos() {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}
 	// 先手の局面
-	pos.Phase = 1
+	pos.Phase = FIRST
 	// 何手目か
 	pos.StartMovesNum = 1
 	pos.OffsetMovesIndex = 0
@@ -174,10 +174,10 @@ func (pos *Position) ReadPosition(command string) {
 		// 手番
 		switch command[i] {
 		case 'b':
-			pos.Phase = 1
+			pos.Phase = FIRST
 			i += 1
 		case 'w':
-			pos.Phase = 2
+			pos.Phase = SECOND
 			i += 1
 		default:
 			panic("Fatal: 手番わかんない（＾～＾）")
@@ -292,6 +292,7 @@ func (pos *Position) ReadPosition(command string) {
 	}
 
 	// 半角スペースに始まり、文字列の終わりで終わるぜ（＾～＾）
+	start_phase := pos.Phase
 	for i < len {
 		if command[i] != ' ' {
 			break
@@ -306,12 +307,14 @@ func (pos *Position) ReadPosition(command string) {
 		}
 		pos.Moves[pos.OffsetMovesIndex] = move
 		pos.OffsetMovesIndex += 1
+		pos.Phase = pos.Phase%2 + 1
 	}
 
 	// 読込んだ Move を、上書きする感じで、もう一回 全て実行（＾～＾）
 	moves_size := pos.OffsetMovesIndex
 	// 一旦 0 リセットするぜ（＾～＾）
 	pos.OffsetMovesIndex = 0
+	pos.Phase = start_phase
 	for i = 0; i < moves_size; i += 1 {
 		pos.DoMove(pos.Moves[i])
 	}
@@ -469,8 +472,10 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 
 // Print - 局面出力（＾ｑ＾）
 func (pos *Position) Sprint() string {
-	var phase_str = "First"
-	if pos.Phase == 2 {
+	var phase_str = "?"
+	if pos.Phase == FIRST {
+		phase_str = "First"
+	} else if pos.Phase == SECOND {
 		phase_str = "Second"
 	}
 
@@ -674,6 +679,7 @@ func (pos *Position) DoMove(move Move) {
 
 	pos.Moves[pos.OffsetMovesIndex] = move
 	pos.OffsetMovesIndex += 1
+	pos.Phase = pos.Phase%2 + 1
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
@@ -683,6 +689,7 @@ func (pos *Position) UndoMove() {
 	}
 
 	pos.OffsetMovesIndex -= 1
+	pos.Phase = pos.Phase%2 + 1
 	move := pos.Moves[pos.OffsetMovesIndex]
 	captured := pos.CapturedList[pos.OffsetMovesIndex]
 
