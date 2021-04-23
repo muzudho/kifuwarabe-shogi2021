@@ -112,16 +112,97 @@ BoardLoop:
 		}
 	}
 
-	if strings.HasPrefix(command[i:], " moves") {
-		i += 6
+	// 手番
+	switch command[i] {
+	case 'b':
+		pos.Phase = 1
+		i += 1
+	case 'w':
+		pos.Phase = 2
+		i += 1
+	default:
+		panic("Fatal: 手番わかんない（＾～＾）")
+	}
+
+	if command[i] != ' ' {
+		panic("Fatal: 手番の後ろにスペースがない（＾～＾）")
+	}
+	i += 1
+
+	// 持ち駒
+	if command[i] == '-' {
+		i += 1
+		if command[i] != ' ' {
+			panic("Fatal: 持ち駒 - の後ろにスペースがない（＾～＾）")
+		}
+		i += 1
+	} else {
+	MoveLoop:
+		for {
+			var piece_type = command[i]
+			switch piece_type {
+			case 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'r', 'b', 'g', 's', 'n', 'l', 'p':
+
+			case ' ':
+				i += 1
+				break MoveLoop
+			default:
+				panic("Fatal: 知らん持ち駒（＾～＾）")
+			}
+
+			var number = 0
+		NumberLoop:
+			for {
+				switch figure := command[i]; figure {
+				case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+					num, err := strconv.Atoi(string(figure))
+					if err != nil {
+						panic(err)
+					}
+					i += 1
+					number *= 10
+					number += num
+				case ' ':
+					i += 1
+					break MoveLoop
+				default:
+					break NumberLoop
+				}
+			}
+		}
+	}
+
+	// 手数
+	pos.MovesNum = 0
+MovesNumLoop:
+	for i < len {
+		switch figure := command[i]; figure {
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			num, err := strconv.Atoi(string(figure))
+			if err != nil {
+				panic(err)
+			}
+			i += 1
+			pos.MovesNum *= 10
+			pos.MovesNum += num
+		case ' ':
+			i += 1
+			break MovesNumLoop
+		default:
+			break MovesNumLoop
+		}
+	}
+
+	// fmt.Printf("command[i:]=[%s]\n", command[i:])
+
+	if strings.HasPrefix(command[i:], "moves") {
+		i += 5
 	} else {
 		return
 	}
 
-	var move = make([]byte, 0, 5)
-	var j = 0
 	for i < len {
-		j = 0
+		var move = make([]byte, 0, 5)
 		if command[i] != ' ' {
 			break
 		}
@@ -133,19 +214,17 @@ BoardLoop:
 		switch ch := command[i]; ch {
 		case 'R', 'B', 'G', 'S', 'N', 'L', 'P':
 			i += 1
-			move[j] = ch
-			j += 1
+			move = append(move, ch)
 
 			if command[i] != '+' {
 				panic("Fatal: +じゃなかった（＾～＾）")
 			}
 
 			i += 1
-			move[j] = '+'
-			j += 1
+			move = append(move, '+')
 			count = 1
 		default:
-			panic("Fatal: なんか分かんないmove（＾～＾）")
+			// Ignored
 		}
 
 		// file, rank
@@ -153,27 +232,27 @@ BoardLoop:
 			switch ch := command[i]; ch {
 			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 				i += 1
-				move[j] = ch
-				j += 1
+				move = append(move, ch)
 
 				switch ch2 := command[i]; ch2 {
 				case 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i':
 					i += 1
-					move[j] = ch2
-					j += 1
+					move = append(move, ch2)
 				default:
-					panic("Fatal: なんか分かんないfileかrank（＾～＾）")
+					panic(fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2))
 				}
 
 			default:
-				panic("Fatal: なんか分かんないmove（＾～＾）")
+				fmt.Println(pos.Sprint())
+				panic(fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' move=%s", ch, string(move)))
 			}
+
+			count += 1
 		}
 
 		if i < len && command[i] == '+' {
 			i += 1
-			move[j] = '+'
-			j += 1
+			move = append(move, '+')
 		}
 
 		pos.Moves = append(pos.Moves, string(move))
@@ -253,10 +332,11 @@ func (pos *Position) Sprint() string {
 		//
 		"\n" +
 		//
-		"moves "
+		"moves"
 
 	moves_list := make([]byte, 0, 512*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
 	for _, move := range pos.Moves {
+		moves_list = append(moves_list, ' ')
 		moves_list = append(moves_list, move...)
 	}
 
