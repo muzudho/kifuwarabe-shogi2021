@@ -1,4 +1,4 @@
-package take4
+package take5
 
 import (
 	"fmt"
@@ -462,7 +462,7 @@ func (pos *Position) Sprint() string {
 
 	var s1 = "\n" +
 		//
-		fmt.Sprintf("[%d + %d moves / %s / ? repeats]\n", pos.StartMovesNum, pos.OffsetMovesIndex, phase_str) +
+		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pos.StartMovesNum, (pos.StartMovesNum+pos.OffsetMovesIndex), phase_str) +
 		//
 		"\n" +
 		//
@@ -528,15 +528,15 @@ func (pos *Position) Sprint() string {
 		//
 		"moves"
 
-	moves_list := make([]byte, 0, 512*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
-	for _, pMove := range pos.Moves {
-		moves_list = append(moves_list, ' ')
-		moves_list = append(moves_list, pMove.ToCode()...)
+	moves_text := make([]byte, 0, MOVES_SIZE*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
+	for i := 0; i < pos.OffsetMovesIndex; i += 1 {
+		moves_text = append(moves_text, ' ')
+		moves_text = append(moves_text, pos.Moves[i].ToCode()...)
 	}
 
 	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
-	// return s1 + *(*string)(unsafe.Pointer(&moves_list)) + "\n"
-	return s1 + string(moves_list) + "\n"
+	//return s1 + *(*string)(unsafe.Pointer(&moves_text)) + "\n"
+	return s1 + string(moves_text) + "\n"
 }
 
 // DoMove - 一手指すぜ（＾～＾）

@@ -1,4 +1,4 @@
-package take4
+package take5
 
 import "fmt"
 
@@ -91,7 +91,7 @@ func (move Move) ToCode() string {
 		// '0'=48, '9'=57, 'a'=97, 'i'=105
 		str = append(str, file+48)
 		str = append(str, rank+96)
-		// fmt.Printf("Debug: file=%d rank=%d\n", file, rank)
+		// fmt.Printf("Debug: move=%d sq=%d count=%d file=%d rank=%d\n", uint32(move), sq, count, file, rank)
 		count += 1
 	}
 
