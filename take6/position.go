@@ -9,11 +9,16 @@ import (
 // 電竜戦が一番長いだろ（＾～＾）
 const MOVES_SIZE = 512
 
+// 1:先手 2:後手
+type Phase byte
+
 const (
+	// 空マス
+	ZEROTH = Phase(0)
 	// 先手
-	FIRST = iota + 1
+	FIRST = Phase(1)
 	// 後手
-	SECOND
+	SECOND = Phase(2)
 )
 
 // 駒
@@ -59,7 +64,7 @@ type Position struct {
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
 	// 先手が1、後手が2（＾～＾）
-	Phase int
+	Phase Phase
 	// 開始局面の時点で何手目か（＾～＾）これは表示のための飾りのようなものだぜ（＾～＾）
 	StartMovesNum int
 	// 開始局面から数えて何手目か（＾～＾）0から始まるぜ（＾～＾）
@@ -304,7 +309,7 @@ MovesNumLoop:
 }
 
 // ParseMove
-func ParseMove(command string, i *int, phase int) (Move, error) {
+func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	var len = len(command)
 	var move = NewMoveValue()
 
