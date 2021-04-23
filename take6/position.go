@@ -302,6 +302,7 @@ func (pos *Position) ReadPosition(command string) {
 		// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
 		var move, err = ParseMove(command, &i, pos.Phase)
 		if err != nil {
+			fmt.Println(err)
 			fmt.Println(pos.Sprint())
 			panic(err)
 		}

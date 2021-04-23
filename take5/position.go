@@ -315,81 +315,88 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 	switch ch := command[*i]; ch {
 	case 'R':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_R1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_R2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'B':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_B1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_B2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'G':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_G1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_G2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'S':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_S1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_S2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'N':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_N1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_N2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'L':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_L1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_L2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'P':
 		*i += 1
+		count = 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(uint32(DROP_P1))
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_P2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	default:
 		// Ignored
 	}
 
 	if count == 1 {
-		if command[*i] != '+' {
-			return *new(Move), fmt.Errorf("Fatal: +じゃなかった（＾～＾）")
+		if command[*i] != '*' {
+			return *new(Move), fmt.Errorf("Fatal: no *")
 		}
 		*i += 1
 	}
@@ -426,7 +433,7 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 			case 'i':
 				rank = 9
 			default:
-				return *new(Move), fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2)
+				return *new(Move), fmt.Errorf("Fatal: Unknown file or rank. ch2='%c'", ch2)
 			}
 			*i += 1
 
@@ -436,10 +443,10 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 			} else if count == 1 {
 				move = move.ReplaceDestination(uint32(sq))
 			} else {
-				return *new(Move), fmt.Errorf("Fatal: なんか分かんないcount（＾～＾） count='%c'", count)
+				return *new(Move), fmt.Errorf("Fatal: Unknown count='%c'", count)
 			}
 		default:
-			return *new(Move), fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' i='%d'", ch, *i)
+			return *new(Move), fmt.Errorf("Fatal: Unknown move. ch='%c' i='%d'", ch, *i)
 		}
 
 		count += 1
