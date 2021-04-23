@@ -63,6 +63,7 @@ func (pos *Position) ReadPosition(command string) {
 		return
 	}
 
+	var len = len(command)
 	// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
 	var i = 14
 	var rank = 1
@@ -109,6 +110,73 @@ BoardLoop:
 		default:
 			panic("Undefined sfen board")
 		}
+	}
+
+	if strings.HasPrefix(command[i:], " moves") {
+		i += 6
+	} else {
+		return
+	}
+
+	var move = make([]byte, 0, 5)
+	var j = 0
+	for i < len {
+		j = 0
+		if command[i] != ' ' {
+			break
+		}
+		i += 1
+
+		var count = 0
+
+		// file
+		switch ch := command[i]; ch {
+		case 'R', 'B', 'G', 'S', 'N', 'L', 'P':
+			i += 1
+			move[j] = ch
+			j += 1
+
+			if command[i] != '+' {
+				panic("Fatal: +じゃなかった（＾～＾）")
+			}
+
+			i += 1
+			move[j] = '+'
+			j += 1
+			count = 1
+		default:
+			panic("Fatal: なんか分かんないmove（＾～＾）")
+		}
+
+		// file, rank
+		for count < 2 {
+			switch ch := command[i]; ch {
+			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+				i += 1
+				move[j] = ch
+				j += 1
+
+				switch ch2 := command[i]; ch2 {
+				case 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i':
+					i += 1
+					move[j] = ch2
+					j += 1
+				default:
+					panic("Fatal: なんか分かんないfileかrank（＾～＾）")
+				}
+
+			default:
+				panic("Fatal: なんか分かんないmove（＾～＾）")
+			}
+		}
+
+		if i < len && command[i] == '+' {
+			i += 1
+			move[j] = '+'
+			j += 1
+		}
+
+		pos.Moves = append(pos.Moves, string(move))
 	}
 }
 
