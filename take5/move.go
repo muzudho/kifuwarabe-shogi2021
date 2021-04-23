@@ -91,7 +91,7 @@ func (move Move) ToCode() string {
 		// '0'=48, '9'=57, 'a'=97, 'i'=105
 		str = append(str, file+48)
 		str = append(str, rank+96)
-		fmt.Printf("Debug: file=%d rank=%d\n", file, rank)
+		// fmt.Printf("Debug: file=%d rank=%d\n", file, rank)
 		count += 1
 	}
 
