@@ -1,4 +1,4 @@
-package take2
+package take3
 
 import (
 	"fmt"
@@ -56,8 +56,6 @@ func (pos *Position) ResetToStartpos() {
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
 func (pos *Position) ReadPosition(command string) {
-	G.Log.Trace("command=%s\n", command)
-
 	if strings.HasPrefix(command, "position startpos") {
 		pos.ResetToStartpos()
 		return
@@ -73,25 +71,20 @@ BoardLoop:
 	for {
 		switch pc := command[i]; pc {
 		case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
-			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
 			pos.Board[file*10+rank] = string(pc)
 			file -= 1
 			i += 1
 		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
 			var spaces, _ = strconv.Atoi(string(pc))
-			fmt.Printf("[%s]=%d spaces\n", string(pc), spaces)
 			for sp := 0; sp < spaces; sp += 1 {
 				pos.Board[file*10+rank] = ""
 				file -= 1
 			}
 			i += 1
 		case '+':
-			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
 			i += 1
 			switch pc2 := command[i]; pc2 {
 			case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
-				fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
 				pos.Board[file*10+rank] = "+" + string(pc2)
 				file -= 1
 				i += 1
@@ -99,12 +92,10 @@ BoardLoop:
 				panic("Undefined sfen board+")
 			}
 		case '/':
-			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
 			file = 9
 			rank += 1
 			i += 1
 		case ' ':
-			fmt.Printf("(%d,%d) [%s]\n", file, rank, string(pc))
 			i += 1
 			break BoardLoop
 		default:
@@ -201,62 +192,75 @@ MovesNumLoop:
 		return
 	}
 
+	// 半角スペースに始まり、文字列の終わりで終わるぜ（＾～＾）
 	for i < len {
-		var move = make([]byte, 0, 5)
 		if command[i] != ' ' {
 			break
 		}
 		i += 1
 
-		var count = 0
+		// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
+		var move, err = ParseMove(command, &i)
+		if err != nil {
+			fmt.Println(pos.Sprint())
+			panic(err)
+		}
+		pos.Moves = append(pos.Moves, move)
+	}
+}
 
-		// file
-		switch ch := command[i]; ch {
-		case 'R', 'B', 'G', 'S', 'N', 'L', 'P':
-			i += 1
+// ParseMove
+func ParseMove(command string, i *int) (string, error) {
+	var len = len(command)
+	var move = make([]byte, 0, 5)
+
+	var count = 0
+
+	// file
+	switch ch := command[*i]; ch {
+	case 'R', 'B', 'G', 'S', 'N', 'L', 'P':
+		*i += 1
+		move = append(move, ch)
+
+		if command[*i] != '+' {
+			return "", fmt.Errorf("Fatal: +じゃなかった（＾～＾）")
+		}
+
+		*i += 1
+		move = append(move, '+')
+		count = 1
+	default:
+		// Ignored
+	}
+
+	// file, rank
+	for count < 2 {
+		switch ch := command[*i]; ch {
+		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			*i += 1
 			move = append(move, ch)
 
-			if command[i] != '+' {
-				panic("Fatal: +じゃなかった（＾～＾）")
-			}
-
-			i += 1
-			move = append(move, '+')
-			count = 1
-		default:
-			// Ignored
-		}
-
-		// file, rank
-		for count < 2 {
-			switch ch := command[i]; ch {
-			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
-				i += 1
-				move = append(move, ch)
-
-				switch ch2 := command[i]; ch2 {
-				case 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i':
-					i += 1
-					move = append(move, ch2)
-				default:
-					panic(fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2))
-				}
-
+			switch ch2 := command[*i]; ch2 {
+			case 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i':
+				*i += 1
+				move = append(move, ch2)
 			default:
-				fmt.Println(pos.Sprint())
-				panic(fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' move=%s", ch, string(move)))
+				return "", fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2)
 			}
 
-			count += 1
+		default:
+			return "", fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' move=%s", ch, string(move))
 		}
 
-		if i < len && command[i] == '+' {
-			i += 1
-			move = append(move, '+')
-		}
-
-		pos.Moves = append(pos.Moves, string(move))
+		count += 1
 	}
+
+	if *i < len && command[*i] == '+' {
+		*i += 1
+		move = append(move, '+')
+	}
+
+	return string(move), nil
 }
 
 // Print - 局面出力（＾ｑ＾）
@@ -343,4 +347,14 @@ func (pos *Position) Sprint() string {
 	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
 	// return s1 + *(*string)(unsafe.Pointer(&moves_list)) + "\n"
 	return s1 + string(moves_list) + "\n"
+}
+
+// DoMove - 一手指すぜ（＾～＾）
+func (pos *Position) DoMove(command string) {
+	var i = 0
+	if strings.HasPrefix(command, "do ") {
+		i += 3
+	} else {
+		fmt.Printf("Error: 知らないコマンドだぜ（＾～＾） command=%s", command)
+	}
 }

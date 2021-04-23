@@ -1,4 +1,4 @@
-package take2
+package take3
 
 import (
 	"bufio"
@@ -85,6 +85,8 @@ func MainLoop() {
 MainLoop:
 	for scanner.Scan() {
 		command := scanner.Text()
+		G.Log.Trace("command=%s\n", command)
+
 		tokens := strings.Split(command, " ")
 		switch tokens[0] {
 		case "usi":
@@ -104,6 +106,9 @@ MainLoop:
 		case "pos":
 			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
 			G.Chat.Debug(pos.Sprint())
+		case "do":
+			// １手指すぜ
+			pos.DoMove(command)
 		}
 
 		G.Log.FlushAllLogs()
