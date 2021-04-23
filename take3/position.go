@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+const (
+	// 先手
+	FIRST = iota + 1
+	// 後手
+	SECOND
+)
+
 // Position - 局面
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
@@ -18,7 +25,7 @@ type Position struct {
 	// 何手目か（＾～＾）
 	MovesNum int
 	// 指し手のリスト（＾～＾）
-	Moves []string
+	Moves []Move
 }
 
 func NewPosition() *Position {
@@ -51,7 +58,7 @@ func (pos *Position) ResetToStartpos() {
 	// 何手目か
 	pos.MovesNum = 1
 	// 指し手のリスト
-	pos.Moves = []string{}
+	pos.Moves = []Move{}
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -200,7 +207,7 @@ MovesNumLoop:
 		i += 1
 
 		// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
-		var move, err = ParseMove(command, &i)
+		var move, err = ParseMove(command, &i, pos.Phase)
 		if err != nil {
 			fmt.Println(pos.Sprint())
 			panic(err)
@@ -210,27 +217,94 @@ MovesNumLoop:
 }
 
 // ParseMove
-func ParseMove(command string, i *int) (string, error) {
+func ParseMove(command string, i *int, phase int) (Move, error) {
 	var len = len(command)
-	var move = make([]byte, 0, 5)
+	var pMove = NewMove()
 
+	// 0=移動元 1=移動先
 	var count = 0
 
 	// file
 	switch ch := command[*i]; ch {
-	case 'R', 'B', 'G', 'S', 'N', 'L', 'P':
+	case 'R':
 		*i += 1
-		move = append(move, ch)
-
-		if command[*i] != '+' {
-			return "", fmt.Errorf("Fatal: +じゃなかった（＾～＾）")
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_R1
+		case SECOND:
+			pMove.Squares[0] = DROP_R2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
-
+	case 'B':
 		*i += 1
-		move = append(move, '+')
-		count = 1
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_B1
+		case SECOND:
+			pMove.Squares[0] = DROP_B2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+		}
+	case 'G':
+		*i += 1
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_G1
+		case SECOND:
+			pMove.Squares[0] = DROP_G2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+		}
+	case 'S':
+		*i += 1
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_S1
+		case SECOND:
+			pMove.Squares[0] = DROP_S2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+		}
+	case 'N':
+		*i += 1
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_N1
+		case SECOND:
+			pMove.Squares[0] = DROP_N2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+		}
+	case 'L':
+		*i += 1
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_L1
+		case SECOND:
+			pMove.Squares[0] = DROP_L2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+		}
+	case 'P':
+		*i += 1
+		switch phase {
+		case FIRST:
+			pMove.Squares[0] = DROP_P1
+		case SECOND:
+			pMove.Squares[0] = DROP_P2
+		default:
+			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+		}
 	default:
 		// Ignored
+	}
+
+	if count == 1 {
+		if command[*i] != '+' {
+			return *new(Move), fmt.Errorf("Fatal: +じゃなかった（＾～＾）")
+		}
+		*i += 1
 	}
 
 	// file, rank
@@ -238,18 +312,40 @@ func ParseMove(command string, i *int) (string, error) {
 		switch ch := command[*i]; ch {
 		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			*i += 1
-			move = append(move, ch)
-
-			switch ch2 := command[*i]; ch2 {
-			case 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i':
-				*i += 1
-				move = append(move, ch2)
-			default:
-				return "", fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2)
+			file_int, err := strconv.Atoi(string(ch))
+			if err != nil {
+				panic(err)
 			}
+			file := byte(file_int)
 
+			var rank byte
+			switch ch2 := command[*i]; ch2 {
+			case 'a':
+				rank = 1
+			case 'b':
+				rank = 2
+			case 'c':
+				rank = 3
+			case 'd':
+				rank = 4
+			case 'e':
+				rank = 5
+			case 'f':
+				rank = 6
+			case 'g':
+				rank = 7
+			case 'h':
+				rank = 8
+			case 'i':
+				rank = 9
+			default:
+				return *new(Move), fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2)
+			}
+			*i += 1
+
+			pMove.Squares[count] = file*10 + rank
 		default:
-			return "", fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' move=%s", ch, string(move))
+			return *new(Move), fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' i='%d'", ch, *i)
 		}
 
 		count += 1
@@ -257,10 +353,10 @@ func ParseMove(command string, i *int) (string, error) {
 
 	if *i < len && command[*i] == '+' {
 		*i += 1
-		move = append(move, '+')
+		pMove.Promotion = true
 	}
 
-	return string(move), nil
+	return *pMove, nil
 }
 
 // Print - 局面出力（＾ｑ＾）
@@ -339,9 +435,9 @@ func (pos *Position) Sprint() string {
 		"moves"
 
 	moves_list := make([]byte, 0, 512*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
-	for _, move := range pos.Moves {
+	for _, pMove := range pos.Moves {
 		moves_list = append(moves_list, ' ')
-		moves_list = append(moves_list, move...)
+		moves_list = append(moves_list, pMove.ToCode()...)
 	}
 
 	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
