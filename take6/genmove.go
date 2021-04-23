@@ -1,7 +1,5 @@
 package take6
 
-import "fmt"
-
 // GenMoveList - 現局面の指し手のリスト。合法手とは限らないし、全ての合法手を含むとも限らないぜ（＾～＾）
 func GenMoveList(pPos *Position) []Move {
 
@@ -46,7 +44,8 @@ func GenMoveList(pPos *Position) []Move {
 	return move_list
 }
 
+// Hetero - 移動元と移動先の駒を持つプレイヤーが異なれば真。片方が空マスでも真
 func (pPos *Position) Hetero(from uint32, to uint32) bool {
-	fmt.Printf("Debug: from=%d to=%d\n", from, to)
+	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
 	return Who(pPos.Board[from]) != Who(pPos.Board[to])
 }

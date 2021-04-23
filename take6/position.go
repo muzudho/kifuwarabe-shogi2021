@@ -117,161 +117,170 @@ func (pos *Position) ReadPosition(command string) {
 	// めんどくさいんで、初期化の代わりに 平手初期局面をセットするぜ（＾～＾） 盤面は あとで上書きされるから大丈夫（＾～＾）
 	pos.ResetToStartpos()
 
+	var len = len(command)
+	var i int
 	if strings.HasPrefix(command, "position startpos") {
 		// 平手初期局面が指定されたら、さっき初期化したんで、そのまま終了だぜ（＾～＾）
-		return
-	}
+		i = 17
 
-	var len = len(command)
-	// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
-	var i = 14
-	var rank = 1
-	var file = 9
+		if i >= len || command[i] != ' ' {
+			return
+		}
+		i += 1
+		// moves へ続くぜ（＾～＾）
 
-BoardLoop:
-	for {
-		switch pc := command[i]; pc {
-		case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
-			pos.Board[file*10+rank] = string(pc)
-			file -= 1
-			i += 1
-		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			var spaces, _ = strconv.Atoi(string(pc))
-			for sp := 0; sp < spaces; sp += 1 {
-				pos.Board[file*10+rank] = ""
-				file -= 1
-			}
-			i += 1
-		case '+':
-			i += 1
-			switch pc2 := command[i]; pc2 {
-			case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
-				pos.Board[file*10+rank] = "+" + string(pc2)
+	} else {
+		// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
+		i = 14
+		var rank = 1
+		var file = 9
+
+	BoardLoop:
+		for {
+			switch pc := command[i]; pc {
+			case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
+				pos.Board[file*10+rank] = string(pc)
 				file -= 1
 				i += 1
-			default:
-				panic("Undefined sfen board+")
-			}
-		case '/':
-			file = 9
-			rank += 1
-			i += 1
-		case ' ':
-			i += 1
-			break BoardLoop
-		default:
-			panic("Undefined sfen board")
-		}
-	}
-
-	// 手番
-	switch command[i] {
-	case 'b':
-		pos.Phase = 1
-		i += 1
-	case 'w':
-		pos.Phase = 2
-		i += 1
-	default:
-		panic("Fatal: 手番わかんない（＾～＾）")
-	}
-
-	if command[i] != ' ' {
-		panic("Fatal: 手番の後ろにスペースがない（＾～＾）")
-	}
-	i += 1
-
-	// 持ち駒
-	if command[i] == '-' {
-		i += 1
-		if command[i] != ' ' {
-			panic("Fatal: 持ち駒 - の後ろにスペースがない（＾～＾）")
-		}
-		i += 1
-	} else {
-	HandLoop:
-		for {
-			var drop_index int
-			var piece = command[i]
-			switch piece {
-			case 'R':
-				drop_index = DROP_R1
-			case 'B':
-				drop_index = DROP_B1
-			case 'G':
-				drop_index = DROP_G1
-			case 'S':
-				drop_index = DROP_S1
-			case 'N':
-				drop_index = DROP_N1
-			case 'L':
-				drop_index = DROP_L1
-			case 'P':
-				drop_index = DROP_P1
-			case 'r':
-				drop_index = DROP_R2
-			case 'b':
-				drop_index = DROP_B2
-			case 'g':
-				drop_index = DROP_G2
-			case 's':
-				drop_index = DROP_S2
-			case 'n':
-				drop_index = DROP_N2
-			case 'l':
-				drop_index = DROP_L2
-			case 'p':
-				drop_index = DROP_P2
+			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+				var spaces, _ = strconv.Atoi(string(pc))
+				for sp := 0; sp < spaces; sp += 1 {
+					pos.Board[file*10+rank] = ""
+					file -= 1
+				}
+				i += 1
+			case '+':
+				i += 1
+				switch pc2 := command[i]; pc2 {
+				case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
+					pos.Board[file*10+rank] = "+" + string(pc2)
+					file -= 1
+					i += 1
+				default:
+					panic("Undefined sfen board+")
+				}
+			case '/':
+				file = 9
+				rank += 1
+				i += 1
 			case ' ':
 				i += 1
-				break HandLoop
+				break BoardLoop
 			default:
-				panic("Fatal: 知らん持ち駒（＾～＾）")
+				panic("Undefined sfen board")
 			}
+		}
 
-			var number = 0
-		NumberLoop:
+		// 手番
+		switch command[i] {
+		case 'b':
+			pos.Phase = 1
+			i += 1
+		case 'w':
+			pos.Phase = 2
+			i += 1
+		default:
+			panic("Fatal: 手番わかんない（＾～＾）")
+		}
+
+		if command[i] != ' ' {
+			panic("Fatal: 手番の後ろにスペースがない（＾～＾）")
+		}
+		i += 1
+
+		// 持ち駒
+		if command[i] == '-' {
+			i += 1
+			if command[i] != ' ' {
+				panic("Fatal: 持ち駒 - の後ろにスペースがない（＾～＾）")
+			}
+			i += 1
+		} else {
+		HandLoop:
 			for {
-				switch figure := command[i]; figure {
-				case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-					num, err := strconv.Atoi(string(figure))
-					if err != nil {
-						panic(err)
-					}
-					i += 1
-					number *= 10
-					number += num
+				var drop_index int
+				var piece = command[i]
+				switch piece {
+				case 'R':
+					drop_index = DROP_R1
+				case 'B':
+					drop_index = DROP_B1
+				case 'G':
+					drop_index = DROP_G1
+				case 'S':
+					drop_index = DROP_S1
+				case 'N':
+					drop_index = DROP_N1
+				case 'L':
+					drop_index = DROP_L1
+				case 'P':
+					drop_index = DROP_P1
+				case 'r':
+					drop_index = DROP_R2
+				case 'b':
+					drop_index = DROP_B2
+				case 'g':
+					drop_index = DROP_G2
+				case 's':
+					drop_index = DROP_S2
+				case 'n':
+					drop_index = DROP_N2
+				case 'l':
+					drop_index = DROP_L2
+				case 'p':
+					drop_index = DROP_P2
 				case ' ':
 					i += 1
 					break HandLoop
 				default:
-					break NumberLoop
+					panic("Fatal: 知らん持ち駒（＾～＾）")
 				}
-			}
 
-			pos.Hands[drop_index] = number
-		}
-	}
+				var number = 0
+			NumberLoop:
+				for {
+					switch figure := command[i]; figure {
+					case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+						num, err := strconv.Atoi(string(figure))
+						if err != nil {
+							panic(err)
+						}
+						i += 1
+						number *= 10
+						number += num
+					case ' ':
+						i += 1
+						break HandLoop
+					default:
+						break NumberLoop
+					}
+				}
 
-	// 手数
-	pos.StartMovesNum = 0
-MovesNumLoop:
-	for i < len {
-		switch figure := command[i]; figure {
-		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			num, err := strconv.Atoi(string(figure))
-			if err != nil {
-				panic(err)
+				pos.Hands[drop_index] = number
 			}
-			i += 1
-			pos.StartMovesNum *= 10
-			pos.StartMovesNum += num
-		case ' ':
-			i += 1
-			break MovesNumLoop
-		default:
-			break MovesNumLoop
 		}
+
+		// 手数
+		pos.StartMovesNum = 0
+	MovesNumLoop:
+		for i < len {
+			switch figure := command[i]; figure {
+			case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+				num, err := strconv.Atoi(string(figure))
+				if err != nil {
+					panic(err)
+				}
+				i += 1
+				pos.StartMovesNum *= 10
+				pos.StartMovesNum += num
+			case ' ':
+				i += 1
+				break MovesNumLoop
+			default:
+				break MovesNumLoop
+			}
+		}
+
 	}
 
 	// fmt.Printf("command[i:]=[%s]\n", command[i:])
