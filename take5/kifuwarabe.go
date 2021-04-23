@@ -117,6 +117,9 @@ MainLoop:
 			}
 
 			pos.DoMove(move)
+		case "undo":
+			// 棋譜を頼りに１手戻すぜ（＾～＾）
+			pos.UndoMove()
 		}
 
 		G.Log.FlushAllLogs()

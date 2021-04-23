@@ -661,3 +661,131 @@ func (pos *Position) DoMove(move Move) {
 	pos.Moves[pos.OffsetMovesIndex] = move
 	pos.OffsetMovesIndex += 1
 }
+
+// UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
+func (pos *Position) UndoMove() {
+	if pos.OffsetMovesIndex < 1 {
+		return
+	}
+
+	pos.OffsetMovesIndex -= 1
+	move := pos.Moves[pos.OffsetMovesIndex]
+	captured := pos.CapturedList[pos.OffsetMovesIndex]
+
+	src_sq := move.GetSource()
+	dst_sq := move.GetDestination()
+	switch src_sq {
+	case DROP_R1:
+		pos.Hands[DROP_R1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_B1:
+		pos.Hands[DROP_B1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_G1:
+		pos.Hands[DROP_G1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_S1:
+		pos.Hands[DROP_S1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_N1:
+		pos.Hands[DROP_N1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_L1:
+		pos.Hands[DROP_L1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_P1:
+		pos.Hands[DROP_P1-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_R2:
+		pos.Hands[DROP_R2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_B2:
+		pos.Hands[DROP_B2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_G2:
+		pos.Hands[DROP_G2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_S2:
+		pos.Hands[DROP_S2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_N2:
+		pos.Hands[DROP_N2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_L2:
+		pos.Hands[DROP_L2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	case DROP_P2:
+		pos.Hands[DROP_P2-DROP_ORIGIN] += 1
+		pos.Board[dst_sq] = PIECE_EMPTY
+	default:
+		pos.Board[src_sq] = pos.Board[dst_sq]
+		// あれば、取った駒
+		pos.Board[dst_sq] = captured
+		switch captured {
+		case PIECE_EMPTY: // Ignored
+		case PIECE_K1: // Second player win
+			// Lost first king
+		case PIECE_R1:
+			pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
+		case PIECE_B1:
+			pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
+		case PIECE_G1:
+			pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
+		case PIECE_S1:
+			pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
+		case PIECE_N1:
+			pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
+		case PIECE_L1:
+			pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
+		case PIECE_P1:
+			pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+		case PIECE_PR1:
+			pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
+		case PIECE_PB1:
+			pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
+		case PIECE_PG1:
+			pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
+		case PIECE_PS1:
+			pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
+		case PIECE_PN1:
+			pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
+		case PIECE_PL1:
+			pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
+		case PIECE_PP1:
+			pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+		case PIECE_K2: // First player win
+			// Lost second king
+		case PIECE_R2:
+			pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
+		case PIECE_B2:
+			pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
+		case PIECE_G2:
+			pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
+		case PIECE_S2:
+			pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
+		case PIECE_N2:
+			pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
+		case PIECE_L2:
+			pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
+		case PIECE_P2:
+			pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+		case PIECE_PR2:
+			pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
+		case PIECE_PB2:
+			pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
+		case PIECE_PG2:
+			pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
+		case PIECE_PS2:
+			pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
+		case PIECE_PN2:
+			pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
+		case PIECE_PL2:
+			pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
+		case PIECE_PP2:
+			pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+		default:
+			fmt.Printf("Error: 知らん駒を取ったぜ（＾～＾） captured=[%s]", captured)
+		}
+	}
+
+}
