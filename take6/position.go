@@ -180,11 +180,12 @@ func (pos *Position) ReadPosition(command string) {
 			pos.Phase = SECOND
 			i += 1
 		default:
-			panic("Fatal: 手番わかんない（＾～＾）")
+			panic("Fatal: Unknown phase")
 		}
 
 		if command[i] != ' ' {
-			panic("Fatal: 手番の後ろにスペースがない（＾～＾）")
+			// 手番の後ろにスペースがない（＾～＾）
+			panic("Fatal: Nothing space")
 		}
 		i += 1
 
@@ -192,7 +193,8 @@ func (pos *Position) ReadPosition(command string) {
 		if command[i] == '-' {
 			i += 1
 			if command[i] != ' ' {
-				panic("Fatal: 持ち駒 - の後ろにスペースがない（＾～＾）")
+				// 持ち駒 - の後ろにスペースがない（＾～＾）
+				panic("Fatal: Nothing space after -")
 			}
 			i += 1
 		} else {
@@ -233,7 +235,7 @@ func (pos *Position) ReadPosition(command string) {
 					i += 1
 					break HandLoop
 				default:
-					panic("Fatal: 知らん持ち駒（＾～＾）")
+					panic(fmt.Errorf("Fatal: Unknown piece=%c", piece))
 				}
 
 				var number = 0
@@ -339,7 +341,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_R2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'B':
 		*i += 1
@@ -349,7 +351,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_B2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'G':
 		*i += 1
@@ -359,7 +361,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_G2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'S':
 		*i += 1
@@ -369,7 +371,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_S2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'N':
 		*i += 1
@@ -379,7 +381,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_N2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'L':
 		*i += 1
@@ -389,7 +391,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_L2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	case 'P':
 		*i += 1
@@ -399,15 +401,15 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case SECOND:
 			move = move.ReplaceSource(uint32(DROP_P2))
 		default:
-			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
 	default:
 		// Ignored
 	}
 
 	if count == 1 {
-		if command[*i] != '+' {
-			return *new(Move), fmt.Errorf("Fatal: +じゃなかった（＾～＾）")
+		if command[*i] != '*' {
+			return *new(Move), fmt.Errorf("Fatal: not *")
 		}
 		*i += 1
 	}
@@ -444,7 +446,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 			case 'i':
 				rank = 9
 			default:
-				return *new(Move), fmt.Errorf("Fatal: なんか分かんないfileかrank（＾～＾） ch2='%c'", ch2)
+				return *new(Move), fmt.Errorf("Fatal: Unknown file or rank. ch2='%c'", ch2)
 			}
 			*i += 1
 
@@ -454,10 +456,10 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 			} else if count == 1 {
 				move = move.ReplaceDestination(uint32(sq))
 			} else {
-				return *new(Move), fmt.Errorf("Fatal: なんか分かんないcount（＾～＾） count='%c'", count)
+				return *new(Move), fmt.Errorf("Fatal: Unknown count='%c'", count)
 			}
 		default:
-			return *new(Move), fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' i='%d'", ch, *i)
+			return *new(Move), fmt.Errorf("Fatal: Unknown move. ch='%c' i='%d'", ch, *i)
 		}
 
 		count += 1
@@ -674,7 +676,7 @@ func (pos *Position) DoMove(move Move) {
 		case PIECE_PP2:
 			pos.Hands[DROP_P1-DROP_ORIGIN] += 1
 		default:
-			fmt.Printf("Error: 知らん駒を取ったぜ（＾～＾） captured=[%s]", captured)
+			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
 	}
 
@@ -806,7 +808,7 @@ func (pos *Position) UndoMove() {
 		case PIECE_PP2:
 			pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
 		default:
-			fmt.Printf("Error: 知らん駒を取ったぜ（＾～＾） captured=[%s]", captured)
+			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
 	}
 
