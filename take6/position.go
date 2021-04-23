@@ -328,90 +328,53 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	var len = len(command)
 	var move = NewMoveValue()
 
-	// 0=移動元 1=移動先
-	var count = 0
+	var hand1 = 0
 
 	// file
 	switch ch := command[*i]; ch {
 	case 'R':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_R1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_R2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_R1
 	case 'B':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_B1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_B2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_B1
 	case 'G':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_G1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_G2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_G1
 	case 'S':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_S1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_S2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_S1
 	case 'N':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_N1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_N2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_N1
 	case 'L':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_L1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_L2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_L1
 	case 'P':
 		*i += 1
-		switch phase {
-		case FIRST:
-			move = move.ReplaceSource(uint32(DROP_P1))
-		case SECOND:
-			move = move.ReplaceSource(uint32(DROP_P2))
-		default:
-			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
-		}
+		hand1 = DROP_P1
 	default:
 		// Ignored
 	}
 
-	if count == 1 {
+	// 0=移動元 1=移動先
+	var count = 0
+
+	if hand1 != 0 {
+		switch phase {
+		case FIRST:
+			move = move.ReplaceSource(uint32(hand1))
+		case SECOND:
+			move = move.ReplaceSource(uint32(hand1 + DROP_TYPE_SIZE))
+		default:
+			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
+		}
+
 		if command[*i] != '*' {
 			return *new(Move), fmt.Errorf("Fatal: not *")
 		}
 		*i += 1
+		count = 1
 	}
 
 	// file, rank
