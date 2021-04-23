@@ -291,7 +291,7 @@ MovesNumLoop:
 // ParseMove
 func ParseMove(command string, i *int, phase int) (Move, error) {
 	var len = len(command)
-	var pMove = NewMove()
+	var move = NewMoveValue()
 
 	// 0=移動元 1=移動先
 	var count = 0
@@ -302,9 +302,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_R1
+			move = move.ReplaceSource(uint32(DROP_R1))
 		case SECOND:
-			pMove.Squares[0] = DROP_R2
+			move = move.ReplaceSource(uint32(DROP_R2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -312,9 +312,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_B1
+			move = move.ReplaceSource(uint32(DROP_B1))
 		case SECOND:
-			pMove.Squares[0] = DROP_B2
+			move = move.ReplaceSource(uint32(DROP_B2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -322,9 +322,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_G1
+			move = move.ReplaceSource(uint32(DROP_G1))
 		case SECOND:
-			pMove.Squares[0] = DROP_G2
+			move = move.ReplaceSource(uint32(DROP_G2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -332,9 +332,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_S1
+			move = move.ReplaceSource(uint32(DROP_S1))
 		case SECOND:
-			pMove.Squares[0] = DROP_S2
+			move = move.ReplaceSource(uint32(DROP_S2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -342,9 +342,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_N1
+			move = move.ReplaceSource(uint32(DROP_N1))
 		case SECOND:
-			pMove.Squares[0] = DROP_N2
+			move = move.ReplaceSource(uint32(DROP_N2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -352,9 +352,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_L1
+			move = move.ReplaceSource(uint32(DROP_L1))
 		case SECOND:
-			pMove.Squares[0] = DROP_L2
+			move = move.ReplaceSource(uint32(DROP_L2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -362,9 +362,9 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 		*i += 1
 		switch phase {
 		case FIRST:
-			pMove.Squares[0] = DROP_P1
+			move = move.ReplaceSource(uint32(DROP_P1))
 		case SECOND:
-			pMove.Squares[0] = DROP_P2
+			move = move.ReplaceSource(uint32(DROP_P2))
 		default:
 			return *new(Move), fmt.Errorf("Fatal: 分からんフェーズ（＾～＾） phase=%d", phase)
 		}
@@ -415,7 +415,14 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 			}
 			*i += 1
 
-			pMove.Squares[count] = file*10 + rank
+			sq := file*10 + rank
+			if count == 0 {
+				move = move.ReplaceSource(uint32(sq))
+			} else if count == 1 {
+				move = move.ReplaceDestination(uint32(sq))
+			} else {
+				return *new(Move), fmt.Errorf("Fatal: なんか分かんないcount（＾～＾） count='%c'", count)
+			}
 		default:
 			return *new(Move), fmt.Errorf("Fatal: なんか分かんないmove（＾～＾） ch='%c' i='%d'", ch, *i)
 		}
@@ -425,10 +432,10 @@ func ParseMove(command string, i *int, phase int) (Move, error) {
 
 	if *i < len && command[*i] == '+' {
 		*i += 1
-		pMove.Promotion = true
+		move = move.ReplacePromotion(true)
 	}
 
-	return *pMove, nil
+	return move, nil
 }
 
 // Print - 局面出力（＾ｑ＾）
@@ -519,54 +526,56 @@ func (pos *Position) Sprint() string {
 
 // DoMove - 一手指すぜ（＾～＾）
 func (pos *Position) DoMove(move Move) {
-	switch move.Squares[0] {
+	src_sq := move.GetSource()
+	dst_sq := move.GetDestination()
+	switch src_sq {
 	case DROP_R1:
 		pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_R1
+		pos.Board[dst_sq] = PIECE_R1
 	case DROP_B1:
 		pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_B1
+		pos.Board[dst_sq] = PIECE_B1
 	case DROP_G1:
 		pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_G1
+		pos.Board[dst_sq] = PIECE_G1
 	case DROP_S1:
 		pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_S1
+		pos.Board[dst_sq] = PIECE_S1
 	case DROP_N1:
 		pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_N1
+		pos.Board[dst_sq] = PIECE_N1
 	case DROP_L1:
 		pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_L1
+		pos.Board[dst_sq] = PIECE_L1
 	case DROP_P1:
 		pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_P1
+		pos.Board[dst_sq] = PIECE_P1
 	case DROP_R2:
 		pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_R2
+		pos.Board[dst_sq] = PIECE_R2
 	case DROP_B2:
 		pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_B2
+		pos.Board[dst_sq] = PIECE_B2
 	case DROP_G2:
 		pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_G2
+		pos.Board[dst_sq] = PIECE_G2
 	case DROP_S2:
 		pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_S2
+		pos.Board[dst_sq] = PIECE_S2
 	case DROP_N2:
 		pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_N2
+		pos.Board[dst_sq] = PIECE_N2
 	case DROP_L2:
 		pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_L2
+		pos.Board[dst_sq] = PIECE_L2
 	case DROP_P2:
 		pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
-		pos.Board[move.Squares[1]] = PIECE_P2
+		pos.Board[dst_sq] = PIECE_P2
 	default:
 		// あれば、取った駒
-		captured := pos.Board[move.Squares[1]]
-		pos.Board[move.Squares[1]] = pos.Board[move.Squares[0]]
-		pos.Board[move.Squares[0]] = PIECE_EMPTY
+		captured := pos.Board[dst_sq]
+		pos.Board[dst_sq] = pos.Board[src_sq]
+		pos.Board[src_sq] = PIECE_EMPTY
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win

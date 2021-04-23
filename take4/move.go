@@ -1,5 +1,7 @@
 package take4
 
+import "fmt"
+
 const (
 	// 持ち駒を打つ 100～113
 	// 先手飛打
@@ -21,26 +23,27 @@ const (
 )
 
 // Move - 指し手
-type Move struct {
-	// [0]移動元 [1]移動先
-	// 持ち駒は仕方ないから 100～113 を使おうぜ（＾～＾）
-	Squares []byte
-	// 成
-	Promotion bool
-}
+//
+// 17bit で表せるはず（＾～＾）
+// pddddddddssssssss
+//
+// 1～8bit: 移動元
+// 9～16bit: 移動先
+// 17bit: 成
+type Move uint32
 
-func NewMove() *Move {
-	move := new(Move)
-	move.Squares = []byte{0, 0}
-	return move
+func NewMoveValue() Move {
+	return Move(0)
 }
 
 // ToCode - SFEN の moves の後に続く指し手に使える文字列を返します
-func (move *Move) ToCode() string {
+func (move Move) ToCode() string {
 	str := make([]byte, 0, 5)
 	count := 0
 
-	switch move.Squares[0] {
+	// 移動元マス(Source square)
+	source_sq := move.GetSource()
+	switch source_sq {
 	case DROP_R1, DROP_R2:
 		str = append(str, 'R')
 		count = 1
@@ -71,9 +74,19 @@ func (move *Move) ToCode() string {
 	}
 
 	for count < 2 {
+		var sq byte // マス番号
+		if count == 0 {
+			// 移動元
+			sq = source_sq
+		} else if count == 1 {
+			// 移動先
+			sq = move.GetDestination()
+		} else {
+			panic(fmt.Errorf("LogicError: count=%d", count))
+		}
 		// 正常時は必ず２桁（＾～＾）
-		file := move.Squares[count] / 10
-		rank := move.Squares[count] % 10
+		file := sq / 10
+		rank := sq % 10
 		// ASCII Code
 		// '0'=48, '9'=57, 'a'=97, 'i'=105
 		str = append(str, file+48)
@@ -83,4 +96,38 @@ func (move *Move) ToCode() string {
 	}
 
 	return string(str)
+}
+
+// ReplaceSource - 移動元マス
+func (move Move) ReplaceSource(sq uint32) Move {
+	return Move(uint32(move)&0xfff0 | sq)
+}
+
+// ReplaceDestination - 移動先マス
+func (move Move) ReplaceDestination(sq uint32) Move {
+	return Move(uint32(move)&0xff0f | (sq << 8))
+}
+
+// ReplacePromotion - 成
+func (move Move) ReplacePromotion(promotion bool) Move {
+	if promotion {
+		return Move(uint32(move) | 0x0100)
+	}
+
+	return Move(uint32(move) & 0x1f11)
+}
+
+// GetSource - 移動元マス
+func (move Move) GetSource() byte {
+	return byte(uint32(move) & 0x000f)
+}
+
+// GetDestination - 移動元マス
+func (move Move) GetDestination() byte {
+	return byte((uint32(move) >> 8) & 0x000f)
+}
+
+// GetPromotion - 成
+func (move Move) GetPromotion() byte {
+	return byte((uint32(move) >> 9) & 0x0001)
 }
