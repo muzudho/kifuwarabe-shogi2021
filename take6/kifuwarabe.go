@@ -80,7 +80,7 @@ func MainLoop() {
 
 	G.Log.FlushAllLogs()
 
-	var pos = NewPosition()
+	var pPos = NewPosition()
 
 MainLoop:
 	for scanner.Scan() {
@@ -98,29 +98,29 @@ MainLoop:
 		case "usinewgame":
 		case "position":
 			// TODO position うわっ、大変だ（＾～＾）
-			pos.ReadPosition(command)
+			pPos.ReadPosition(command)
 		case "go":
-			bestmove := Search()
+			bestmove := Search(pPos)
 			G.Chat.Print("bestmove %s\n", bestmove.ToCode())
 		case "quit":
 			break MainLoop
 		case "pos":
 			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
-			G.Chat.Debug(pos.Sprint())
+			G.Chat.Debug(pPos.Sprint())
 		case "do":
 			// １手指すぜ（＾～＾）
 			// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
 			i := 3
-			var move, err = ParseMove(command, &i, pos.Phase)
+			var move, err = ParseMove(command, &i, pPos.Phase)
 			if err != nil {
-				fmt.Println(pos.Sprint())
+				fmt.Println(pPos.Sprint())
 				panic(err)
 			}
 
-			pos.DoMove(move)
+			pPos.DoMove(move)
 		case "undo":
 			// 棋譜を頼りに１手戻すぜ（＾～＾）
-			pos.UndoMove()
+			pPos.UndoMove()
 		}
 
 		G.Log.FlushAllLogs()

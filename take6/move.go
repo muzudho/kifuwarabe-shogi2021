@@ -39,6 +39,13 @@ func NewMoveValue() Move {
 	return Move(0)
 }
 
+// NewMoveValue2 - 初期値として 移動元マス、移動先マスを指定してください
+func NewMoveValue2(src_sq uint32, dst_sq uint32) Move {
+	move := Move(0)
+	move = move.ReplaceSource(src_sq)
+	return move.ReplaceDestination(dst_sq)
+}
+
 // ToCode - SFEN の moves の後に続く指し手に使える文字列を返します
 func (move Move) ToCode() string {
 
