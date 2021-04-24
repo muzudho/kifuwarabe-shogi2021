@@ -67,6 +67,12 @@ type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
 	// [19] は １九、 [91] は ９一（＾～＾）反時計回りに９０°回転した将棋盤の状態で入ってるぜ（＾～＾）想像しろだぜ（＾～＾）
 	Board [BOARD_SIZE]string
+	// 飛車の場所。長い利きを消すために必要（＾～＾）
+	RookLocations [2]Square
+	// 角の場所。長い利きを消すために必要（＾～＾）
+	BishopLocations [2]Square
+	// 香の場所。長い利きを消すために必要（＾～＾）
+	LanceLocations [4]Square
 	// 利きテーブル [0]先手 [1]後手
 	// マスへの利き数が入っています
 	ControlBoards [2][BOARD_SIZE]int8
@@ -84,12 +90,6 @@ type Position struct {
 	Moves [MOVES_SIZE]Move
 	// 取った駒のリスト（＾～＾）アンドゥ ムーブするときに使うだけ（＾～＾）指し手のリストと同じ添え字を使うぜ（＾～＾）
 	CapturedList [MOVES_SIZE]string
-	// 飛車の場所。長い利きを消すために必要（＾～＾）
-	RookLocations [2]Square
-	// 角の場所。長い利きを消すために必要（＾～＾）
-	BishopLocations [2]Square
-	// 香の場所。長い利きを消すために必要（＾～＾）
-	LanceLocations [4]Square
 }
 
 func NewPosition() *Position {
@@ -136,6 +136,9 @@ func (pPos *Position) ResetToStartpos() {
 		0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
 		0, 0, 2, 2, 1, 0, 0, 0, 0, 0,
 	}}
+	pPos.RookLocations = [2]Square{28, 82}
+	pPos.BishopLocations = [2]Square{22, 88}
+	pPos.LanceLocations = [4]Square{11, 19, 91, 99}
 
 	// 持ち駒の数
 	pPos.Hands = []int{
@@ -629,143 +632,124 @@ func (pPos *Position) SprintControl(phase Phase) string {
 
 // DoMove - 一手指すぜ（＾～＾）
 func (pPos *Position) DoMove(move Move) {
+	// 作業前に、長い利きの駒の利きを -1 します
+	pPos.AddControlAllSlidingPiece(-1)
+
 	src_sq := move.GetSource()
 	dst_sq := move.GetDestination()
+
+	// まず、打かどうかで処理を分けます
+	drop := src_sq
+	var piece string
 	switch src_sq {
 	case DROP_R1:
-		pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_R1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_R1
 	case DROP_B1:
-		pPos.Hands[DROP_B1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_B1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_B1
 	case DROP_G1:
-		pPos.Hands[DROP_G1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_G1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_G1
 	case DROP_S1:
-		pPos.Hands[DROP_S1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_S1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_S1
 	case DROP_N1:
-		pPos.Hands[DROP_N1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_N1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_N1
 	case DROP_L1:
-		pPos.Hands[DROP_L1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_L1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_L1
 	case DROP_P1:
-		pPos.Hands[DROP_P1-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_P1
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_P1
 	case DROP_R2:
-		pPos.Hands[DROP_R2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_R2
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_R2
 	case DROP_B2:
-		pPos.Hands[DROP_B2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_B2
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_B2
 	case DROP_G2:
-		pPos.Hands[DROP_G2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_G2
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_G2
 	case DROP_S2:
-		pPos.Hands[DROP_S2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_S2
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_S2
 	case DROP_N2:
-		pPos.Hands[DROP_N2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_N2
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_N2
 	case DROP_L2:
-		pPos.Hands[DROP_L2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_L2
-		pPos.AddControl(dst_sq, 1)
+		piece = PIECE_L2
 	case DROP_P2:
-		pPos.Hands[DROP_P2-DROP_ORIGIN] -= 1
-		pPos.Board[dst_sq] = PIECE_P2
-		pPos.AddControl(dst_sq, 1)
+		drop = src_sq
+		piece = PIECE_P2
 	default:
+		// Not drop
+		drop = Square(0)
+	}
+
+	if drop != 0 {
+		// 打なら
+
+		// 持ち駒の数を減らします
+		pPos.Hands[drop-DROP_ORIGIN] -= 1
+
+		// 行き先に駒を置きます
+		pPos.Board[dst_sq] = piece
+		pPos.AddControl(dst_sq, 1)
+	} else {
+		// 打でないなら
+
 		// あれば、取った駒
 		pPos.AddControl(dst_sq, -1)
 		captured := pPos.Board[dst_sq]
+
+		// 元位置の駒を除去
 		pPos.AddControl(src_sq, -1)
+
+		// 行き先の駒の配置
 		pPos.Board[dst_sq] = pPos.Board[src_sq]
 		pPos.Board[src_sq] = PIECE_EMPTY
 		pPos.AddControl(dst_sq, 1)
+
+		drop := Square(0)
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
 			// Lost first king
-		case PIECE_R1:
-			pPos.Hands[DROP_R2-DROP_ORIGIN] += 1
-		case PIECE_B1:
-			pPos.Hands[DROP_B2-DROP_ORIGIN] += 1
-		case PIECE_G1:
-			pPos.Hands[DROP_G2-DROP_ORIGIN] += 1
-		case PIECE_S1:
-			pPos.Hands[DROP_S2-DROP_ORIGIN] += 1
-		case PIECE_N1:
-			pPos.Hands[DROP_N2-DROP_ORIGIN] += 1
-		case PIECE_L1:
-			pPos.Hands[DROP_L2-DROP_ORIGIN] += 1
-		case PIECE_P1:
-			pPos.Hands[DROP_P2-DROP_ORIGIN] += 1
-		case PIECE_PR1:
-			pPos.Hands[DROP_R2-DROP_ORIGIN] += 1
-		case PIECE_PB1:
-			pPos.Hands[DROP_B2-DROP_ORIGIN] += 1
-		case PIECE_PG1:
-			pPos.Hands[DROP_G2-DROP_ORIGIN] += 1
-		case PIECE_PS1:
-			pPos.Hands[DROP_S2-DROP_ORIGIN] += 1
-		case PIECE_PN1:
-			pPos.Hands[DROP_N2-DROP_ORIGIN] += 1
-		case PIECE_PL1:
-			pPos.Hands[DROP_L2-DROP_ORIGIN] += 1
-		case PIECE_PP1:
-			pPos.Hands[DROP_P2-DROP_ORIGIN] += 1
+		case PIECE_R1, PIECE_PR1:
+			drop = DROP_R2
+		case PIECE_B1, PIECE_PB1:
+			drop = DROP_B2
+		case PIECE_G1, PIECE_PG1:
+			drop = DROP_G2
+		case PIECE_S1, PIECE_PS1:
+			drop = DROP_S2
+		case PIECE_N1, PIECE_PN1:
+			drop = DROP_N2
+		case PIECE_L1, PIECE_PL1:
+			drop = DROP_L2
+		case PIECE_P1, PIECE_PP1:
+			drop = DROP_P2
 		case PIECE_K2: // First player win
 			// Lost second king
-		case PIECE_R2:
-			pPos.Hands[DROP_R1-DROP_ORIGIN] += 1
-		case PIECE_B2:
-			pPos.Hands[DROP_B1-DROP_ORIGIN] += 1
-		case PIECE_G2:
-			pPos.Hands[DROP_G1-DROP_ORIGIN] += 1
-		case PIECE_S2:
-			pPos.Hands[DROP_S1-DROP_ORIGIN] += 1
-		case PIECE_N2:
-			pPos.Hands[DROP_N1-DROP_ORIGIN] += 1
-		case PIECE_L2:
-			pPos.Hands[DROP_L1-DROP_ORIGIN] += 1
-		case PIECE_P2:
-			pPos.Hands[DROP_P1-DROP_ORIGIN] += 1
-		case PIECE_PR2:
-			pPos.Hands[DROP_R1-DROP_ORIGIN] += 1
-		case PIECE_PB2:
-			pPos.Hands[DROP_B1-DROP_ORIGIN] += 1
-		case PIECE_PG2:
-			pPos.Hands[DROP_G1-DROP_ORIGIN] += 1
-		case PIECE_PS2:
-			pPos.Hands[DROP_S1-DROP_ORIGIN] += 1
-		case PIECE_PN2:
-			pPos.Hands[DROP_N1-DROP_ORIGIN] += 1
-		case PIECE_PL2:
-			pPos.Hands[DROP_L1-DROP_ORIGIN] += 1
-		case PIECE_PP2:
-			pPos.Hands[DROP_P1-DROP_ORIGIN] += 1
+		case PIECE_R2, PIECE_PR2:
+			drop = DROP_R1
+		case PIECE_B2, PIECE_PB2:
+			drop = DROP_B1
+		case PIECE_G2, PIECE_PG2:
+			drop = DROP_G1
+		case PIECE_S2, PIECE_PS2:
+			drop = DROP_S1
+		case PIECE_N2, PIECE_PN2:
+			drop = DROP_N1
+		case PIECE_L2, PIECE_PL2:
+			drop = DROP_L1
+		case PIECE_P2, PIECE_PP2:
+			drop = DROP_P1
 		default:
 			fmt.Printf("Error: Unknown captured=[%s]", captured)
+		}
+
+		if drop != 0 {
+			pPos.Hands[drop-DROP_ORIGIN] += 1
 		}
 	}
 
 	pPos.Moves[pPos.OffsetMovesIndex] = move
 	pPos.OffsetMovesIndex += 1
 	pPos.Phase = pPos.Phase%2 + 1
+
+	// 作業後に、長い利きの駒の利きをプラス１します
+	pPos.AddControlAllSlidingPiece(1)
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
@@ -774,6 +758,9 @@ func (pPos *Position) UndoMove() {
 		return
 	}
 
+	// 作業前に、長い利きの駒の利きを -1 します
+	pPos.AddControlAllSlidingPiece(-1)
+
 	pPos.OffsetMovesIndex -= 1
 	pPos.Phase = pPos.Phase%2 + 1
 	move := pPos.Moves[pPos.OffsetMovesIndex]
@@ -781,128 +768,99 @@ func (pPos *Position) UndoMove() {
 
 	src_sq := move.GetSource()
 	dst_sq := move.GetDestination()
-	pPos.AddControl(dst_sq, -1)
+
+	// 打かどうかで分けます
 	switch src_sq {
-	case DROP_R1:
-		pPos.Hands[DROP_R1-DROP_ORIGIN] += 1
+	case DROP_R1, DROP_B1, DROP_G1, DROP_S1, DROP_N1, DROP_L1, DROP_P1, DROP_R2, DROP_B2, DROP_G2, DROP_S2, DROP_N2, DROP_L2, DROP_P2:
+		// 打なら
+		drop := src_sq
+		// 盤上から駒を除去します
 		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_B1:
-		pPos.Hands[DROP_B1-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_G1:
-		pPos.Hands[DROP_G1-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_S1:
-		pPos.Hands[DROP_S1-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_N1:
-		pPos.Hands[DROP_N1-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_L1:
-		pPos.Hands[DROP_L1-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_P1:
-		pPos.Hands[DROP_P1-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_R2:
-		pPos.Hands[DROP_R2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_B2:
-		pPos.Hands[DROP_B2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_G2:
-		pPos.Hands[DROP_G2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_S2:
-		pPos.Hands[DROP_S2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_N2:
-		pPos.Hands[DROP_N2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_L2:
-		pPos.Hands[DROP_L2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
-	case DROP_P2:
-		pPos.Hands[DROP_P2-DROP_ORIGIN] += 1
-		pPos.Board[dst_sq] = PIECE_EMPTY
+
+		// 駒台に駒を戻します
+		pPos.Hands[drop-DROP_ORIGIN] += 1
 	default:
+		// 打でないなら
+
+		// 行き先の駒の除去
+		pPos.AddControl(dst_sq, -1)
+		// 移動元への駒の配置
 		pPos.Board[src_sq] = pPos.Board[dst_sq]
 
-		// あれば、取った駒
-		pPos.Board[dst_sq] = captured
-		pPos.AddControl(src_sq, 1)
-		pPos.AddControl(dst_sq, 1)
-
+		// あれば、取った駒は駒台から下ろします
+		cap := Square(0)
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
 			// Lost first king
-		case PIECE_R1:
-			pPos.Hands[DROP_R2-DROP_ORIGIN] -= 1
-		case PIECE_B1:
-			pPos.Hands[DROP_B2-DROP_ORIGIN] -= 1
-		case PIECE_G1:
-			pPos.Hands[DROP_G2-DROP_ORIGIN] -= 1
-		case PIECE_S1:
-			pPos.Hands[DROP_S2-DROP_ORIGIN] -= 1
-		case PIECE_N1:
-			pPos.Hands[DROP_N2-DROP_ORIGIN] -= 1
-		case PIECE_L1:
-			pPos.Hands[DROP_L2-DROP_ORIGIN] -= 1
-		case PIECE_P1:
-			pPos.Hands[DROP_P2-DROP_ORIGIN] -= 1
-		case PIECE_PR1:
-			pPos.Hands[DROP_R2-DROP_ORIGIN] -= 1
-		case PIECE_PB1:
-			pPos.Hands[DROP_B2-DROP_ORIGIN] -= 1
-		case PIECE_PG1:
-			pPos.Hands[DROP_G2-DROP_ORIGIN] -= 1
-		case PIECE_PS1:
-			pPos.Hands[DROP_S2-DROP_ORIGIN] -= 1
-		case PIECE_PN1:
-			pPos.Hands[DROP_N2-DROP_ORIGIN] -= 1
-		case PIECE_PL1:
-			pPos.Hands[DROP_L2-DROP_ORIGIN] -= 1
-		case PIECE_PP1:
-			pPos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+		case PIECE_R1, PIECE_PR1:
+			cap = DROP_R2
+		case PIECE_B1, PIECE_PB1:
+			cap = DROP_B2
+		case PIECE_G1, PIECE_PG1:
+			cap = DROP_G2
+		case PIECE_S1, PIECE_PS1:
+			cap = DROP_S2
+		case PIECE_N1, PIECE_PN1:
+			cap = DROP_N2
+		case PIECE_L1, PIECE_PL1:
+			cap = DROP_L2
+		case PIECE_P1, PIECE_PP1:
+			cap = DROP_P2
 		case PIECE_K2: // First player win
 			// Lost second king
-		case PIECE_R2:
-			pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
-		case PIECE_B2:
-			pPos.Hands[DROP_B1-DROP_ORIGIN] -= 1
-		case PIECE_G2:
-			pPos.Hands[DROP_G1-DROP_ORIGIN] -= 1
-		case PIECE_S2:
-			pPos.Hands[DROP_S1-DROP_ORIGIN] -= 1
-		case PIECE_N2:
-			pPos.Hands[DROP_N1-DROP_ORIGIN] -= 1
-		case PIECE_L2:
-			pPos.Hands[DROP_L1-DROP_ORIGIN] -= 1
-		case PIECE_P2:
-			pPos.Hands[DROP_P1-DROP_ORIGIN] -= 1
-		case PIECE_PR2:
-			pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
-		case PIECE_PB2:
-			pPos.Hands[DROP_B1-DROP_ORIGIN] -= 1
-		case PIECE_PG2:
-			pPos.Hands[DROP_G1-DROP_ORIGIN] -= 1
-		case PIECE_PS2:
-			pPos.Hands[DROP_S1-DROP_ORIGIN] -= 1
-		case PIECE_PN2:
-			pPos.Hands[DROP_N1-DROP_ORIGIN] -= 1
-		case PIECE_PL2:
-			pPos.Hands[DROP_L1-DROP_ORIGIN] -= 1
-		case PIECE_PP2:
-			pPos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+		case PIECE_R2, PIECE_PR2:
+			cap = DROP_R1
+		case PIECE_B2, PIECE_PB2:
+			cap = DROP_B1
+		case PIECE_G2, PIECE_PG2:
+			cap = DROP_G1
+		case PIECE_S2, PIECE_PS2:
+			cap = DROP_S1
+		case PIECE_N2, PIECE_PN2:
+			cap = DROP_N1
+		case PIECE_L2, PIECE_PL2:
+			cap = DROP_L1
+		case PIECE_P2, PIECE_PP2:
+			cap = DROP_P1
 		default:
 			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
+
+		if cap != 0 {
+			pPos.Hands[cap-DROP_ORIGIN] -= 1
+
+			// 取った駒を行き先に戻します
+			pPos.Board[dst_sq] = captured
+			pPos.AddControl(src_sq, 1)
+			pPos.AddControl(dst_sq, 1)
+		}
+	}
+
+	// 作業後に、長い利きの駒の利きをプラス１します
+	pPos.AddControlAllSlidingPiece(1)
+}
+
+// AddControlAllSlidingPiece - すべての長い利きの駒の利きを増減させます
+func (pPos *Position) AddControlAllSlidingPiece(sign int8) {
+	for _, from := range pPos.RookLocations {
+		pPos.AddControl(from, sign)
+	}
+	for _, from := range pPos.BishopLocations {
+		pPos.AddControl(from, sign)
+	}
+	for _, from := range pPos.LanceLocations {
+		pPos.AddControl(from, sign)
 	}
 }
 
 // AddControl - 盤上のマスを指定することで、そこにある駒の利きを増減させます
 func (pPos *Position) AddControl(from Square, sign int8) {
+	if from > 99 {
+		// 持ち駒は無視します
+		return
+	}
+
 	piece := pPos.Board[from]
 	ph := int(Who(piece)) - 1
 
