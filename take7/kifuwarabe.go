@@ -97,7 +97,7 @@ MainLoop:
 			G.Chat.Print("readyok\n")
 		case "usinewgame":
 		case "position":
-			// TODO position うわっ、大変だ（＾～＾）
+			// position うわっ、大変だ（＾～＾）
 			pPos.ReadPosition(command)
 		case "go":
 			bestmove := Search(pPos)

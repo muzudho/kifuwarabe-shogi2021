@@ -66,7 +66,7 @@ type Position struct {
 	Board [BOARD_SIZE]string
 	// 利きテーブル [0]先手 [1]後手
 	// マスへの利き数が入っています
-	ControlBoards [2][BOARD_SIZE]byte
+	ControlBoards [2][BOARD_SIZE]int8
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
@@ -90,9 +90,9 @@ func NewPosition() *Position {
 }
 
 // ResetToStartpos - 初期局面にします。
-func (pos *Position) ResetToStartpos() {
+func (pPos *Position) ResetToStartpos() {
 	// 初期局面にします
-	pos.Board = [BOARD_SIZE]string{
+	pPos.Board = [BOARD_SIZE]string{
 		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
 		"1", "l", "", "p", "", "", "", "P", "", "L",
 		"2", "n", "b", "p", "", "", "", "P", "R", "N",
@@ -104,7 +104,7 @@ func (pos *Position) ResetToStartpos() {
 		"8", "n", "r", "p", "", "", "", "P", "B", "N",
 		"9", "l", "", "p", "", "", "", "P", "", "L",
 	}
-	pos.ControlBoards = [2][BOARD_SIZE]byte{{
+	pPos.ControlBoards = [2][BOARD_SIZE]int8{{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 1, 2, 2, 1,
 		0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -129,24 +129,24 @@ func (pos *Position) ResetToStartpos() {
 	}}
 
 	// 持ち駒の数
-	pos.Hands = []int{
+	pPos.Hands = []int{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}
 	// 先手の局面
-	pos.Phase = FIRST
+	pPos.Phase = FIRST
 	// 何手目か
-	pos.StartMovesNum = 1
-	pos.OffsetMovesIndex = 0
+	pPos.StartMovesNum = 1
+	pPos.OffsetMovesIndex = 0
 	// 指し手のリスト
-	pos.Moves = [MOVES_SIZE]Move{}
+	pPos.Moves = [MOVES_SIZE]Move{}
 	// 取った駒のリスト
-	pos.CapturedList = [MOVES_SIZE]string{}
+	pPos.CapturedList = [MOVES_SIZE]string{}
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
-func (pos *Position) ReadPosition(command string) {
+func (pPos *Position) ReadPosition(command string) {
 	// めんどくさいんで、初期化の代わりに 平手初期局面をセットするぜ（＾～＾） 盤面は あとで上書きされるから大丈夫（＾～＾）
-	pos.ResetToStartpos()
+	pPos.ResetToStartpos()
 
 	var len = len(command)
 	var i int
@@ -170,13 +170,13 @@ func (pos *Position) ReadPosition(command string) {
 		for {
 			switch pc := command[i]; pc {
 			case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
-				pos.Board[file*10+rank] = string(pc)
+				pPos.Board[file*10+rank] = string(pc)
 				file -= 1
 				i += 1
 			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 				var spaces, _ = strconv.Atoi(string(pc))
 				for sp := 0; sp < spaces; sp += 1 {
-					pos.Board[file*10+rank] = ""
+					pPos.Board[file*10+rank] = ""
 					file -= 1
 				}
 				i += 1
@@ -184,7 +184,7 @@ func (pos *Position) ReadPosition(command string) {
 				i += 1
 				switch pc2 := command[i]; pc2 {
 				case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
-					pos.Board[file*10+rank] = "+" + string(pc2)
+					pPos.Board[file*10+rank] = "+" + string(pc2)
 					file -= 1
 					i += 1
 				default:
@@ -205,10 +205,10 @@ func (pos *Position) ReadPosition(command string) {
 		// 手番
 		switch command[i] {
 		case 'b':
-			pos.Phase = FIRST
+			pPos.Phase = FIRST
 			i += 1
 		case 'w':
-			pos.Phase = SECOND
+			pPos.Phase = SECOND
 			i += 1
 		default:
 			panic("Fatal: Unknown phase")
@@ -289,12 +289,12 @@ func (pos *Position) ReadPosition(command string) {
 					}
 				}
 
-				pos.Hands[drop_index] = number
+				pPos.Hands[drop_index] = number
 			}
 		}
 
 		// 手数
-		pos.StartMovesNum = 0
+		pPos.StartMovesNum = 0
 	MovesNumLoop:
 		for i < len {
 			switch figure := command[i]; figure {
@@ -304,8 +304,8 @@ func (pos *Position) ReadPosition(command string) {
 					panic(err)
 				}
 				i += 1
-				pos.StartMovesNum *= 10
-				pos.StartMovesNum += num
+				pPos.StartMovesNum *= 10
+				pPos.StartMovesNum += num
 			case ' ':
 				i += 1
 				break MovesNumLoop
@@ -325,7 +325,7 @@ func (pos *Position) ReadPosition(command string) {
 	}
 
 	// 半角スペースに始まり、文字列の終わりで終わるぜ（＾～＾）
-	start_phase := pos.Phase
+	start_phase := pPos.Phase
 	for i < len {
 		if command[i] != ' ' {
 			break
@@ -333,24 +333,24 @@ func (pos *Position) ReadPosition(command string) {
 		i += 1
 
 		// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
-		var move, err = ParseMove(command, &i, pos.Phase)
+		var move, err = ParseMove(command, &i, pPos.Phase)
 		if err != nil {
 			fmt.Println(err)
-			fmt.Println(pos.Sprint())
+			fmt.Println(pPos.Sprint())
 			panic(err)
 		}
-		pos.Moves[pos.OffsetMovesIndex] = move
-		pos.OffsetMovesIndex += 1
-		pos.Phase = pos.Phase%2 + 1
+		pPos.Moves[pPos.OffsetMovesIndex] = move
+		pPos.OffsetMovesIndex += 1
+		pPos.Phase = pPos.Phase%2 + 1
 	}
 
 	// 読込んだ Move を、上書きする感じで、もう一回 全て実行（＾～＾）
-	moves_size := pos.OffsetMovesIndex
+	moves_size := pPos.OffsetMovesIndex
 	// 一旦 0 リセットするぜ（＾～＾）
-	pos.OffsetMovesIndex = 0
-	pos.Phase = start_phase
+	pPos.OffsetMovesIndex = 0
+	pPos.Phase = start_phase
 	for i = 0; i < moves_size; i += 1 {
-		pos.DoMove(pos.Moves[i])
+		pPos.DoMove(pPos.Moves[i])
 	}
 }
 
@@ -468,66 +468,66 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 }
 
 // Print - 局面出力（＾ｑ＾）
-func (pos *Position) Sprint() string {
+func (pPos *Position) Sprint() string {
 	var phase_str = "?"
-	if pos.Phase == FIRST {
+	if pPos.Phase == FIRST {
 		phase_str = "First"
-	} else if pos.Phase == SECOND {
+	} else if pPos.Phase == SECOND {
 		phase_str = "Second"
 	}
 
 	var s1 = "\n" +
 		//
-		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pos.StartMovesNum, (pos.StartMovesNum+pos.OffsetMovesIndex), phase_str) +
+		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPos.StartMovesNum, (pPos.StartMovesNum+pPos.OffsetMovesIndex), phase_str) +
 		//
 		"\n" +
 		//
 		"  r  b  g  s  n  l  p\n" +
 		"+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pos.Hands[7], pos.Hands[8], pos.Hands[9], pos.Hands[10], pos.Hands[11], pos.Hands[12], pos.Hands[13]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[7], pPos.Hands[8], pPos.Hands[9], pPos.Hands[10], pPos.Hands[11], pPos.Hands[12], pPos.Hands[13]) +
 		//
 		"+--+--+--+--+--+--+--+\n" +
 		//
 		"\n" +
 		//
-		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pos.Board[90], pos.Board[80], pos.Board[70], pos.Board[60], pos.Board[50], pos.Board[40], pos.Board[30], pos.Board[20], pos.Board[10], pos.Board[0]) +
+		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pPos.Board[90], pPos.Board[80], pPos.Board[70], pPos.Board[60], pPos.Board[50], pPos.Board[40], pPos.Board[30], pPos.Board[20], pPos.Board[10], pPos.Board[0]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[91], pos.Board[81], pos.Board[71], pos.Board[61], pos.Board[51], pos.Board[41], pos.Board[31], pos.Board[21], pos.Board[11], pos.Board[1]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[91], pPos.Board[81], pPos.Board[71], pPos.Board[61], pPos.Board[51], pPos.Board[41], pPos.Board[31], pPos.Board[21], pPos.Board[11], pPos.Board[1]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[92], pos.Board[82], pos.Board[72], pos.Board[62], pos.Board[52], pos.Board[42], pos.Board[32], pos.Board[22], pos.Board[12], pos.Board[2]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[92], pPos.Board[82], pPos.Board[72], pPos.Board[62], pPos.Board[52], pPos.Board[42], pPos.Board[32], pPos.Board[22], pPos.Board[12], pPos.Board[2]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[93], pos.Board[83], pos.Board[73], pos.Board[63], pos.Board[53], pos.Board[43], pos.Board[33], pos.Board[23], pos.Board[13], pos.Board[3]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[93], pPos.Board[83], pPos.Board[73], pPos.Board[63], pPos.Board[53], pPos.Board[43], pPos.Board[33], pPos.Board[23], pPos.Board[13], pPos.Board[3]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[94], pos.Board[84], pos.Board[74], pos.Board[64], pos.Board[54], pos.Board[44], pos.Board[34], pos.Board[24], pos.Board[14], pos.Board[4]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[94], pPos.Board[84], pPos.Board[74], pPos.Board[64], pPos.Board[54], pPos.Board[44], pPos.Board[34], pPos.Board[24], pPos.Board[14], pPos.Board[4]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[95], pos.Board[85], pos.Board[75], pos.Board[65], pos.Board[55], pos.Board[45], pos.Board[35], pos.Board[25], pos.Board[15], pos.Board[5]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[95], pPos.Board[85], pPos.Board[75], pPos.Board[65], pPos.Board[55], pPos.Board[45], pPos.Board[35], pPos.Board[25], pPos.Board[15], pPos.Board[5]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[96], pos.Board[86], pos.Board[76], pos.Board[66], pos.Board[56], pos.Board[46], pos.Board[36], pos.Board[26], pos.Board[16], pos.Board[6]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[96], pPos.Board[86], pPos.Board[76], pPos.Board[66], pPos.Board[56], pPos.Board[46], pPos.Board[36], pPos.Board[26], pPos.Board[16], pPos.Board[6]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[97], pos.Board[87], pos.Board[77], pos.Board[67], pos.Board[57], pos.Board[47], pos.Board[37], pos.Board[27], pos.Board[17], pos.Board[7]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[97], pPos.Board[87], pPos.Board[77], pPos.Board[67], pPos.Board[57], pPos.Board[47], pPos.Board[37], pPos.Board[27], pPos.Board[17], pPos.Board[7]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[98], pos.Board[88], pos.Board[78], pos.Board[68], pos.Board[58], pos.Board[48], pos.Board[38], pos.Board[28], pos.Board[18], pos.Board[8]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[98], pPos.Board[88], pPos.Board[78], pPos.Board[68], pPos.Board[58], pPos.Board[48], pPos.Board[38], pPos.Board[28], pPos.Board[18], pPos.Board[8]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pos.Board[99], pos.Board[89], pos.Board[79], pos.Board[69], pos.Board[59], pos.Board[49], pos.Board[39], pos.Board[29], pos.Board[19], pos.Board[9]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[99], pPos.Board[89], pPos.Board[79], pPos.Board[69], pPos.Board[59], pPos.Board[49], pPos.Board[39], pPos.Board[29], pPos.Board[19], pPos.Board[9]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
@@ -536,7 +536,7 @@ func (pos *Position) Sprint() string {
 		"        R  B  G  S  N  L  P\n" +
 		"      +--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pos.Hands[0], pos.Hands[1], pos.Hands[2], pos.Hands[3], pos.Hands[4], pos.Hands[5], pos.Hands[6]) +
+		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[0], pPos.Hands[1], pPos.Hands[2], pPos.Hands[3], pPos.Hands[4], pPos.Hands[5], pPos.Hands[6]) +
 		//
 		"      +--+--+--+--+--+--+--+\n" +
 		//
@@ -545,9 +545,9 @@ func (pos *Position) Sprint() string {
 		"moves"
 
 	moves_text := make([]byte, 0, MOVES_SIZE*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
-	for i := 0; i < pos.OffsetMovesIndex; i += 1 {
+	for i := 0; i < pPos.OffsetMovesIndex; i += 1 {
 		moves_text = append(moves_text, ' ')
-		moves_text = append(moves_text, pos.Moves[i].ToCode()...)
+		moves_text = append(moves_text, pPos.Moves[i].ToCode()...)
 	}
 
 	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
@@ -556,27 +556,27 @@ func (pos *Position) Sprint() string {
 }
 
 // Print - 利き数ボード出力（＾ｑ＾）
-func (pos *Position) SprintControl(phase Phase) string {
-	var board [BOARD_SIZE]byte
+func (pPos *Position) SprintControl(phase Phase) string {
+	var board [BOARD_SIZE]int8
 	var phase_str string
 	switch phase {
 	case FIRST:
 		phase_str = "First"
-		board = pos.ControlBoards[0]
+		board = pPos.ControlBoards[0]
 	case SECOND:
 		phase_str = "Second"
-		board = pos.ControlBoards[1]
+		board = pPos.ControlBoards[1]
 	default:
 		return "\n"
 	}
 
 	return "\n" +
 		//
-		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pos.StartMovesNum, (pos.StartMovesNum+pos.OffsetMovesIndex), phase_str) +
+		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPos.StartMovesNum, (pPos.StartMovesNum+pPos.OffsetMovesIndex), phase_str) +
 		//
 		"\n" +
 		//
-		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pos.Board[90], pos.Board[80], pos.Board[70], pos.Board[60], pos.Board[50], pos.Board[40], pos.Board[30], pos.Board[20], pos.Board[10], pos.Board[0]) +
+		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pPos.Board[90], pPos.Board[80], pPos.Board[70], pPos.Board[60], pPos.Board[50], pPos.Board[40], pPos.Board[30], pPos.Board[20], pPos.Board[10], pPos.Board[0]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
@@ -620,254 +620,353 @@ func (pos *Position) SprintControl(phase Phase) string {
 }
 
 // DoMove - 一手指すぜ（＾～＾）
-func (pos *Position) DoMove(move Move) {
-	src_sq := move.GetSource()
-	dst_sq := move.GetDestination()
+func (pPos *Position) DoMove(move Move) {
+	src_sq := uint32(move.GetSource())
+	dst_sq := uint32(move.GetDestination())
 	switch src_sq {
 	case DROP_R1:
-		pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_R1
+		pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_R1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_B1:
-		pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_B1
+		pPos.Hands[DROP_B1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_B1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_G1:
-		pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_G1
+		pPos.Hands[DROP_G1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_G1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_S1:
-		pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_S1
+		pPos.Hands[DROP_S1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_S1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_N1:
-		pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_N1
+		pPos.Hands[DROP_N1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_N1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_L1:
-		pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_L1
+		pPos.Hands[DROP_L1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_L1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_P1:
-		pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_P1
+		pPos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_P1
+		pPos.AddControl(dst_sq, 1)
 	case DROP_R2:
-		pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_R2
+		pPos.Hands[DROP_R2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_R2
+		pPos.AddControl(dst_sq, 1)
 	case DROP_B2:
-		pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_B2
+		pPos.Hands[DROP_B2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_B2
+		pPos.AddControl(dst_sq, 1)
 	case DROP_G2:
-		pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_G2
+		pPos.Hands[DROP_G2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_G2
+		pPos.AddControl(dst_sq, 1)
 	case DROP_S2:
-		pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_S2
+		pPos.Hands[DROP_S2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_S2
+		pPos.AddControl(dst_sq, 1)
 	case DROP_N2:
-		pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_N2
+		pPos.Hands[DROP_N2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_N2
+		pPos.AddControl(dst_sq, 1)
 	case DROP_L2:
-		pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_L2
+		pPos.Hands[DROP_L2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_L2
+		pPos.AddControl(dst_sq, 1)
 	case DROP_P2:
-		pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
-		pos.Board[dst_sq] = PIECE_P2
+		pPos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+		pPos.Board[dst_sq] = PIECE_P2
+		pPos.AddControl(dst_sq, 1)
 	default:
 		// あれば、取った駒
-		captured := pos.Board[dst_sq]
-		pos.Board[dst_sq] = pos.Board[src_sq]
-		pos.Board[src_sq] = PIECE_EMPTY
+		pPos.AddControl(dst_sq, -1)
+		captured := pPos.Board[dst_sq]
+		pPos.AddControl(src_sq, -1)
+		pPos.Board[dst_sq] = pPos.Board[src_sq]
+		pPos.Board[src_sq] = PIECE_EMPTY
+		pPos.AddControl(dst_sq, 1)
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
 			// Lost first king
 		case PIECE_R1:
-			pos.Hands[DROP_R2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_R2-DROP_ORIGIN] += 1
 		case PIECE_B1:
-			pos.Hands[DROP_B2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_B2-DROP_ORIGIN] += 1
 		case PIECE_G1:
-			pos.Hands[DROP_G2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_G2-DROP_ORIGIN] += 1
 		case PIECE_S1:
-			pos.Hands[DROP_S2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_S2-DROP_ORIGIN] += 1
 		case PIECE_N1:
-			pos.Hands[DROP_N2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_N2-DROP_ORIGIN] += 1
 		case PIECE_L1:
-			pos.Hands[DROP_L2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_L2-DROP_ORIGIN] += 1
 		case PIECE_P1:
-			pos.Hands[DROP_P2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_P2-DROP_ORIGIN] += 1
 		case PIECE_PR1:
-			pos.Hands[DROP_R2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_R2-DROP_ORIGIN] += 1
 		case PIECE_PB1:
-			pos.Hands[DROP_B2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_B2-DROP_ORIGIN] += 1
 		case PIECE_PG1:
-			pos.Hands[DROP_G2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_G2-DROP_ORIGIN] += 1
 		case PIECE_PS1:
-			pos.Hands[DROP_S2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_S2-DROP_ORIGIN] += 1
 		case PIECE_PN1:
-			pos.Hands[DROP_N2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_N2-DROP_ORIGIN] += 1
 		case PIECE_PL1:
-			pos.Hands[DROP_L2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_L2-DROP_ORIGIN] += 1
 		case PIECE_PP1:
-			pos.Hands[DROP_P2-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_P2-DROP_ORIGIN] += 1
 		case PIECE_K2: // First player win
 			// Lost second king
 		case PIECE_R2:
-			pos.Hands[DROP_R1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_R1-DROP_ORIGIN] += 1
 		case PIECE_B2:
-			pos.Hands[DROP_B1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_B1-DROP_ORIGIN] += 1
 		case PIECE_G2:
-			pos.Hands[DROP_G1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_G1-DROP_ORIGIN] += 1
 		case PIECE_S2:
-			pos.Hands[DROP_S1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_S1-DROP_ORIGIN] += 1
 		case PIECE_N2:
-			pos.Hands[DROP_N1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_N1-DROP_ORIGIN] += 1
 		case PIECE_L2:
-			pos.Hands[DROP_L1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_L1-DROP_ORIGIN] += 1
 		case PIECE_P2:
-			pos.Hands[DROP_P1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_P1-DROP_ORIGIN] += 1
 		case PIECE_PR2:
-			pos.Hands[DROP_R1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_R1-DROP_ORIGIN] += 1
 		case PIECE_PB2:
-			pos.Hands[DROP_B1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_B1-DROP_ORIGIN] += 1
 		case PIECE_PG2:
-			pos.Hands[DROP_G1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_G1-DROP_ORIGIN] += 1
 		case PIECE_PS2:
-			pos.Hands[DROP_S1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_S1-DROP_ORIGIN] += 1
 		case PIECE_PN2:
-			pos.Hands[DROP_N1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_N1-DROP_ORIGIN] += 1
 		case PIECE_PL2:
-			pos.Hands[DROP_L1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_L1-DROP_ORIGIN] += 1
 		case PIECE_PP2:
-			pos.Hands[DROP_P1-DROP_ORIGIN] += 1
+			pPos.Hands[DROP_P1-DROP_ORIGIN] += 1
 		default:
 			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
 	}
 
-	pos.Moves[pos.OffsetMovesIndex] = move
-	pos.OffsetMovesIndex += 1
-	pos.Phase = pos.Phase%2 + 1
+	pPos.Moves[pPos.OffsetMovesIndex] = move
+	pPos.OffsetMovesIndex += 1
+	pPos.Phase = pPos.Phase%2 + 1
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
-func (pos *Position) UndoMove() {
-	if pos.OffsetMovesIndex < 1 {
+func (pPos *Position) UndoMove() {
+	if pPos.OffsetMovesIndex < 1 {
 		return
 	}
 
-	pos.OffsetMovesIndex -= 1
-	pos.Phase = pos.Phase%2 + 1
-	move := pos.Moves[pos.OffsetMovesIndex]
-	captured := pos.CapturedList[pos.OffsetMovesIndex]
+	pPos.OffsetMovesIndex -= 1
+	pPos.Phase = pPos.Phase%2 + 1
+	move := pPos.Moves[pPos.OffsetMovesIndex]
+	captured := pPos.CapturedList[pPos.OffsetMovesIndex]
 
-	src_sq := move.GetSource()
-	dst_sq := move.GetDestination()
+	src_sq := uint32(move.GetSource())
+	dst_sq := uint32(move.GetDestination())
+	pPos.AddControl(dst_sq, -1)
 	switch src_sq {
 	case DROP_R1:
-		pos.Hands[DROP_R1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_R1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_B1:
-		pos.Hands[DROP_B1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_B1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_G1:
-		pos.Hands[DROP_G1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_G1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_S1:
-		pos.Hands[DROP_S1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_S1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_N1:
-		pos.Hands[DROP_N1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_N1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_L1:
-		pos.Hands[DROP_L1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_L1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_P1:
-		pos.Hands[DROP_P1-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_P1-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_R2:
-		pos.Hands[DROP_R2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_R2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_B2:
-		pos.Hands[DROP_B2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_B2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_G2:
-		pos.Hands[DROP_G2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_G2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_S2:
-		pos.Hands[DROP_S2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_S2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_N2:
-		pos.Hands[DROP_N2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_N2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_L2:
-		pos.Hands[DROP_L2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_L2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	case DROP_P2:
-		pos.Hands[DROP_P2-DROP_ORIGIN] += 1
-		pos.Board[dst_sq] = PIECE_EMPTY
+		pPos.Hands[DROP_P2-DROP_ORIGIN] += 1
+		pPos.Board[dst_sq] = PIECE_EMPTY
 	default:
-		pos.Board[src_sq] = pos.Board[dst_sq]
+		pPos.Board[src_sq] = pPos.Board[dst_sq]
+
 		// あれば、取った駒
-		pos.Board[dst_sq] = captured
+		pPos.Board[dst_sq] = captured
+		pPos.AddControl(src_sq, 1)
+		pPos.AddControl(dst_sq, 1)
+
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
 			// Lost first king
 		case PIECE_R1:
-			pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_R2-DROP_ORIGIN] -= 1
 		case PIECE_B1:
-			pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_B2-DROP_ORIGIN] -= 1
 		case PIECE_G1:
-			pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_G2-DROP_ORIGIN] -= 1
 		case PIECE_S1:
-			pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_S2-DROP_ORIGIN] -= 1
 		case PIECE_N1:
-			pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_N2-DROP_ORIGIN] -= 1
 		case PIECE_L1:
-			pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_L2-DROP_ORIGIN] -= 1
 		case PIECE_P1:
-			pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_P2-DROP_ORIGIN] -= 1
 		case PIECE_PR1:
-			pos.Hands[DROP_R2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_R2-DROP_ORIGIN] -= 1
 		case PIECE_PB1:
-			pos.Hands[DROP_B2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_B2-DROP_ORIGIN] -= 1
 		case PIECE_PG1:
-			pos.Hands[DROP_G2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_G2-DROP_ORIGIN] -= 1
 		case PIECE_PS1:
-			pos.Hands[DROP_S2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_S2-DROP_ORIGIN] -= 1
 		case PIECE_PN1:
-			pos.Hands[DROP_N2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_N2-DROP_ORIGIN] -= 1
 		case PIECE_PL1:
-			pos.Hands[DROP_L2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_L2-DROP_ORIGIN] -= 1
 		case PIECE_PP1:
-			pos.Hands[DROP_P2-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_P2-DROP_ORIGIN] -= 1
 		case PIECE_K2: // First player win
 			// Lost second king
 		case PIECE_R2:
-			pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
 		case PIECE_B2:
-			pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_B1-DROP_ORIGIN] -= 1
 		case PIECE_G2:
-			pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_G1-DROP_ORIGIN] -= 1
 		case PIECE_S2:
-			pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_S1-DROP_ORIGIN] -= 1
 		case PIECE_N2:
-			pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_N1-DROP_ORIGIN] -= 1
 		case PIECE_L2:
-			pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_L1-DROP_ORIGIN] -= 1
 		case PIECE_P2:
-			pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_P1-DROP_ORIGIN] -= 1
 		case PIECE_PR2:
-			pos.Hands[DROP_R1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
 		case PIECE_PB2:
-			pos.Hands[DROP_B1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_B1-DROP_ORIGIN] -= 1
 		case PIECE_PG2:
-			pos.Hands[DROP_G1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_G1-DROP_ORIGIN] -= 1
 		case PIECE_PS2:
-			pos.Hands[DROP_S1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_S1-DROP_ORIGIN] -= 1
 		case PIECE_PN2:
-			pos.Hands[DROP_N1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_N1-DROP_ORIGIN] -= 1
 		case PIECE_PL2:
-			pos.Hands[DROP_L1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_L1-DROP_ORIGIN] -= 1
 		case PIECE_PP2:
-			pos.Hands[DROP_P1-DROP_ORIGIN] -= 1
+			pPos.Hands[DROP_P1-DROP_ORIGIN] -= 1
 		default:
 			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
 	}
+}
 
+// AddControl - 盤上のマスを指定することで、そこにある駒の利きを増減させます
+func (pPos *Position) AddControl(from uint32, sign int8) {
+	piece := pPos.Board[from]
+	ph := int(Who(piece)) - 1
+
+	switch piece {
+	case PIECE_EMPTY: // Ignored
+	case PIECE_K1, PIECE_K2: // 玉は先後同型
+		if to := from + 9; to/10%10 != 0 && to%10 != 0 { // 左上
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from - 1; to%10 != 0 { // 上
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from - 11; to/10%10 != 0 && to%10 != 0 { // 右上
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from + 10; to/10%10 != 0 { // 左
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from - 10; to/10%10 != 0 { // 右
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from + 11; to/10%10 != 0 && to%10 != 0 { // 左下
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from + 1; to%10 != 0 { // 下
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+		if to := from - 9; to/10%10 != 0 && to%10 != 0 { // 右下
+			pPos.ControlBoards[ph][to] += sign * 1
+		}
+	case PIECE_R1:
+	case PIECE_B1:
+	case PIECE_G1:
+	case PIECE_S1:
+	case PIECE_N1:
+	case PIECE_L1:
+	case PIECE_P1:
+	case PIECE_PR1:
+	case PIECE_PB1:
+	case PIECE_PG1:
+	case PIECE_PS1:
+	case PIECE_PN1:
+	case PIECE_PL1:
+	case PIECE_PP1:
+	case PIECE_R2:
+	case PIECE_B2:
+	case PIECE_G2:
+	case PIECE_S2:
+	case PIECE_N2:
+	case PIECE_L2:
+	case PIECE_P2:
+	case PIECE_PR2:
+	case PIECE_PB2:
+	case PIECE_PG2:
+	case PIECE_PS2:
+	case PIECE_PN2:
+	case PIECE_PL2:
+	case PIECE_PP2:
+	default:
+		fmt.Printf("Error: Unknown piece=[%s]", piece)
+	}
+}
+
+// Homo - 手番と移動元の駒を持つプレイヤーが等しければ真。移動先が空なら偽
+func (pPos *Position) Homo(to uint32) bool {
+	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
+	return pPos.Phase == Who(pPos.Board[to])
+}
+
+// Hetero - 手番と移動先の駒を持つプレイヤーが異なれば真。移動先が空マスでも真
+// Homo の逆だぜ（＾～＾）片方ありゃいいんだけど（＾～＾）
+func (pPos *Position) Hetero(to uint32) bool {
+	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
+	return pPos.Phase != Who(pPos.Board[to])
 }
