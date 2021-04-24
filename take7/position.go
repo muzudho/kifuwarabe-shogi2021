@@ -689,10 +689,12 @@ func (pPos *Position) DoMove(move Move) {
 	} else {
 		// 打でないなら
 
-		// あれば、取った駒
-		pPos.AddControl(dst_sq, -1)
+		// 移動先に駒があれば、その駒の利きを除外します
 		captured := pPos.Board[dst_sq]
-		moving_piece_types[1] = What(captured)
+		if captured != PIECE_EMPTY {
+			pPos.AddControl(dst_sq, -1)
+			moving_piece_types[1] = What(captured)
+		}
 
 		// 元位置の駒を除去
 		pPos.AddControl(src_sq, -1)
@@ -919,63 +921,16 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 	}
 
 	piece := pPos.Board[from]
+	if piece == PIECE_EMPTY {
+		panic(fmt.Errorf("LogicalError: Empty square has no control"))
+	}
+
 	ph := int(Who(piece)) - 1
 
-	switch piece {
-	case PIECE_EMPTY: // Ignored
-	case PIECE_K1, PIECE_K2: // 玉は先後同型
-		if to := from + 9; to/10%10 != 0 && to%10 != 0 { // 左上
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from - 1; to%10 != 0 { // 上
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from - 11; to/10%10 != 0 && to%10 != 0 { // 右上
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from + 10; to/10%10 != 0 { // 左
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from - 10; to/10%10 != 0 { // 右
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from + 11; to/10%10 != 0 && to%10 != 0 { // 左下
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from + 1; to%10 != 0 { // 下
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-		if to := from - 9; to/10%10 != 0 && to%10 != 0 { // 右下
-			pPos.ControlBoards[ph][to] += sign * 1
-		}
-	case PIECE_R1:
-	case PIECE_B1:
-	case PIECE_G1:
-	case PIECE_S1:
-	case PIECE_N1:
-	case PIECE_L1:
-	case PIECE_P1:
-	case PIECE_PR1:
-	case PIECE_PB1:
-	case PIECE_PS1:
-	case PIECE_PN1:
-	case PIECE_PL1:
-	case PIECE_PP1:
-	case PIECE_R2:
-	case PIECE_B2:
-	case PIECE_G2:
-	case PIECE_S2:
-	case PIECE_N2:
-	case PIECE_L2:
-	case PIECE_P2:
-	case PIECE_PR2:
-	case PIECE_PB2:
-	case PIECE_PS2:
-	case PIECE_PN2:
-	case PIECE_PL2:
-	case PIECE_PP2:
-	default:
-		fmt.Printf("Error: Unknown piece=[%s]", piece)
+	sq_list := GenControl(pPos, from)
+
+	for _, to := range sq_list {
+		pPos.ControlBoards[ph][to] += sign * 1
 	}
 }
 
