@@ -629,8 +629,8 @@ func (pPos *Position) SprintControl(phase Phase) string {
 
 // DoMove - 一手指すぜ（＾～＾）
 func (pPos *Position) DoMove(move Move) {
-	src_sq := Square(move.GetSource())
-	dst_sq := Square(move.GetDestination())
+	src_sq := move.GetSource()
+	dst_sq := move.GetDestination()
 	switch src_sq {
 	case DROP_R1:
 		pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
@@ -779,8 +779,8 @@ func (pPos *Position) UndoMove() {
 	move := pPos.Moves[pPos.OffsetMovesIndex]
 	captured := pPos.CapturedList[pPos.OffsetMovesIndex]
 
-	src_sq := Square(move.GetSource())
-	dst_sq := Square(move.GetDestination())
+	src_sq := move.GetSource()
+	dst_sq := move.GetDestination()
 	pPos.AddControl(dst_sq, -1)
 	switch src_sq {
 	case DROP_R1:

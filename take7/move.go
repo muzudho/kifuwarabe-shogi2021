@@ -135,16 +135,16 @@ func (move Move) ReplacePromotion(promotion bool) Move {
 }
 
 // GetSource - 移動元マス
-func (move Move) GetSource() byte {
-	return byte(uint32(move) & 0x000000ff)
+func (move Move) GetSource() Square {
+	return Square(uint32(move) & 0x000000ff)
 }
 
 // GetDestination - 移動元マス
-func (move Move) GetDestination() byte {
-	return byte((uint32(move) >> 8) & 0x000000ff)
+func (move Move) GetDestination() Square {
+	return Square((uint32(move) >> 8) & 0x000000ff)
 }
 
 // GetPromotion - 成
-func (move Move) GetPromotion() byte {
-	return byte((uint32(move) >> 9) & 0x00000001)
+func (move Move) GetPromotion() bool {
+	return (uint32(move)>>9)&0x00000001 == 1
 }
