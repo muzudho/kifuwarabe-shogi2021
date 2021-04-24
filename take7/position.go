@@ -40,7 +40,6 @@ const (
 	PIECE_P1    = "P"
 	PIECE_PR1   = "+R"
 	PIECE_PB1   = "+B"
-	PIECE_PG1   = "+G"
 	PIECE_PS1   = "+S"
 	PIECE_PN1   = "+N"
 	PIECE_PL1   = "+L"
@@ -55,7 +54,6 @@ const (
 	PIECE_P2    = "p"
 	PIECE_PR2   = "+r"
 	PIECE_PB2   = "+b"
-	PIECE_PG2   = "+g"
 	PIECE_PS2   = "+s"
 	PIECE_PN2   = "+n"
 	PIECE_PL2   = "+l"
@@ -714,7 +712,7 @@ func (pPos *Position) DoMove(move Move) {
 			drop = DROP_R2
 		case PIECE_B1, PIECE_PB1:
 			drop = DROP_B2
-		case PIECE_G1, PIECE_PG1:
+		case PIECE_G1:
 			drop = DROP_G2
 		case PIECE_S1, PIECE_PS1:
 			drop = DROP_S2
@@ -730,7 +728,7 @@ func (pPos *Position) DoMove(move Move) {
 			drop = DROP_R1
 		case PIECE_B2, PIECE_PB2:
 			drop = DROP_B1
-		case PIECE_G2, PIECE_PG2:
+		case PIECE_G2:
 			drop = DROP_G1
 		case PIECE_S2, PIECE_PS2:
 			drop = DROP_S1
@@ -831,7 +829,7 @@ func (pPos *Position) UndoMove() {
 			cap = DROP_R2
 		case PIECE_B1, PIECE_PB1:
 			cap = DROP_B2
-		case PIECE_G1, PIECE_PG1:
+		case PIECE_G1:
 			cap = DROP_G2
 		case PIECE_S1, PIECE_PS1:
 			cap = DROP_S2
@@ -847,7 +845,7 @@ func (pPos *Position) UndoMove() {
 			cap = DROP_R1
 		case PIECE_B2, PIECE_PB2:
 			cap = DROP_B1
-		case PIECE_G2, PIECE_PG2:
+		case PIECE_G2:
 			cap = DROP_G1
 		case PIECE_S2, PIECE_PS2:
 			cap = DROP_S1
@@ -959,7 +957,6 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 	case PIECE_P1:
 	case PIECE_PR1:
 	case PIECE_PB1:
-	case PIECE_PG1:
 	case PIECE_PS1:
 	case PIECE_PN1:
 	case PIECE_PL1:
@@ -973,7 +970,6 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 	case PIECE_P2:
 	case PIECE_PR2:
 	case PIECE_PB2:
-	case PIECE_PG2:
 	case PIECE_PS2:
 	case PIECE_PN2:
 	case PIECE_PL2:

@@ -17,11 +17,10 @@ const (
 	PIECE_TYPE_P     = PieceType(8)
 	PIECE_TYPE_PR    = PieceType(9)
 	PIECE_TYPE_PB    = PieceType(10)
-	PIECE_TYPE_PG    = PieceType(11)
-	PIECE_TYPE_PS    = PieceType(12)
-	PIECE_TYPE_PN    = PieceType(13)
-	PIECE_TYPE_PL    = PieceType(14)
-	PIECE_TYPE_PP    = PieceType(15)
+	PIECE_TYPE_PS    = PieceType(11)
+	PIECE_TYPE_PN    = PieceType(12)
+	PIECE_TYPE_PL    = PieceType(13)
+	PIECE_TYPE_PP    = PieceType(14)
 )
 
 // Who - 駒が先手か後手か空升かを返します
@@ -29,9 +28,9 @@ func Who(piece string) Phase {
 	switch piece {
 	case PIECE_EMPTY: // 空きマス
 		return ZEROTH
-	case PIECE_K1, PIECE_R1, PIECE_B1, PIECE_G1, PIECE_S1, PIECE_N1, PIECE_L1, PIECE_P1, PIECE_PR1, PIECE_PB1, PIECE_PG1, PIECE_PS1, PIECE_PN1, PIECE_PL1, PIECE_PP1:
+	case PIECE_K1, PIECE_R1, PIECE_B1, PIECE_G1, PIECE_S1, PIECE_N1, PIECE_L1, PIECE_P1, PIECE_PR1, PIECE_PB1, PIECE_PS1, PIECE_PN1, PIECE_PL1, PIECE_PP1:
 		return FIRST
-	case PIECE_K2, PIECE_R2, PIECE_B2, PIECE_G2, PIECE_S2, PIECE_N2, PIECE_L2, PIECE_P2, PIECE_PR2, PIECE_PB2, PIECE_PG2, PIECE_PS2, PIECE_PN2, PIECE_PL2, PIECE_PP2:
+	case PIECE_K2, PIECE_R2, PIECE_B2, PIECE_G2, PIECE_S2, PIECE_N2, PIECE_L2, PIECE_P2, PIECE_PR2, PIECE_PB2, PIECE_PS2, PIECE_PN2, PIECE_PL2, PIECE_PP2:
 		return SECOND
 	default:
 		panic(fmt.Errorf("Error: Unknown piece=[%s]", piece))
@@ -63,8 +62,6 @@ func What(piece string) PieceType {
 		return PIECE_TYPE_PR
 	case PIECE_PB1, PIECE_PB2:
 		return PIECE_TYPE_PB
-	case PIECE_PG1, PIECE_PG2:
-		return PIECE_TYPE_PG
 	case PIECE_PS1, PIECE_PS2:
 		return PIECE_TYPE_PS
 	case PIECE_PN1, PIECE_PN2:
