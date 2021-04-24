@@ -946,3 +946,7 @@ func (pPos *Position) Hetero(to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
 	return pPos.Phase != Who(pPos.Board[to])
 }
+
+func (pPos *Position) IsEmptySq(sq Square) bool {
+	return pPos.Board[sq] == PIECE_EMPTY
+}
