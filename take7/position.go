@@ -637,6 +637,8 @@ func (pPos *Position) DoMove(move Move) {
 
 	src_sq := move.GetSource()
 	dst_sq := move.GetDestination()
+	// [0]movingPieceType [1]capturedPieceType
+	moving_piece_types := []PieceType{PIECE_TYPE_EMPTY, PIECE_TYPE_EMPTY}
 
 	// まず、打かどうかで処理を分けます
 	drop := src_sq
@@ -685,18 +687,21 @@ func (pPos *Position) DoMove(move Move) {
 		// 行き先に駒を置きます
 		pPos.Board[dst_sq] = piece
 		pPos.AddControl(dst_sq, 1)
+		moving_piece_types[0] = What(piece)
 	} else {
 		// 打でないなら
 
 		// あれば、取った駒
 		pPos.AddControl(dst_sq, -1)
 		captured := pPos.Board[dst_sq]
+		moving_piece_types[1] = What(captured)
 
 		// 元位置の駒を除去
 		pPos.AddControl(src_sq, -1)
 
 		// 行き先の駒の配置
 		pPos.Board[dst_sq] = pPos.Board[src_sq]
+		moving_piece_types[0] = What(pPos.Board[dst_sq])
 		pPos.Board[src_sq] = PIECE_EMPTY
 		pPos.AddControl(dst_sq, 1)
 
@@ -748,6 +753,30 @@ func (pPos *Position) DoMove(move Move) {
 	pPos.OffsetMovesIndex += 1
 	pPos.Phase = pPos.Phase%2 + 1
 
+	// 長い利きの駒が動いたときは、位置情報更新
+	for _, moving_piece_type := range moving_piece_types {
+		switch moving_piece_type {
+		case PIECE_TYPE_R:
+			for i, sq := range pPos.RookLocations {
+				if sq == src_sq {
+					pPos.RookLocations[i] = dst_sq
+				}
+			}
+		case PIECE_TYPE_B:
+			for i, sq := range pPos.BishopLocations {
+				if sq == src_sq {
+					pPos.BishopLocations[i] = dst_sq
+				}
+			}
+		case PIECE_TYPE_L:
+			for i, sq := range pPos.LanceLocations {
+				if sq == src_sq {
+					pPos.LanceLocations[i] = dst_sq
+				}
+			}
+		}
+	}
+
 	// 作業後に、長い利きの駒の利きをプラス１します
 	pPos.AddControlAllSlidingPiece(1)
 }
@@ -757,6 +786,9 @@ func (pPos *Position) UndoMove() {
 	if pPos.OffsetMovesIndex < 1 {
 		return
 	}
+
+	// [0]movingPieceType [1]capturedPieceType
+	moving_piece_types := []PieceType{PIECE_TYPE_EMPTY, PIECE_TYPE_EMPTY}
 
 	// 作業前に、長い利きの駒の利きを -1 します
 	pPos.AddControlAllSlidingPiece(-1)
@@ -775,6 +807,7 @@ func (pPos *Position) UndoMove() {
 		// 打なら
 		drop := src_sq
 		// 盤上から駒を除去します
+		moving_piece_types[0] = What(pPos.Board[dst_sq])
 		pPos.Board[dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
@@ -783,6 +816,7 @@ func (pPos *Position) UndoMove() {
 		// 打でないなら
 
 		// 行き先の駒の除去
+		moving_piece_types[0] = What(pPos.Board[dst_sq])
 		pPos.AddControl(dst_sq, -1)
 		// 移動元への駒の配置
 		pPos.Board[src_sq] = pPos.Board[dst_sq]
@@ -831,9 +865,34 @@ func (pPos *Position) UndoMove() {
 			pPos.Hands[cap-DROP_ORIGIN] -= 1
 
 			// 取った駒を行き先に戻します
+			moving_piece_types[1] = What(captured)
 			pPos.Board[dst_sq] = captured
 			pPos.AddControl(src_sq, 1)
 			pPos.AddControl(dst_sq, 1)
+		}
+	}
+
+	// 長い利きの駒が動いたときは、位置情報更新
+	for _, moving_piece_type := range moving_piece_types {
+		switch moving_piece_type {
+		case PIECE_TYPE_R:
+			for i, sq := range pPos.RookLocations {
+				if sq == src_sq {
+					pPos.RookLocations[i] = dst_sq
+				}
+			}
+		case PIECE_TYPE_B:
+			for i, sq := range pPos.BishopLocations {
+				if sq == src_sq {
+					pPos.BishopLocations[i] = dst_sq
+				}
+			}
+		case PIECE_TYPE_L:
+			for i, sq := range pPos.LanceLocations {
+				if sq == src_sq {
+					pPos.LanceLocations[i] = dst_sq
+				}
+			}
 		}
 	}
 
