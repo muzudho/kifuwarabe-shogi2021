@@ -8,7 +8,7 @@ func GenMoveList(pPos *Position) []Move {
 	// 盤面スキャンしたくないけど、駒の位置インデックスを作ってないから 仕方ない（＾～＾）
 	for rank := 1; rank < 10; rank += 1 {
 		for file := 1; file < 10; file += 1 {
-			from := uint32(file*10 + rank)
+			from := Square(file*10 + rank)
 			if pPos.Homo(from) {
 				piece := pPos.Board[from]
 

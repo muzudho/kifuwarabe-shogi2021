@@ -5,20 +5,20 @@ import "fmt"
 const (
 	// 持ち駒を打つ 100～113
 	// 先手飛打
-	DROP_R1 = iota + 100
-	DROP_B1
-	DROP_G1
-	DROP_S1
-	DROP_N1
-	DROP_L1
-	DROP_P1
-	DROP_R2
-	DROP_B2
-	DROP_G2
-	DROP_S2
-	DROP_N2
-	DROP_L2
-	DROP_P2
+	DROP_R1        = Square(100)
+	DROP_B1        = Square(101)
+	DROP_G1        = Square(102)
+	DROP_S1        = Square(103)
+	DROP_N1        = Square(104)
+	DROP_L1        = Square(105)
+	DROP_P1        = Square(106)
+	DROP_R2        = Square(107)
+	DROP_B2        = Square(108)
+	DROP_G2        = Square(109)
+	DROP_S2        = Square(110)
+	DROP_N2        = Square(111)
+	DROP_L2        = Square(112)
+	DROP_P2        = Square(113)
 	DROP_ORIGIN    = DROP_R1
 	DROP_TYPE_SIZE = DROP_P1 - DROP_ORIGIN
 )
@@ -41,7 +41,7 @@ func NewMoveValue() Move {
 }
 
 // NewMoveValue2 - 初期値として 移動元マス、移動先マスを指定してください
-func NewMoveValue2(src_sq uint32, dst_sq uint32) Move {
+func NewMoveValue2(src_sq Square, dst_sq Square) Move {
 	move := Move(0)
 	move = move.ReplaceSource(src_sq)
 	return move.ReplaceDestination(dst_sq)
@@ -59,7 +59,7 @@ func (move Move) ToCode() string {
 	count := 0
 
 	// 移動元マス(Source square)
-	source_sq := move.GetSource()
+	source_sq := Square(move.GetSource())
 	switch source_sq {
 	case DROP_R1, DROP_R2:
 		str = append(str, 'R')
@@ -91,19 +91,19 @@ func (move Move) ToCode() string {
 	}
 
 	for count < 2 {
-		var sq byte // マス番号
+		var sq Square // マス番号
 		if count == 0 {
 			// 移動元
 			sq = source_sq
 		} else if count == 1 {
 			// 移動先
-			sq = move.GetDestination()
+			sq = Square(move.GetDestination())
 		} else {
 			panic(fmt.Errorf("LogicError: count=%d", count))
 		}
 		// 正常時は必ず２桁（＾～＾）
-		file := sq / 10
-		rank := sq % 10
+		file := byte(sq / 10)
+		rank := byte(sq % 10)
 		// ASCII Code
 		// '0'=48, '9'=57, 'a'=97, 'i'=105
 		str = append(str, file+48)
@@ -116,13 +116,13 @@ func (move Move) ToCode() string {
 }
 
 // ReplaceSource - 移動元マス
-func (move Move) ReplaceSource(sq uint32) Move {
-	return Move(uint32(move)&0xffffff00 | sq)
+func (move Move) ReplaceSource(sq Square) Move {
+	return Move(uint32(move)&0xffffff00 | uint32(sq))
 }
 
 // ReplaceDestination - 移動先マス
-func (move Move) ReplaceDestination(sq uint32) Move {
-	return Move(uint32(move)&0xffff00ff | (sq << 8))
+func (move Move) ReplaceDestination(sq Square) Move {
+	return Move(uint32(move)&0xffff00ff | (uint32(sq) << 8))
 }
 
 // ReplacePromotion - 成

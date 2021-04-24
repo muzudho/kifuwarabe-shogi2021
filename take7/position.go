@@ -15,6 +15,9 @@ const BOARD_SIZE = 100
 // 1:先手 2:後手
 type Phase byte
 
+// マス番号 00～99,100～113
+type Square uint32
+
 const (
 	// 空マス
 	ZEROTH = Phase(0)
@@ -81,6 +84,12 @@ type Position struct {
 	Moves [MOVES_SIZE]Move
 	// 取った駒のリスト（＾～＾）アンドゥ ムーブするときに使うだけ（＾～＾）指し手のリストと同じ添え字を使うぜ（＾～＾）
 	CapturedList [MOVES_SIZE]string
+	// 飛車の場所。長い利きを消すために必要（＾～＾）
+	RookLocations [2]Square
+	// 角の場所。長い利きを消すために必要（＾～＾）
+	BishopLocations [2]Square
+	// 香の場所。長い利きを消すために必要（＾～＾）
+	LanceLocations [4]Square
 }
 
 func NewPosition() *Position {
@@ -231,7 +240,7 @@ func (pPos *Position) ReadPosition(command string) {
 		} else {
 		HandLoop:
 			for {
-				var drop_index int
+				var drop_index Square
 				var piece = command[i]
 				switch piece {
 				case 'R':
@@ -359,7 +368,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	var len = len(command)
 	var move = NewMoveValue()
 
-	var hand1 = 0
+	var hand1 = Square(0)
 
 	// file
 	switch ch := command[*i]; ch {
@@ -394,9 +403,9 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	if hand1 != 0 {
 		switch phase {
 		case FIRST:
-			move = move.ReplaceSource(uint32(hand1))
+			move = move.ReplaceSource(hand1)
 		case SECOND:
-			move = move.ReplaceSource(uint32(hand1 + DROP_TYPE_SIZE))
+			move = move.ReplaceSource(hand1 + DROP_TYPE_SIZE)
 		default:
 			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
@@ -413,13 +422,12 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		switch ch := command[*i]; ch {
 		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			*i += 1
-			file_int, err := strconv.Atoi(string(ch))
+			file, err := strconv.Atoi(string(ch))
 			if err != nil {
 				panic(err)
 			}
-			file := byte(file_int)
 
-			var rank byte
+			var rank int
 			switch ch2 := command[*i]; ch2 {
 			case 'a':
 				rank = 1
@@ -444,11 +452,11 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 			}
 			*i += 1
 
-			sq := file*10 + rank
+			sq := Square(file*10 + rank)
 			if count == 0 {
-				move = move.ReplaceSource(uint32(sq))
+				move = move.ReplaceSource(sq)
 			} else if count == 1 {
-				move = move.ReplaceDestination(uint32(sq))
+				move = move.ReplaceDestination(sq)
 			} else {
 				return *new(Move), fmt.Errorf("Fatal: Unknown count='%c'", count)
 			}
@@ -621,8 +629,8 @@ func (pPos *Position) SprintControl(phase Phase) string {
 
 // DoMove - 一手指すぜ（＾～＾）
 func (pPos *Position) DoMove(move Move) {
-	src_sq := uint32(move.GetSource())
-	dst_sq := uint32(move.GetDestination())
+	src_sq := Square(move.GetSource())
+	dst_sq := Square(move.GetDestination())
 	switch src_sq {
 	case DROP_R1:
 		pPos.Hands[DROP_R1-DROP_ORIGIN] -= 1
@@ -771,8 +779,8 @@ func (pPos *Position) UndoMove() {
 	move := pPos.Moves[pPos.OffsetMovesIndex]
 	captured := pPos.CapturedList[pPos.OffsetMovesIndex]
 
-	src_sq := uint32(move.GetSource())
-	dst_sq := uint32(move.GetDestination())
+	src_sq := Square(move.GetSource())
+	dst_sq := Square(move.GetDestination())
 	pPos.AddControl(dst_sq, -1)
 	switch src_sq {
 	case DROP_R1:
@@ -894,7 +902,7 @@ func (pPos *Position) UndoMove() {
 }
 
 // AddControl - 盤上のマスを指定することで、そこにある駒の利きを増減させます
-func (pPos *Position) AddControl(from uint32, sign int8) {
+func (pPos *Position) AddControl(from Square, sign int8) {
 	piece := pPos.Board[from]
 	ph := int(Who(piece)) - 1
 
@@ -959,14 +967,14 @@ func (pPos *Position) AddControl(from uint32, sign int8) {
 }
 
 // Homo - 手番と移動元の駒を持つプレイヤーが等しければ真。移動先が空なら偽
-func (pPos *Position) Homo(to uint32) bool {
+func (pPos *Position) Homo(to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
 	return pPos.Phase == Who(pPos.Board[to])
 }
 
 // Hetero - 手番と移動先の駒を持つプレイヤーが異なれば真。移動先が空マスでも真
 // Homo の逆だぜ（＾～＾）片方ありゃいいんだけど（＾～＾）
-func (pPos *Position) Hetero(to uint32) bool {
+func (pPos *Position) Hetero(to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
 	return pPos.Phase != Who(pPos.Board[to])
 }
