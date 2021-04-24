@@ -9,6 +9,9 @@ import (
 // 電竜戦が一番長いだろ（＾～＾）
 const MOVES_SIZE = 512
 
+// 00～99
+const BOARD_SIZE = 100
+
 // 1:先手 2:後手
 type Phase byte
 
@@ -60,10 +63,10 @@ const (
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
 	// [19] は １九、 [91] は ９一（＾～＾）反時計回りに９０°回転した将棋盤の状態で入ってるぜ（＾～＾）想像しろだぜ（＾～＾）
-	Board []string
+	Board [BOARD_SIZE]string
 	// 利きテーブル [0]先手 [1]後手
 	// マスへの利き数が入っています
-	ControlBoard []byte
+	ControlBoards [2][BOARD_SIZE]byte
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
@@ -89,7 +92,7 @@ func NewPosition() *Position {
 // ResetToStartpos - 初期局面にします。
 func (pos *Position) ResetToStartpos() {
 	// 初期局面にします
-	pos.Board = []string{
+	pos.Board = [BOARD_SIZE]string{
 		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
 		"1", "l", "", "p", "", "", "", "P", "", "L",
 		"2", "n", "b", "p", "", "", "", "P", "R", "N",
@@ -101,18 +104,29 @@ func (pos *Position) ResetToStartpos() {
 		"8", "n", "r", "p", "", "", "", "P", "B", "N",
 		"9", "l", "", "p", "", "", "", "P", "", "L",
 	}
-	pos.ControlBoard = []byte{
-		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
-		"1", "l", "", "p", "", "", "", "P", "", "L",
-		"2", "n", "b", "p", "", "", "", "P", "R", "N",
-		"3", "s", "", "p", "", "", "", "P", "", "S",
-		"4", "g", "", "p", "", "", "", "P", "", "G",
-		"5", "k", "", "p", "", "", "", "P", "", "K",
-		"6", "g", "", "p", "", "", "", "P", "", "G",
-		"7", "s", "", "p", "", "", "", "P", "", "S",
-		"8", "n", "r", "p", "", "", "", "P", "B", "N",
-		"9", "l", "", "p", "", "", "", "P", "", "L",
-	}
+	pos.ControlBoards = [2][BOARD_SIZE]byte{{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 1, 2, 2, 1,
+		0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+		0, 0, 0, 0, 0, 0, 1, 1, 3, 1,
+		0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
+		0, 0, 0, 0, 0, 0, 1, 0, 4, 1,
+		0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
+		0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
+		0, 0, 0, 0, 0, 0, 1, 0, 2, 0,
+		0, 0, 0, 0, 0, 0, 1, 3, 1, 1,
+	}, {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 3, 1, 0, 0, 0, 0, 0,
+		0, 0, 2, 0, 1, 0, 0, 0, 0, 0,
+		0, 2, 3, 2, 1, 0, 0, 0, 0, 0,
+		0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
+		0, 2, 4, 0, 1, 0, 0, 0, 0, 0,
+		0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
+		0, 1, 3, 1, 1, 0, 0, 0, 0, 0,
+		0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+		0, 0, 2, 2, 1, 0, 0, 0, 0, 0,
+	}}
 
 	// 持ち駒の数
 	pos.Hands = []int{
@@ -539,6 +553,70 @@ func (pos *Position) Sprint() string {
 	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
 	//return s1 + *(*string)(unsafe.Pointer(&moves_text)) + "\n"
 	return s1 + string(moves_text) + "\n"
+}
+
+// Print - 利き数ボード出力（＾ｑ＾）
+func (pos *Position) SprintControl(phase Phase) string {
+	var board [BOARD_SIZE]byte
+	var phase_str string
+	switch phase {
+	case FIRST:
+		phase_str = "First"
+		board = pos.ControlBoards[0]
+	case SECOND:
+		phase_str = "Second"
+		board = pos.ControlBoards[1]
+	default:
+		return "\n"
+	}
+
+	return "\n" +
+		//
+		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pos.StartMovesNum, (pos.StartMovesNum+pos.OffsetMovesIndex), phase_str) +
+		//
+		"\n" +
+		//
+		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pos.Board[90], pos.Board[80], pos.Board[70], pos.Board[60], pos.Board[50], pos.Board[40], pos.Board[30], pos.Board[20], pos.Board[10], pos.Board[0]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[91], board[81], board[71], board[61], board[51], board[41], board[31], board[21], board[11], board[1]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[92], board[82], board[72], board[62], board[52], board[42], board[32], board[22], board[12], board[2]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[93], board[83], board[73], board[63], board[53], board[43], board[33], board[23], board[13], board[3]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[94], board[84], board[74], board[64], board[54], board[44], board[34], board[24], board[14], board[4]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[95], board[85], board[75], board[65], board[55], board[45], board[35], board[25], board[15], board[5]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[96], board[86], board[76], board[66], board[56], board[46], board[36], board[26], board[16], board[6]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[97], board[87], board[77], board[67], board[57], board[47], board[37], board[27], board[17], board[7]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[98], board[88], board[78], board[68], board[58], board[48], board[38], board[28], board[18], board[8]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[99], board[89], board[79], board[69], board[59], board[49], board[39], board[29], board[19], board[9]) +
+		//
+		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		"\n"
 }
 
 // DoMove - 一手指すぜ（＾～＾）

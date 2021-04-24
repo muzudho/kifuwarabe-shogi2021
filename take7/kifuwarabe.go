@@ -121,6 +121,10 @@ MainLoop:
 		case "undo":
 			// 棋譜を頼りに１手戻すぜ（＾～＾）
 			pPos.UndoMove()
+		case "control":
+			// 利きの表示（＾～＾）
+			G.Chat.Debug(pPos.SprintControl(FIRST))
+			G.Chat.Debug(pPos.SprintControl(SECOND))
 		}
 
 		G.Log.FlushAllLogs()
