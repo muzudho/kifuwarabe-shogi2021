@@ -99,6 +99,10 @@ do 4d4e
 ## Test3
 
 ```plain
-# 歩が成られたところで、強制終了した（＾～＾）
+# 歩が成られたところで、強制終了した（＾～＾） --> dropのとこ直した
 position startpos moves 2g2f 1c1d 6i7h 9a9b 5i6h 4a3b 4i5h 5c5d 6g6f 7a6b 5h6g 6a7b 2f2e 2a1c 2e2d 7c7d 2d2c+
+
+# 飛打で王手されたところで、強制終了した（＾～＾）
+# 王手回避を考えてるときに、盤のUndoがちゃんとできてないようだぜ（＾～＾）
+position startpos moves 7g7f 4a5b 6i7h 6a6b 7i6h 5b4b 6h7g 4b5b 5i6h 5a4a 4i5h 2c2d 6g6f 7c7d 5h6g 3a3b 9g9f 6b7c 8i9g 7a6b 6f6e 5c5d 9g8e 5b4b 8e7c+ 2d2e 7c8b 1c1d R*6a
 ```

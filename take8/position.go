@@ -1063,8 +1063,7 @@ func (pPos *Position) DoMove(move Move) {
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
 func (pPos *Position) UndoMove() {
 
-	// TODO
-	fmt.Printf("Info: UndoMove() is under developing\n")
+	// G.StderrChat.Trace(pPos.Sprint())
 
 	if pPos.OffsetMovesIndex < 1 {
 		return
@@ -1075,9 +1074,10 @@ func (pPos *Position) UndoMove() {
 	mov_piece_type := PIECE_TYPE_EMPTY
 	cap_piece_type := PIECE_TYPE_EMPTY
 
-	pPos.OffsetMovesIndex -= 1
 	prev_phase := pPos.Phase
 	pPos.Phase = FlipPhase(pPos.Phase)
+
+	pPos.OffsetMovesIndex -= 1
 	move := pPos.Moves[pPos.OffsetMovesIndex]
 	captured := pPos.CapturedList[pPos.OffsetMovesIndex]
 
@@ -1110,6 +1110,7 @@ func (pPos *Position) UndoMove() {
 		// 行き先の駒の除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		pPos.AddControlDiff(mov_dst_sq, -1)
+
 		// 移動元への駒の配置
 		pPos.Board[mov_src_sq] = pPos.Board[mov_dst_sq]
 
@@ -1161,6 +1162,8 @@ func (pPos *Position) UndoMove() {
 			pPos.Board[mov_dst_sq] = captured
 			pPos.AddControlDiff(mov_src_sq, 1)
 			pPos.AddControlDiff(mov_dst_sq, 1)
+		} else {
+			pPos.Board[mov_dst_sq] = PIECE_EMPTY
 		}
 	}
 
@@ -1282,6 +1285,10 @@ func (pPos *Position) Hetero(from Square, to Square) bool {
 	return Who(pPos.Board[from]) != Who(pPos.Board[to])
 }
 
+// IsEmptySq - 空きマスなら真。持ち駒は偽
 func (pPos *Position) IsEmptySq(sq Square) bool {
+	if sq > 99 {
+		return false
+	}
 	return pPos.Board[sq] == PIECE_EMPTY
 }
