@@ -57,4 +57,7 @@ go btime 71000 wtime 71000 binc 2000 winc 2000
 ```plain
 # 香を１個にして利きの様子を見たろ（＾～＾）
 position sfen 4k4/9/9/9/9/9/9/9/4K3L w - 1
+
+# 歩を置いたろ（＾～＾）
+position sfen 4k4/9/9/9/9/9/8P/9/4K3L w - 1
 ```
