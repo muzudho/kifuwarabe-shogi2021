@@ -1,4 +1,4 @@
-package take7
+package take8
 
 // File - マス番号から筋（列）を取り出します
 func File(sq Square) Square {

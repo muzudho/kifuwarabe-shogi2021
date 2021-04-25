@@ -19,3 +19,7 @@ position sfen lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1 moves 
 # 局面の表示(独自拡張コマンド)
 pos
 ```
+
+## References
+
+* [go - 2つの異なるデータ型の多次元配列を宣言する方法](https://cloud6.net/so/go/977771)

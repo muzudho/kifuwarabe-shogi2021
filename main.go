@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/muzudho/kifuwarabe-shogi2021/take7"
+	"github.com/muzudho/kifuwarabe-shogi2021/take8"
 )
 
 // main - 最初に実行されます
@@ -20,5 +20,6 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	// take6.MainLoop()
-	take7.MainLoop()
+	// take7.MainLoop()
+	take8.MainLoop()
 }
