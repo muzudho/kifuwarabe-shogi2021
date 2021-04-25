@@ -56,8 +56,18 @@ go btime 71000 wtime 71000 binc 2000 winc 2000
 
 ```plain
 # 香を１個にして利きの様子を見たろ（＾～＾）
-position sfen 4k4/9/9/9/9/9/9/9/4K3L w - 1
+position sfen 4k4/9/9/9/9/9/9/9/4K3L b - 1
+pos
+control diff
 
 # 歩を置いたろ（＾～＾）
-position sfen 4k4/9/9/9/9/9/8P/9/4K3L w - 1
+position sfen 4k4/9/9/9/9/9/8P/9/4K3L b - 1
+pos
+control diff
+
+# 飛車の利きをテストするとき（＾～＾）
+position sfen 4k4/9/9/5R3/2P3P2/9/9/9/4K4 b - 1
+pos
+control diff
+do 4e4d
 ```

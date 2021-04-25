@@ -99,12 +99,12 @@ type Position struct {
 
 func NewPosition() *Position {
 	var ins = new(Position)
-	ins.ResetToStartpos()
+	ins.resetToZero()
 	return ins
 }
 
 // ResetToStartpos - 駒を置いていな状態でリセットします
-func (pPos *Position) ResetToZero() {
+func (pPos *Position) resetToZero() {
 	// 筋、段のラベルだけ入れとくぜ（＾～＾）
 	pPos.Board = [BOARD_SIZE]string{
 		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
@@ -185,8 +185,8 @@ func (pPos *Position) ResetToZero() {
 	pPos.CapturedList = [MOVES_SIZE]string{}
 }
 
-// ResetToStartpos - 初期局面にします。
-func (pPos *Position) ResetToStartpos() {
+// resetToStartpos - 初期局面にします。利きの計算はまだ行っていません。
+func (pPos *Position) resetToStartpos() {
 	// 初期局面にします
 	pPos.Board = [BOARD_SIZE]string{
 		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
@@ -202,27 +202,50 @@ func (pPos *Position) ResetToStartpos() {
 	}
 	pPos.ControlBoards = [2][BOARD_SIZE]int8{{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 1, 2, 2, 1,
-		0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
-		0, 0, 0, 0, 0, 0, 1, 1, 3, 1,
-		0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
-		0, 0, 0, 0, 0, 0, 1, 0, 4, 1,
-		0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
-		0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
-		0, 0, 0, 0, 0, 0, 1, 0, 2, 0,
-		0, 0, 0, 0, 0, 0, 1, 3, 1, 1,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}, {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 1, 1, 3, 1, 0, 0, 0, 0, 0,
-		0, 0, 2, 0, 1, 0, 0, 0, 0, 0,
-		0, 2, 3, 2, 1, 0, 0, 0, 0, 0,
-		0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
-		0, 2, 4, 0, 1, 0, 0, 0, 0, 0,
-		0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
-		0, 1, 3, 1, 1, 0, 0, 0, 0, 0,
-		0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
-		0, 0, 2, 2, 1, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}}
+	// pPos.ControlBoards = [2][BOARD_SIZE]int8{{
+	// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	// 	0, 0, 0, 0, 0, 0, 1, 2, 2, 1,
+	// 	0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+	// 	0, 0, 0, 0, 0, 0, 1, 1, 3, 1,
+	// 	0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
+	// 	0, 0, 0, 0, 0, 0, 1, 0, 4, 1,
+	// 	0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
+	// 	0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
+	// 	0, 0, 0, 0, 0, 0, 1, 0, 2, 0,
+	// 	0, 0, 0, 0, 0, 0, 1, 3, 1, 1,
+	// }, {
+	// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	// 	0, 1, 1, 3, 1, 0, 0, 0, 0, 0,
+	// 	0, 0, 2, 0, 1, 0, 0, 0, 0, 0,
+	// 	0, 2, 3, 2, 1, 0, 0, 0, 0, 0,
+	// 	0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
+	// 	0, 2, 4, 0, 1, 0, 0, 0, 0, 0,
+	// 	0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
+	// 	0, 1, 3, 1, 1, 0, 0, 0, 0, 0,
+	// 	0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+	// 	0, 0, 2, 2, 1, 0, 0, 0, 0, 0,
+	// }}
 	pPos.ControlBoardsDiff = [2][BOARD_SIZE]int8{{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -272,7 +295,7 @@ func (pPos *Position) ReadPosition(command string) {
 	var i int
 	if strings.HasPrefix(command, "position startpos") {
 		// 平手初期局面をセット（＾～＾）
-		pPos.ResetToStartpos()
+		pPos.resetToStartpos()
 		i = 17
 
 		if i >= len || command[i] != ' ' {
@@ -283,7 +306,7 @@ func (pPos *Position) ReadPosition(command string) {
 
 	} else if strings.HasPrefix(command, "position sfen ") {
 		// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
-		pPos.ResetToZero()
+		pPos.resetToZero()
 		i = 14
 		var rank = 1
 		var file = 9
@@ -528,16 +551,16 @@ func (pPos *Position) ReadPosition(command string) {
 	}
 
 	// 開始局面の利きを計算（＾～＾）
-	fmt.Printf("Debug: 開始局面の利きを計算（＾～＾）\n")
+	//fmt.Printf("Debug: 開始局面の利きを計算（＾～＾）\n")
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			if !pPos.IsEmptySq(sq) {
-				fmt.Printf("Debug: sq=%d\n", sq)
+				//fmt.Printf("Debug: sq=%d\n", sq)
 				pPos.AddControl(sq, 1)
 			}
 		}
 	}
-	fmt.Printf("Debug: 開始局面の利き計算おわり（＾～＾）\n")
+	//fmt.Printf("Debug: 開始局面の利き計算おわり（＾～＾）\n")
 
 	// 読込んだ Move を、上書きする感じで、もう一回 全て実行（＾～＾）
 	moves_size := pPos.OffsetMovesIndex
@@ -757,19 +780,24 @@ func (pPos *Position) Sprint() string {
 func (pPos *Position) SprintControl(phase Phase, flag int) string {
 	var board [BOARD_SIZE]int8
 	var phase_str string
+	var title string
 	switch phase {
 	case FIRST:
 		phase_str = "First"
 		if flag == 1 { // 利き数の差分
+			title = "ControlDiff"
 			board = pPos.ControlBoardsDiff[0]
 		} else {
+			title = "Control"
 			board = pPos.ControlBoards[0]
 		}
 	case SECOND:
 		phase_str = "Second"
 		if flag == 1 {
+			title = "ControlDiff"
 			board = pPos.ControlBoardsDiff[1]
 		} else {
+			title = "Control"
 			board = pPos.ControlBoards[1]
 		}
 	default:
@@ -778,7 +806,7 @@ func (pPos *Position) SprintControl(phase Phase, flag int) string {
 
 	return "\n" +
 		//
-		fmt.Sprintf("[Control %s]\n", phase_str) +
+		fmt.Sprintf("[%s %s]\n", title, phase_str) +
 		//
 		"\n" +
 		//
@@ -858,7 +886,7 @@ func (pPos *Position) DoMove(move Move) {
 	mov_src_sq := move.GetSource()
 	mov_dst_sq := move.GetDestination()
 	var cap_src_sq Square
-	var cap_dst_sq Square
+	var cap_dst_sq = SQUARE_EMPTY
 
 	// まず、打かどうかで処理を分けます
 	drop := mov_src_sq
@@ -927,7 +955,6 @@ func (pPos *Position) DoMove(move Move) {
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
 		pPos.AddControl(mov_dst_sq, 1)
 
-		// cap_dst_sq = Square(0)
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
@@ -1039,7 +1066,7 @@ func (pPos *Position) UndoMove() {
 	mov_dst_sq := move.GetDestination()
 	mov_src_sq := move.GetSource()
 	var cap_dst_sq Square
-	var cap_src_sq Square
+	var cap_src_sq = SQUARE_EMPTY
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1063,7 +1090,6 @@ func (pPos *Position) UndoMove() {
 		pPos.Board[mov_src_sq] = pPos.Board[mov_dst_sq]
 
 		// あれば、取った駒は駒台から下ろします
-		// cap := Square(0)
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
@@ -1186,12 +1212,12 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 	}
 
 	ph := int(Who(piece)) - 1
-	fmt.Printf("Debug: ph=%d\n", ph)
+	// fmt.Printf("Debug: ph=%d\n", ph)
 
 	sq_list := GenControl(pPos, from)
 
 	for _, to := range sq_list {
-		fmt.Printf("Debug: to=%d\n", to)
+		// fmt.Printf("Debug: to=%d\n", to)
 		// 差分の方のテーブルを更新（＾～＾）
 		pPos.ControlBoardsDiff[ph][to] += sign * 1
 	}

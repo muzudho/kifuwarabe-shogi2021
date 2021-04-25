@@ -40,7 +40,7 @@ func MainLoop() {
 	printPath := filepath.Join(*workdir, "output/print.log")
 
 	// ロガーの作成。
-	// TODO ディレクトリが存在しなければ、強制終了します。
+	// TODO ディレクトリが存在しなければ、強制終了してしまいます。
 	G.Log = *l.NewLogger(
 		tracePath,
 		debugPath,
