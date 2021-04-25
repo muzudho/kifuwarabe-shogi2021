@@ -875,18 +875,22 @@ func (pPos *Position) SprintLocation() string {
 
 // DoMove - 一手指すぜ（＾～＾）
 func (pPos *Position) DoMove(move Move) {
-	// 作業前に、長い利きの駒の利きを -1 します
-	pPos.AddControlAllSlidingPiece(-1)
-
 	// １手指すと１～２の駒が動くことに着目してくれだぜ（＾～＾）
 	// 動かしている駒と、取った駒だぜ（＾～＾）
 	mov_piece_type := PIECE_TYPE_EMPTY
 	cap_piece_type := PIECE_TYPE_EMPTY
 
 	mov_src_sq := move.GetSource()
+	if pPos.IsEmptySq(mov_src_sq) {
+		// 人間の打鍵ミスか（＾～＾）
+		fmt.Printf("Error: %d square is empty\n", mov_src_sq)
+	}
 	mov_dst_sq := move.GetDestination()
 	var cap_src_sq Square
 	var cap_dst_sq = SQUARE_EMPTY
+
+	// 作業前に、長い利きの駒の利きを -1 します
+	pPos.AddControlAllSlidingPiece(-1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	drop := mov_src_sq
@@ -1040,7 +1044,7 @@ func (pPos *Position) DoMove(move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します
-	// TODO pPos.AddControlAllSlidingPiece(1)
+	pPos.AddControlAllSlidingPiece(1, mov_src_sq)
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
@@ -1054,9 +1058,6 @@ func (pPos *Position) UndoMove() {
 	mov_piece_type := PIECE_TYPE_EMPTY
 	cap_piece_type := PIECE_TYPE_EMPTY
 
-	// 作業前に、長い利きの駒の利きを -1 します
-	// TODO pPos.AddControlAllSlidingPiece(-1)
-
 	pPos.OffsetMovesIndex -= 1
 	prev_phase := pPos.Phase
 	pPos.Phase = pPos.Phase%2 + 1
@@ -1067,6 +1068,9 @@ func (pPos *Position) UndoMove() {
 	mov_src_sq := move.GetSource()
 	var cap_dst_sq Square
 	var cap_src_sq = SQUARE_EMPTY
+
+	// 作業前に、長い利きの駒の利きを -1 します
+	pPos.AddControlAllSlidingPiece(-1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1177,23 +1181,23 @@ func (pPos *Position) UndoMove() {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します
-	// TODO pPos.AddControlAllSlidingPiece(1)
+	pPos.AddControlAllSlidingPiece(1, mov_dst_sq)
 }
 
 // AddControlAllSlidingPiece - すべての長い利きの駒の利きを増減させます
-func (pPos *Position) AddControlAllSlidingPiece(sign int8) {
+func (pPos *Position) AddControlAllSlidingPiece(sign int8, excludeFrom Square) {
 	for _, from := range pPos.RookLocations {
-		if from != SQUARE_EMPTY {
+		if from != SQUARE_EMPTY && from != excludeFrom {
 			pPos.AddControl(from, sign)
 		}
 	}
 	for _, from := range pPos.BishopLocations {
-		if from != SQUARE_EMPTY {
+		if from != SQUARE_EMPTY && from != excludeFrom {
 			pPos.AddControl(from, sign)
 		}
 	}
 	for _, from := range pPos.LanceLocations {
-		if from != SQUARE_EMPTY {
+		if from != SQUARE_EMPTY && from != excludeFrom {
 			pPos.AddControl(from, sign)
 		}
 	}

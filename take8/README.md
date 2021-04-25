@@ -69,5 +69,5 @@ control diff
 position sfen 4k4/9/9/5R3/2P3P2/9/9/9/4K4 b - 1
 pos
 control diff
-do 4e4d
+do 4d4e
 ```
