@@ -104,6 +104,7 @@ MainLoop:
 			G.Chat.Print("bestmove %s\n", bestmove.ToCode())
 		case "quit":
 			break MainLoop
+		// 以下、きふわらべ独自拡張コマンド
 		case "pos":
 			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
 			G.Chat.Debug(pPos.Sprint())
@@ -131,6 +132,9 @@ MainLoop:
 				G.Chat.Debug(pPos.SprintControl(FIRST, 0))
 				G.Chat.Debug(pPos.SprintControl(SECOND, 0))
 			}
+		case "location":
+			// あの駒、どこにいんの（＾～＾）？
+			G.Chat.Debug(pPos.SprintLocation())
 		}
 
 		G.Log.FlushAllLogs()

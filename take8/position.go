@@ -98,6 +98,86 @@ func NewPosition() *Position {
 	return ins
 }
 
+// ResetToStartpos - 駒を置いていな状態でリセットします
+func (pPos *Position) ResetToZero() {
+	pPos.Board = [BOARD_SIZE]string{
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "", "", "",
+	}
+	pPos.ControlBoards = [2][BOARD_SIZE]int8{{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}, {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}}
+	pPos.ControlBoardsDiff = [2][BOARD_SIZE]int8{{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}, {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}}
+	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
+	pPos.RookLocations = [2]Square{0, 0}
+	pPos.BishopLocations = [2]Square{0, 0}
+	pPos.LanceLocations = [4]Square{0, 0, 0, 0}
+
+	// 持ち駒の数
+	pPos.Hands = []int{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}
+	// 先手の局面
+	pPos.Phase = FIRST
+	// 何手目か
+	pPos.StartMovesNum = 1
+	pPos.OffsetMovesIndex = 0
+	// 指し手のリスト
+	pPos.Moves = [MOVES_SIZE]Move{}
+	// 取った駒のリスト
+	pPos.CapturedList = [MOVES_SIZE]string{}
+}
+
 // ResetToStartpos - 初期局面にします。
 func (pPos *Position) ResetToStartpos() {
 	// 初期局面にします
@@ -180,13 +260,11 @@ func (pPos *Position) ResetToStartpos() {
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
 func (pPos *Position) ReadPosition(command string) {
-	// めんどくさいんで、初期化の代わりに 平手初期局面をセットするぜ（＾～＾） 盤面は あとで上書きされるから大丈夫（＾～＾）
-	pPos.ResetToStartpos()
-
 	var len = len(command)
 	var i int
 	if strings.HasPrefix(command, "position startpos") {
-		// 平手初期局面が指定されたら、さっき初期化したんで、そのまま終了だぜ（＾～＾）
+		// 平手初期局面をセット（＾～＾）
+		pPos.ResetToStartpos()
 		i = 17
 
 		if i >= len || command[i] != ' ' {
@@ -197,12 +275,14 @@ func (pPos *Position) ReadPosition(command string) {
 
 	} else {
 		// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
+		pPos.ResetToZero()
 		i = 14
 		var rank = 1
 		var file = 9
 
 	BoardLoop:
 		for {
+			promoted := false
 			switch pc := command[i]; pc {
 			case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
 				pPos.Board[file*10+rank] = string(pc)
@@ -217,14 +297,7 @@ func (pPos *Position) ReadPosition(command string) {
 				i += 1
 			case '+':
 				i += 1
-				switch pc2 := command[i]; pc2 {
-				case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
-					pPos.Board[file*10+rank] = "+" + string(pc2)
-					file -= 1
-					i += 1
-				default:
-					panic("Undefined sfen board+")
-				}
+				promoted = true
 			case '/':
 				file = 9
 				rank += 1
@@ -234,6 +307,39 @@ func (pPos *Position) ReadPosition(command string) {
 				break BoardLoop
 			default:
 				panic("Undefined sfen board")
+			}
+
+			if promoted {
+				switch pc2 := command[i]; pc2 {
+				case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
+					pPos.Board[file*10+rank] = "+" + string(pc2)
+					file -= 1
+					i += 1
+				default:
+					panic("Undefined sfen board+")
+				}
+			}
+
+			// 長い利きの駒は位置を覚えておくぜ（＾～＾）
+			switch command[i-1] {
+			case 'R', 'r': // 成も兼ねてる（＾～＾）
+				for i, sq := range pPos.RookLocations {
+					if sq == 0 {
+						pPos.RookLocations[i] = Square(file*10 + rank)
+					}
+				}
+			case 'B', 'b':
+				for i, sq := range pPos.BishopLocations {
+					if sq == 0 {
+						pPos.RookLocations[i] = Square(file*10 + rank)
+					}
+				}
+			case 'L', 'l':
+				for i, sq := range pPos.LanceLocations {
+					if sq == 0 {
+						pPos.RookLocations[i] = Square(file*10 + rank)
+					}
+				}
 			}
 		}
 
@@ -303,6 +409,7 @@ func (pPos *Position) ReadPosition(command string) {
 				default:
 					panic(fmt.Errorf("Fatal: Unknown piece=%c", piece))
 				}
+				i += 1
 
 				var number = 0
 			NumberLoop:
@@ -325,6 +432,29 @@ func (pPos *Position) ReadPosition(command string) {
 				}
 
 				pPos.Hands[drop_index] = number
+
+				// 長い利きの駒は位置を覚えておくぜ（＾～＾）
+				switch drop_index {
+				case DROP_R1, DROP_R2:
+					for i, sq := range pPos.RookLocations {
+						if sq == 0 {
+							pPos.RookLocations[i] = Square(file*10 + rank)
+						}
+					}
+				case DROP_B1, DROP_B2:
+					for i, sq := range pPos.BishopLocations {
+						if sq == 0 {
+							pPos.RookLocations[i] = Square(file*10 + rank)
+						}
+					}
+				case DROP_L1, DROP_L2:
+					for i, sq := range pPos.LanceLocations {
+						if sq == 0 {
+							pPos.RookLocations[i] = Square(file*10 + rank)
+						}
+					}
+				}
+
 			}
 		}
 
@@ -589,7 +719,7 @@ func (pPos *Position) Sprint() string {
 	return s1 + string(moves_text) + "\n"
 }
 
-// Print - 利き数ボード出力（＾ｑ＾）
+// SprintControl - 利き数ボード出力（＾ｑ＾）
 //
 // Parameters
 // ----------
@@ -661,6 +791,25 @@ func (pPos *Position) SprintControl(phase Phase, flag int) string {
 		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[99], board[89], board[79], board[69], board[59], board[49], board[39], board[29], board[19], board[9]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
+		//
+		"\n"
+}
+
+// SprintLocation - あの駒どこにいんの？を表示
+func (pPos *Position) SprintLocation() string {
+	return "\n" +
+		//
+		" R          B          L\n" +
+		//
+		"+---+---+  +---+---+  +---+---+---+---+\n" +
+		// 持ち駒は３桁になるぜ（＾～＾）
+		fmt.Sprintf("|%3d|%3d|  |%3d|%3d|  |%3d|%3d|%3d|%3d|\n",
+			pPos.RookLocations[0], pPos.RookLocations[1],
+			pPos.BishopLocations[0], pPos.BishopLocations[1],
+			pPos.LanceLocations[0], pPos.LanceLocations[1],
+			pPos.LanceLocations[2], pPos.LanceLocations[3]) +
+		//
+		"+---+---+  +---+---+  +---+---+---+---+\n" +
 		//
 		"\n"
 }
@@ -980,7 +1129,8 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 	sq_list := GenControl(pPos, from)
 
 	for _, to := range sq_list {
-		pPos.ControlBoards[ph][to] += sign * 1
+		// 差分の方のテーブルを更新（＾～＾）
+		pPos.ControlBoardsDiff[ph][to] += sign * 1
 	}
 }
 
