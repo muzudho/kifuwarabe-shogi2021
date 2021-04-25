@@ -15,6 +15,11 @@ const BOARD_SIZE = 100
 // 1:先手 2:後手
 type Phase byte
 
+// FlipPhase - 先後を反転します
+func FlipPhase(phase Phase) Phase {
+	return phase%2 + 1
+}
+
 // マス番号 00～99,100～113
 type Square uint32
 
@@ -545,7 +550,7 @@ func (pPos *Position) ReadPosition(command string) {
 			}
 			pPos.Moves[pPos.OffsetMovesIndex] = move
 			pPos.OffsetMovesIndex += 1
-			pPos.Phase = pPos.Phase%2 + 1
+			pPos.Phase = FlipPhase(pPos.Phase)
 		}
 	}
 
@@ -1004,14 +1009,14 @@ func (pPos *Position) DoMove(move Move) {
 		}
 
 		if cap_dst_sq != SQUARE_EMPTY {
-			pPos.Hands[drop-DROP_ORIGIN] += 1
+			pPos.Hands[cap_dst_sq-DROP_ORIGIN] += 1
 		}
 	}
 
 	pPos.Moves[pPos.OffsetMovesIndex] = move
 	pPos.OffsetMovesIndex += 1
 	prev_phase := pPos.Phase
-	pPos.Phase = pPos.Phase%2 + 1
+	pPos.Phase = FlipPhase(pPos.Phase)
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
 	piece_type_list := []PieceType{mov_piece_type, cap_piece_type}
@@ -1072,7 +1077,7 @@ func (pPos *Position) UndoMove() {
 
 	pPos.OffsetMovesIndex -= 1
 	prev_phase := pPos.Phase
-	pPos.Phase = pPos.Phase%2 + 1
+	pPos.Phase = FlipPhase(pPos.Phase)
 	move := pPos.Moves[pPos.OffsetMovesIndex]
 	captured := pPos.CapturedList[pPos.OffsetMovesIndex]
 

@@ -95,3 +95,10 @@ pos
 control diff
 do 4d4e
 ```
+
+## Test3
+
+```plain
+# 歩が成られたところで、強制終了した（＾～＾）
+position startpos moves 2g2f 1c1d 6i7h 9a9b 5i6h 4a3b 4i5h 5c5d 6g6f 7a6b 5h6g 6a7b 2f2e 2a1c 2e2d 7c7d 2d2c+
+```

@@ -41,6 +41,7 @@ func NewMoveValue() Move {
 }
 
 // NewMoveValue2 - 初期値として 移動元マス、移動先マスを指定してください
+// TODO 成、不成も欲しいぜ（＾～＾）
 func NewMoveValue2(src_sq Square, dst_sq Square) Move {
 	move := Move(0)
 	move = move.ReplaceSource(src_sq)
