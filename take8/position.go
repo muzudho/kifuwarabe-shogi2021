@@ -889,7 +889,7 @@ func (pPos *Position) DoMove(move Move) {
 	var cap_src_sq Square
 	var cap_dst_sq = SQUARE_EMPTY
 
-	// 作業前に、長い利きの駒の利きを -1 します
+	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
 	pPos.AddControlAllSlidingPiece(-1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
@@ -1043,12 +1043,16 @@ func (pPos *Position) DoMove(move Move) {
 		}
 	}
 
-	// 作業後に、長い利きの駒の利きをプラス１します
-	pPos.AddControlAllSlidingPiece(1, mov_src_sq)
+	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
+	pPos.AddControlAllSlidingPiece(1, mov_dst_sq)
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
 func (pPos *Position) UndoMove() {
+
+	// TODO
+	fmt.Printf("Info: UndoMove() is under developing\n")
+
 	if pPos.OffsetMovesIndex < 1 {
 		return
 	}
@@ -1069,7 +1073,7 @@ func (pPos *Position) UndoMove() {
 	var cap_dst_sq Square
 	var cap_src_sq = SQUARE_EMPTY
 
-	// 作業前に、長い利きの駒の利きを -1 します
+	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	pPos.AddControlAllSlidingPiece(-1, mov_dst_sq)
 
 	// 打かどうかで分けます
@@ -1180,8 +1184,8 @@ func (pPos *Position) UndoMove() {
 		}
 	}
 
-	// 作業後に、長い利きの駒の利きをプラス１します
-	pPos.AddControlAllSlidingPiece(1, mov_dst_sq)
+	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
+	pPos.AddControlAllSlidingPiece(1, mov_src_sq)
 }
 
 // AddControlAllSlidingPiece - すべての長い利きの駒の利きを増減させます
