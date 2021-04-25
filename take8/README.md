@@ -55,6 +55,12 @@ go btime 71000 wtime 71000 binc 2000 winc 2000
 ## Test2
 
 ```plain
+# 玉だけ（＾～＾）
+position sfen 4k4/9/9/9/9/9/9/9/4K4 b - 1
+pos
+control
+control diff
+
 # 香を１個にして利きの様子を見たろ（＾～＾）
 position sfen 4k4/9/9/9/9/9/9/9/4K3L b - 1
 pos

@@ -79,7 +79,7 @@ type Position struct {
 	// 利きテーブル [0]先手 [1]後手
 	// マスへの利き数が入っています
 	ControlBoards [2][BOARD_SIZE]int8
-	// マスへの利き数の差分が入っています
+	// マスへの利き数の差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
 	ControlBoardsDiff [2][BOARD_SIZE]int8
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
@@ -298,10 +298,9 @@ func (pPos *Position) ReadPosition(command string) {
 		pPos.resetToStartpos()
 		i = 17
 
-		if i >= len || command[i] != ' ' {
-			return
+		if i < len && command[i] == ' ' {
+			i += 1
 		}
-		i += 1
 		// moves へ続くぜ（＾～＾）
 
 	} else if strings.HasPrefix(command, "position sfen ") {
@@ -550,17 +549,21 @@ func (pPos *Position) ReadPosition(command string) {
 		}
 	}
 
+	// 利きの差分テーブルをクリアー（＾～＾）
+	pPos.ClearControlDiff()
+
 	// 開始局面の利きを計算（＾～＾）
 	//fmt.Printf("Debug: 開始局面の利きを計算（＾～＾）\n")
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			if !pPos.IsEmptySq(sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
-				pPos.AddControl(sq, 1)
+				pPos.AddControlDiff(sq, 1)
 			}
 		}
 	}
 	//fmt.Printf("Debug: 開始局面の利き計算おわり（＾～＾）\n")
+	pPos.MergeControlDiff()
 
 	// 読込んだ Move を、上書きする感じで、もう一回 全て実行（＾～＾）
 	moves_size := pPos.OffsetMovesIndex
@@ -889,8 +892,11 @@ func (pPos *Position) DoMove(move Move) {
 	var cap_src_sq Square
 	var cap_dst_sq = SQUARE_EMPTY
 
+	// 利きの差分テーブルをクリアー（＾～＾）
+	pPos.ClearControlDiff()
+
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
-	pPos.AddControlAllSlidingPiece(-1, mov_src_sq)
+	pPos.AddControlDiffAllSlidingPiece(-1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	drop := mov_src_sq
@@ -937,7 +943,7 @@ func (pPos *Position) DoMove(move Move) {
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
-		pPos.AddControl(mov_dst_sq, 1)
+		pPos.AddControlDiff(mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -945,19 +951,19 @@ func (pPos *Position) DoMove(move Move) {
 		// 移動先に駒があれば、その駒の利きを除外します
 		captured := pPos.Board[mov_dst_sq]
 		if captured != PIECE_EMPTY {
-			pPos.AddControl(mov_dst_sq, -1)
+			pPos.AddControlDiff(mov_dst_sq, -1)
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
 
 		// 元位置の駒を除去
-		pPos.AddControl(mov_src_sq, -1)
+		pPos.AddControlDiff(mov_src_sq, -1)
 
 		// 行き先の駒の配置
 		pPos.Board[mov_dst_sq] = pPos.Board[mov_src_sq]
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
-		pPos.AddControl(mov_dst_sq, 1)
+		pPos.AddControlDiff(mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1044,7 +1050,9 @@ func (pPos *Position) DoMove(move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
-	pPos.AddControlAllSlidingPiece(1, mov_dst_sq)
+	pPos.AddControlDiffAllSlidingPiece(1, mov_dst_sq)
+
+	pPos.MergeControlDiff()
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
@@ -1073,8 +1081,11 @@ func (pPos *Position) UndoMove() {
 	var cap_dst_sq Square
 	var cap_src_sq = SQUARE_EMPTY
 
+	// 利きの差分テーブルをクリアー（＾～＾）
+	pPos.ClearControlDiff()
+
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
-	pPos.AddControlAllSlidingPiece(-1, mov_dst_sq)
+	pPos.AddControlDiffAllSlidingPiece(-1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1093,7 +1104,7 @@ func (pPos *Position) UndoMove() {
 
 		// 行き先の駒の除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
-		pPos.AddControl(mov_dst_sq, -1)
+		pPos.AddControlDiff(mov_dst_sq, -1)
 		// 移動元への駒の配置
 		pPos.Board[mov_src_sq] = pPos.Board[mov_dst_sq]
 
@@ -1143,8 +1154,8 @@ func (pPos *Position) UndoMove() {
 			// 取った駒を行き先に戻します
 			cap_piece_type = What(captured)
 			pPos.Board[mov_dst_sq] = captured
-			pPos.AddControl(mov_src_sq, 1)
-			pPos.AddControl(mov_dst_sq, 1)
+			pPos.AddControlDiff(mov_src_sq, 1)
+			pPos.AddControlDiff(mov_dst_sq, 1)
 		}
 	}
 
@@ -1185,30 +1196,32 @@ func (pPos *Position) UndoMove() {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
-	pPos.AddControlAllSlidingPiece(1, mov_src_sq)
+	pPos.AddControlDiffAllSlidingPiece(1, mov_src_sq)
+
+	pPos.MergeControlDiff()
 }
 
-// AddControlAllSlidingPiece - すべての長い利きの駒の利きを増減させます
-func (pPos *Position) AddControlAllSlidingPiece(sign int8, excludeFrom Square) {
+// AddControlDiffAllSlidingPiece - すべての長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
+func (pPos *Position) AddControlDiffAllSlidingPiece(sign int8, excludeFrom Square) {
 	for _, from := range pPos.RookLocations {
 		if from != SQUARE_EMPTY && from != excludeFrom {
-			pPos.AddControl(from, sign)
+			pPos.AddControlDiff(from, sign)
 		}
 	}
 	for _, from := range pPos.BishopLocations {
 		if from != SQUARE_EMPTY && from != excludeFrom {
-			pPos.AddControl(from, sign)
+			pPos.AddControlDiff(from, sign)
 		}
 	}
 	for _, from := range pPos.LanceLocations {
 		if from != SQUARE_EMPTY && from != excludeFrom {
-			pPos.AddControl(from, sign)
+			pPos.AddControlDiff(from, sign)
 		}
 	}
 }
 
-// AddControl - 盤上のマスを指定することで、そこにある駒の利きを増減させます
-func (pPos *Position) AddControl(from Square, sign int8) {
+// AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
+func (pPos *Position) AddControlDiff(from Square, sign int8) {
 	if from > 99 {
 		// 持ち駒は無視します
 		return
@@ -1228,6 +1241,26 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 		// fmt.Printf("Debug: to=%d\n", to)
 		// 差分の方のテーブルを更新（＾～＾）
 		pPos.ControlBoardsDiff[ph][to] += sign * 1
+	}
+}
+
+// ClearControlDiff - 利きの差分テーブルをクリアーするぜ（＾～＾）
+func (pPos *Position) ClearControlDiff() {
+	for sq := Square(11); sq < 100; sq += 1 {
+		if File(sq) != 0 && Rank(sq) != 0 {
+			pPos.ControlBoardsDiff[0][sq] = 0
+			pPos.ControlBoardsDiff[1][sq] = 0
+		}
+	}
+}
+
+// MergeControlDiff - 利きの差分を解消するぜ（＾～＾）
+func (pPos *Position) MergeControlDiff() {
+	for sq := Square(11); sq < 100; sq += 1 {
+		if File(sq) != 0 && Rank(sq) != 0 {
+			pPos.ControlBoards[0][sq] += pPos.ControlBoardsDiff[0][sq]
+			pPos.ControlBoards[1][sq] += pPos.ControlBoardsDiff[1][sq]
+		}
 	}
 }
 
