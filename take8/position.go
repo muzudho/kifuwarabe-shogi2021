@@ -18,6 +18,9 @@ type Phase byte
 // マス番号 00～99,100～113
 type Square uint32
 
+// マス番号を指定しないことを意味するマス番号
+const SQUARE_EMPTY = Square(0)
+
 const (
 	// 空マス
 	ZEROTH = Phase(0)
@@ -100,17 +103,18 @@ func NewPosition() *Position {
 
 // ResetToStartpos - 駒を置いていな状態でリセットします
 func (pPos *Position) ResetToZero() {
+	// 筋、段のラベルだけ入れとくぜ（＾～＾）
 	pPos.Board = [BOARD_SIZE]string{
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "",
+		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
+		"1", "", "", "", "", "", "", "", "", "",
+		"2", "", "", "", "", "", "", "", "", "",
+		"3", "", "", "", "", "", "", "", "", "",
+		"4", "", "", "", "", "", "", "", "", "",
+		"5", "", "", "", "", "", "", "", "", "",
+		"6", "", "", "", "", "", "", "", "", "",
+		"7", "", "", "", "", "", "", "", "", "",
+		"8", "", "", "", "", "", "", "", "", "",
+		"9", "", "", "", "", "", "", "", "", "",
 	}
 	pPos.ControlBoards = [2][BOARD_SIZE]int8{{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -273,7 +277,7 @@ func (pPos *Position) ReadPosition(command string) {
 		i += 1
 		// moves へ続くぜ（＾～＾）
 
-	} else {
+	} else if strings.HasPrefix(command, "position sfen ") {
 		// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
 		pPos.ResetToZero()
 		i = 14
@@ -324,20 +328,23 @@ func (pPos *Position) ReadPosition(command string) {
 			switch command[i-1] {
 			case 'R', 'r': // 成も兼ねてる（＾～＾）
 				for i, sq := range pPos.RookLocations {
-					if sq == 0 {
-						pPos.RookLocations[i] = Square(file*10 + rank)
+					if sq == SQUARE_EMPTY {
+						pPos.RookLocations[i] = Square((file+1)*10 + rank)
+						break
 					}
 				}
 			case 'B', 'b':
 				for i, sq := range pPos.BishopLocations {
-					if sq == 0 {
-						pPos.RookLocations[i] = Square(file*10 + rank)
+					if sq == SQUARE_EMPTY {
+						pPos.BishopLocations[i] = Square((file+1)*10 + rank)
+						break
 					}
 				}
 			case 'L', 'l':
 				for i, sq := range pPos.LanceLocations {
-					if sq == 0 {
-						pPos.RookLocations[i] = Square(file*10 + rank)
+					if sq == SQUARE_EMPTY {
+						pPos.LanceLocations[i] = Square((file+1)*10 + rank)
+						break
 					}
 				}
 			}
@@ -437,20 +444,23 @@ func (pPos *Position) ReadPosition(command string) {
 				switch drop_index {
 				case DROP_R1, DROP_R2:
 					for i, sq := range pPos.RookLocations {
-						if sq == 0 {
-							pPos.RookLocations[i] = Square(file*10 + rank)
+						if sq == SQUARE_EMPTY {
+							pPos.RookLocations[i] = drop_index
+							break
 						}
 					}
 				case DROP_B1, DROP_B2:
 					for i, sq := range pPos.BishopLocations {
-						if sq == 0 {
-							pPos.RookLocations[i] = Square(file*10 + rank)
+						if sq == SQUARE_EMPTY {
+							pPos.BishopLocations[i] = drop_index
+							break
 						}
 					}
 				case DROP_L1, DROP_L2:
 					for i, sq := range pPos.LanceLocations {
-						if sq == 0 {
-							pPos.RookLocations[i] = Square(file*10 + rank)
+						if sq == SQUARE_EMPTY {
+							pPos.LanceLocations[i] = drop_index
+							break
 						}
 					}
 				}
@@ -479,6 +489,8 @@ func (pPos *Position) ReadPosition(command string) {
 			}
 		}
 
+	} else {
+		fmt.Printf("Error: Unknown command=[%s]", command)
 	}
 
 	// fmt.Printf("command[i:]=[%s]\n", command[i:])
@@ -970,7 +982,7 @@ func (pPos *Position) DoMove(move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します
-	pPos.AddControlAllSlidingPiece(1)
+	// TODO pPos.AddControlAllSlidingPiece(1)
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
@@ -985,7 +997,7 @@ func (pPos *Position) UndoMove() {
 	cap_piece_type := PIECE_TYPE_EMPTY
 
 	// 作業前に、長い利きの駒の利きを -1 します
-	pPos.AddControlAllSlidingPiece(-1)
+	// TODO pPos.AddControlAllSlidingPiece(-1)
 
 	pPos.OffsetMovesIndex -= 1
 	pPos.Phase = pPos.Phase%2 + 1
@@ -1096,19 +1108,25 @@ func (pPos *Position) UndoMove() {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します
-	pPos.AddControlAllSlidingPiece(1)
+	// TODO pPos.AddControlAllSlidingPiece(1)
 }
 
 // AddControlAllSlidingPiece - すべての長い利きの駒の利きを増減させます
 func (pPos *Position) AddControlAllSlidingPiece(sign int8) {
 	for _, from := range pPos.RookLocations {
-		pPos.AddControl(from, sign)
+		if from != SQUARE_EMPTY {
+			pPos.AddControl(from, sign)
+		}
 	}
 	for _, from := range pPos.BishopLocations {
-		pPos.AddControl(from, sign)
+		if from != SQUARE_EMPTY {
+			pPos.AddControl(from, sign)
+		}
 	}
 	for _, from := range pPos.LanceLocations {
-		pPos.AddControl(from, sign)
+		if from != SQUARE_EMPTY {
+			pPos.AddControl(from, sign)
+		}
 	}
 }
 
