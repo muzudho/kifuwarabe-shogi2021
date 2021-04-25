@@ -55,6 +55,24 @@ go btime 71000 wtime 71000 binc 2000 winc 2000
 ## Test2
 
 ```plain
+# 平手初期局面を sfen で指定（＾～＾）
+position sfen lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1
+pos
+control
+control diff
+
+# 玉と歩だけ（＾～＾）
+position sfen 4k4/9/ppppppppp/9/9/9/PPPPPPPPP/9/4K4 b - 1
+pos
+control
+control diff
+
+# 玉と歩と飛だけ（＾～＾）
+position sfen 4k4/1r7/ppppppppp/9/9/9/PPPPPPPPP/7R1/4K4 b - 1
+pos
+control
+control diff
+
 # 玉だけ（＾～＾）
 position sfen 4k4/9/9/9/9/9/9/9/4K4 b - 1
 pos
