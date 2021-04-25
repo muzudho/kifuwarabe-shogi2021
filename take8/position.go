@@ -495,31 +495,41 @@ func (pPos *Position) ReadPosition(command string) {
 
 	// fmt.Printf("command[i:]=[%s]\n", command[i:])
 
+	start_phase := pPos.Phase
 	if strings.HasPrefix(command[i:], "moves") {
 		i += 5
-	} else {
-		return
+
+		// 半角スペースに始まり、文字列の終わりで終わるぜ（＾～＾）
+		for i < len {
+			if command[i] != ' ' {
+				break
+			}
+			i += 1
+
+			// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
+			var move, err = ParseMove(command, &i, pPos.Phase)
+			if err != nil {
+				fmt.Println(err)
+				fmt.Println(pPos.Sprint())
+				panic(err)
+			}
+			pPos.Moves[pPos.OffsetMovesIndex] = move
+			pPos.OffsetMovesIndex += 1
+			pPos.Phase = pPos.Phase%2 + 1
+		}
 	}
 
-	// 半角スペースに始まり、文字列の終わりで終わるぜ（＾～＾）
-	start_phase := pPos.Phase
-	for i < len {
-		if command[i] != ' ' {
-			break
+	// 開始局面の利きを計算（＾～＾）
+	fmt.Printf("Debug: 開始局面の利きを計算（＾～＾）\n")
+	for sq := Square(11); sq < 100; sq += 1 {
+		if File(sq) != 0 && Rank(sq) != 0 {
+			if !pPos.IsEmptySq(sq) {
+				fmt.Printf("Debug: sq=%d\n", sq)
+				pPos.AddControl(sq, 1)
+			}
 		}
-		i += 1
-
-		// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
-		var move, err = ParseMove(command, &i, pPos.Phase)
-		if err != nil {
-			fmt.Println(err)
-			fmt.Println(pPos.Sprint())
-			panic(err)
-		}
-		pPos.Moves[pPos.OffsetMovesIndex] = move
-		pPos.OffsetMovesIndex += 1
-		pPos.Phase = pPos.Phase%2 + 1
 	}
+	fmt.Printf("Debug: 開始局面の利き計算おわり（＾～＾）\n")
 
 	// 読込んだ Move を、上書きする感じで、もう一回 全て実行（＾～＾）
 	moves_size := pPos.OffsetMovesIndex
@@ -760,47 +770,47 @@ func (pPos *Position) SprintControl(phase Phase, flag int) string {
 
 	return "\n" +
 		//
-		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPos.StartMovesNum, (pPos.StartMovesNum+pPos.OffsetMovesIndex), phase_str) +
+		fmt.Sprintf("[Control %s]\n", phase_str) +
 		//
 		"\n" +
 		//
-		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pPos.Board[90], pPos.Board[80], pPos.Board[70], pPos.Board[60], pPos.Board[50], pPos.Board[40], pPos.Board[30], pPos.Board[20], pPos.Board[10], pPos.Board[0]) +
+		"  9  8  7  6  5  4  3  2  1\n" +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[91], board[81], board[71], board[61], board[51], board[41], board[31], board[21], board[11], board[1]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| a\n", board[91], board[81], board[71], board[61], board[51], board[41], board[31], board[21], board[11]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[92], board[82], board[72], board[62], board[52], board[42], board[32], board[22], board[12], board[2]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| b\n", board[92], board[82], board[72], board[62], board[52], board[42], board[32], board[22], board[12]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[93], board[83], board[73], board[63], board[53], board[43], board[33], board[23], board[13], board[3]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| c\n", board[93], board[83], board[73], board[63], board[53], board[43], board[33], board[23], board[13]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[94], board[84], board[74], board[64], board[54], board[44], board[34], board[24], board[14], board[4]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| d\n", board[94], board[84], board[74], board[64], board[54], board[44], board[34], board[24], board[14]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[95], board[85], board[75], board[65], board[55], board[45], board[35], board[25], board[15], board[5]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| e\n", board[95], board[85], board[75], board[65], board[55], board[45], board[35], board[25], board[15]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[96], board[86], board[76], board[66], board[56], board[46], board[36], board[26], board[16], board[6]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| f\n", board[96], board[86], board[76], board[66], board[56], board[46], board[36], board[26], board[16]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[97], board[87], board[77], board[67], board[57], board[47], board[37], board[27], board[17], board[7]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| g\n", board[97], board[87], board[77], board[67], board[57], board[47], board[37], board[27], board[17]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[98], board[88], board[78], board[68], board[58], board[48], board[38], board[28], board[18], board[8]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| h\n", board[98], board[88], board[78], board[68], board[58], board[48], board[38], board[28], board[18]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d\n", board[99], board[89], board[79], board[69], board[59], board[49], board[39], board[29], board[19], board[9]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d| i\n", board[99], board[89], board[79], board[69], board[59], board[49], board[39], board[29], board[19]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
@@ -1143,10 +1153,12 @@ func (pPos *Position) AddControl(from Square, sign int8) {
 	}
 
 	ph := int(Who(piece)) - 1
+	fmt.Printf("Debug: ph=%d\n", ph)
 
 	sq_list := GenControl(pPos, from)
 
 	for _, to := range sq_list {
+		fmt.Printf("Debug: to=%d\n", to)
 		// 差分の方のテーブルを更新（＾～＾）
 		pPos.ControlBoardsDiff[ph][to] += sign * 1
 	}
