@@ -74,6 +74,8 @@ type Position struct {
 	// 利きテーブル [0]先手 [1]後手
 	// マスへの利き数が入っています
 	ControlBoards [2][BOARD_SIZE]int8
+	// マスへの利き数の差分が入っています
+	ControlBoardsDiff [2][BOARD_SIZE]int8
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
@@ -133,6 +135,29 @@ func (pPos *Position) ResetToStartpos() {
 		0, 1, 3, 1, 1, 0, 0, 0, 0, 0,
 		0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
 		0, 0, 2, 2, 1, 0, 0, 0, 0, 0,
+	}}
+	pPos.ControlBoardsDiff = [2][BOARD_SIZE]int8{{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}, {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}}
 	pPos.RookLocations = [2]Square{28, 82}
 	pPos.BishopLocations = [2]Square{22, 88}
@@ -565,16 +590,28 @@ func (pPos *Position) Sprint() string {
 }
 
 // Print - 利き数ボード出力（＾ｑ＾）
-func (pPos *Position) SprintControl(phase Phase) string {
+//
+// Parameters
+// ----------
+// * `flag` - 1:利き数の差分, それ以外: 利き数ボード
+func (pPos *Position) SprintControl(phase Phase, flag int) string {
 	var board [BOARD_SIZE]int8
 	var phase_str string
 	switch phase {
 	case FIRST:
 		phase_str = "First"
-		board = pPos.ControlBoards[0]
+		if flag == 1 { // 利き数の差分
+			board = pPos.ControlBoardsDiff[0]
+		} else {
+			board = pPos.ControlBoards[0]
+		}
 	case SECOND:
 		phase_str = "Second"
-		board = pPos.ControlBoards[1]
+		if flag == 1 {
+			board = pPos.ControlBoardsDiff[1]
+		} else {
+			board = pPos.ControlBoards[1]
+		}
 	default:
 		return "\n"
 	}

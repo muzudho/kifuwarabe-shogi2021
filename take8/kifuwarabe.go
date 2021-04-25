@@ -122,9 +122,15 @@ MainLoop:
 			// 棋譜を頼りに１手戻すぜ（＾～＾）
 			pPos.UndoMove()
 		case "control":
-			// 利きの表示（＾～＾）
-			G.Chat.Debug(pPos.SprintControl(FIRST))
-			G.Chat.Debug(pPos.SprintControl(SECOND))
+			if len(tokens) > 1 && tokens[1] == "diff" {
+				// 利きの差分の表示（＾～＾）
+				G.Chat.Debug(pPos.SprintControl(FIRST, 1))
+				G.Chat.Debug(pPos.SprintControl(SECOND, 1))
+			} else {
+				// 利きの表示（＾～＾）
+				G.Chat.Debug(pPos.SprintControl(FIRST, 0))
+				G.Chat.Debug(pPos.SprintControl(SECOND, 0))
+			}
 		}
 
 		G.Log.FlushAllLogs()
