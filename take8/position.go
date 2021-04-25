@@ -633,17 +633,19 @@ func (pPos *Position) DoMove(move Move) {
 	// 作業前に、長い利きの駒の利きを -1 します
 	pPos.AddControlAllSlidingPiece(-1)
 
-	src_sq := move.GetSource()
-	dst_sq := move.GetDestination()
-
 	// １手指すと１～２の駒が動くことに着目してくれだぜ（＾～＾）
-	// [0]movingPieceType [1]capturedPieceType
-	moving_piece_types := []PieceType{PIECE_TYPE_EMPTY, PIECE_TYPE_EMPTY}
+	// 動かしている駒と、取った駒だぜ（＾～＾）
+	mov_piece_type := PIECE_TYPE_EMPTY
+	cap_piece_type := PIECE_TYPE_EMPTY
+
+	mov_src_sq := move.GetSource()
+	mov_dst_sq := move.GetDestination()
+	var cap_src_sq Square
 
 	// まず、打かどうかで処理を分けます
-	drop := src_sq
+	drop := mov_src_sq
 	var piece string
-	switch src_sq {
+	switch mov_src_sq {
 	case DROP_R1:
 		piece = PIECE_R1
 	case DROP_B1:
@@ -671,7 +673,6 @@ func (pPos *Position) DoMove(move Move) {
 	case DROP_L2:
 		piece = PIECE_L2
 	case DROP_P2:
-		drop = src_sq
 		piece = PIECE_P2
 	default:
 		// Not drop
@@ -685,27 +686,28 @@ func (pPos *Position) DoMove(move Move) {
 		pPos.Hands[drop-DROP_ORIGIN] -= 1
 
 		// 行き先に駒を置きます
-		pPos.Board[dst_sq] = piece
-		pPos.AddControl(dst_sq, 1)
-		moving_piece_types[0] = What(piece)
+		pPos.Board[mov_dst_sq] = piece
+		pPos.AddControl(mov_dst_sq, 1)
+		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
 
 		// 移動先に駒があれば、その駒の利きを除外します
-		captured := pPos.Board[dst_sq]
+		captured := pPos.Board[mov_dst_sq]
 		if captured != PIECE_EMPTY {
-			pPos.AddControl(dst_sq, -1)
-			moving_piece_types[1] = What(captured)
+			pPos.AddControl(mov_dst_sq, -1)
+			cap_piece_type = What(captured)
+			cap_src_sq = mov_dst_sq
 		}
 
 		// 元位置の駒を除去
-		pPos.AddControl(src_sq, -1)
+		pPos.AddControl(mov_src_sq, -1)
 
 		// 行き先の駒の配置
-		pPos.Board[dst_sq] = pPos.Board[src_sq]
-		moving_piece_types[0] = What(pPos.Board[dst_sq])
-		pPos.Board[src_sq] = PIECE_EMPTY
-		pPos.AddControl(dst_sq, 1)
+		pPos.Board[mov_dst_sq] = pPos.Board[mov_src_sq]
+		mov_piece_type = What(pPos.Board[mov_dst_sq])
+		pPos.Board[mov_src_sq] = PIECE_EMPTY
+		pPos.AddControl(mov_dst_sq, 1)
 
 		drop := Square(0)
 		switch captured {
@@ -756,24 +758,26 @@ func (pPos *Position) DoMove(move Move) {
 	pPos.Phase = pPos.Phase%2 + 1
 
 	// 長い利きの駒が動いたときは、位置情報更新
-	for _, moving_piece_type := range moving_piece_types {
+	piece_type_list := []interface{}{mov_piece_type, cap_piece_type}
+	src_sq_list := []interface{}{mov_src_sq, cap_src_sq}
+	for j, moving_piece_type := range piece_type_list {
 		switch moving_piece_type {
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
 			for i, sq := range pPos.RookLocations {
-				if sq == src_sq {
-					pPos.RookLocations[i] = dst_sq
+				if sq == src_sq_list[j] {
+					pPos.RookLocations[i] = sq
 				}
 			}
 		case PIECE_TYPE_B, PIECE_TYPE_PB:
 			for i, sq := range pPos.BishopLocations {
-				if sq == src_sq {
-					pPos.BishopLocations[i] = dst_sq
+				if sq == src_sq_list[j] {
+					pPos.BishopLocations[i] = sq
 				}
 			}
 		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
 			for i, sq := range pPos.LanceLocations {
-				if sq == src_sq {
-					pPos.LanceLocations[i] = dst_sq
+				if sq == src_sq_list[j] {
+					pPos.LanceLocations[i] = sq
 				}
 			}
 		}
