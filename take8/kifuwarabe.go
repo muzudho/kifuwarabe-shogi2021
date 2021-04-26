@@ -135,6 +135,9 @@ MainLoop:
 		case "location":
 			// あの駒、どこにいんの（＾～＾）？
 			G.Chat.Debug(pPos.SprintLocation())
+		case "sfen":
+			// SFEN文字列返せよ（＾～＾）
+			G.Chat.Debug(pPos.SprintSfen())
 		}
 
 		G.Log.FlushAllLogs()

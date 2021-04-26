@@ -12,6 +12,9 @@ const MOVES_SIZE = 512
 // 00～99
 const BOARD_SIZE = 100
 
+// position sfen の盤のスペース数に使われますN
+var OneDigitNumbers = [10]byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+
 // 1:先手 2:後手
 type Phase byte
 
@@ -22,6 +25,11 @@ func FlipPhase(phase Phase) Phase {
 
 // マス番号 00～99,100～113
 type Square uint32
+
+// From - 筋と段からマス番号を作成します
+func SquareFrom(file Square, rank Square) Square {
+	return Square(file*10 + rank)
+}
 
 // マス番号を指定しないことを意味するマス番号
 const SQUARE_EMPTY = Square(0)
@@ -879,6 +887,49 @@ func (pPos *Position) SprintLocation() string {
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		//
 		"\n"
+}
+
+// SprintSfen - SFEN文字列返せよ（＾～＾）
+func (pPos *Position) SprintSfen() string {
+	// 9x9=81 + 8slash = 89 文字 なんだが成り駒で増えるし めんどくさ（＾～＾）多めに取っとくか（＾～＾）
+	// 成り駒２文字なんで、byte型だとめんどくさ（＾～＾）
+	buf := make([]byte, 0, 200)
+
+	spaces := 0
+	for rank := Square(1); rank < 10; rank += 1 {
+		for file := Square(9); file > 0; file -= 1 {
+			piece := pPos.Board[SquareFrom(file, rank)]
+
+			length := len(piece)
+
+			if length > 0 && spaces > 0 {
+				buf = append(buf, OneDigitNumbers[spaces])
+				spaces = 0
+			}
+
+			switch length {
+			case 2:
+				buf = append(buf, piece[0])
+				buf = append(buf, piece[1])
+			case 1:
+				buf = append(buf, piece[0])
+			default:
+				// Space
+				spaces += 1
+			}
+		}
+
+		if spaces > 0 {
+			buf = append(buf, OneDigitNumbers[spaces])
+			spaces = 0
+		}
+
+		if rank < 9 {
+			buf = append(buf, '/')
+		}
+	}
+
+	return string(buf)
 }
 
 // DoMove - 一手指すぜ（＾～＾）
