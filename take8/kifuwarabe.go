@@ -156,6 +156,9 @@ MainLoop:
 		case "sfen":
 			// SFEN文字列返せよ（＾～＾）
 			G.Chat.Debug(pPos.SprintSfen())
+		case "record":
+			// 棋譜表示。取った駒を表示するためのもの（＾～＾）
+			G.Chat.Debug(pPos.SprintRecord())
 		}
 
 		G.Log.FlushAllLogs()

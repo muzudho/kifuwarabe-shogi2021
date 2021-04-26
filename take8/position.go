@@ -31,6 +31,11 @@ func SquareFrom(file Square, rank Square) Square {
 	return Square(file*10 + rank)
 }
 
+// 盤上なら真。ラベルのとこを指定しても場所によっては真だがめんどくさいんでOKで（＾～＾）
+func OnBoard(sq Square) bool {
+	return 10 < sq && sq < 100
+}
+
 // マス番号を指定しないことを意味するマス番号
 const SQUARE_EMPTY = Square(0)
 
@@ -1078,6 +1083,21 @@ func (pPos *Position) SprintSfen() string {
 	return fmt.Sprintf("position sfen %s %s %s %d moves%s\n", buf, phaseStr, hands, movesNum, moves_text)
 }
 
+// SprintRecord - 棋譜表示（＾～＾）
+func (pPos *Position) SprintRecord() string {
+
+	// "8h2b+ b \n" 1行9byteぐらいを想定（＾～＾）
+	record_text := make([]byte, 0, MOVES_SIZE*9)
+	for i := 0; i < pPos.OffsetMovesIndex; i += 1 {
+		record_text = append(record_text, pPos.Moves[i].ToCode()...)
+		record_text = append(record_text, ' ')
+		record_text = append(record_text, pPos.CapturedList[i]...)
+		record_text = append(record_text, '\n')
+	}
+
+	return fmt.Sprintf("record\n------\n%s", record_text)
+}
+
 // DoMove - 一手指すぜ（＾～＾）
 func (pPos *Position) DoMove(move Move) {
 	// １手指すと１～２の駒が動くことに着目してくれだぜ（＾～＾）
@@ -1423,17 +1443,17 @@ func (pPos *Position) UndoMove() {
 // AddControlDiffAllSlidingPiece - すべての長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pPos *Position) AddControlDiffAllSlidingPiece(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.RookLocations {
-		if from != SQUARE_EMPTY && from != excludeFrom {
+		if OnBoard(from) && from != excludeFrom {
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
 	for _, from := range pPos.BishopLocations {
-		if from != SQUARE_EMPTY && from != excludeFrom {
+		if OnBoard(from) && from != excludeFrom {
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
 	for _, from := range pPos.LanceLocations {
-		if from != SQUARE_EMPTY && from != excludeFrom && PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
+		if OnBoard(from) && from != excludeFrom && PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
