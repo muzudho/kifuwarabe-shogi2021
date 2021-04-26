@@ -25,12 +25,12 @@ const (
 
 // Move - 指し手
 //
-// 17bit で表せるはず（＾～＾）
-// pddddddddssssssss
+// 15bit で表せるはず（＾～＾）
+// .pdd dddd dsss ssss
 //
-// 1～8bit: 移動元
-// 9～16bit: 移動先
-// 17bit: 成
+// 1～7bit: 移動元(0～127)
+// 8～14bit: 移動先(0～127)
+// 15bit: 成(0～1)
 type Move uint32
 
 // 0 は 投了ということにするぜ（＾～＾）
@@ -117,35 +117,48 @@ func (move Move) ToCode() string {
 }
 
 // ReplaceSource - 移動元マス
+// 1111 1111 1000 0000 (Clear) 0xff80
+// .pdd dddd dsss ssss
 func (move Move) ReplaceSource(sq Square) Move {
-	return Move(uint32(move)&0xffffff00 | uint32(sq))
+	return Move(uint16(move)&0xff80 | uint16(sq))
 }
 
 // ReplaceDestination - 移動先マス
+// 1100 0000 0111 1111 (Clear) 0xc07f
+// .pdd dddd dsss ssss
 func (move Move) ReplaceDestination(sq Square) Move {
-	return Move(uint32(move)&0xffff00ff | (uint32(sq) << 8))
+	return Move(uint16(move)&0xc07f | (uint16(sq) << 7))
 }
 
 // ReplacePromotion - 成
+// 0100 0000 0000 0000 (Stand) 0x4000
+// 1011 1111 1111 1111 (Clear) 0xbfff
+// .pdd dddd dsss ssss
 func (move Move) ReplacePromotion(promotion bool) Move {
 	if promotion {
-		return Move(uint32(move) | 0x00010000)
+		return Move(uint16(move) | 0x4000)
 	}
 
-	return Move(uint32(move) & 0xfffeffff)
+	return Move(uint16(move) & 0xbfff)
 }
 
 // GetSource - 移動元マス
+// 0000 0000 0111 1111 (Mask) 0x007f
+// .pdd dddd dsss ssss
 func (move Move) GetSource() Square {
-	return Square(uint32(move) & 0x000000ff)
+	return Square(uint16(move) & 0x007f)
 }
 
 // GetDestination - 移動元マス
+// 0011 1111 1000 0000 (Mask) 0x3f80
+// .pdd dddd dsss ssss
 func (move Move) GetDestination() Square {
-	return Square((uint32(move) >> 8) & 0x000000ff)
+	return Square((uint16(move) & 0x3f80) >> 7)
 }
 
 // GetPromotion - 成
+// 0100 0000 0000 0000 (Mask) 0x4000
+// .pdd dddd dsss ssss
 func (move Move) GetPromotion() bool {
-	return (uint32(move)>>9)&0x00000001 == 1
+	return uint16(move)&0x4000 != 0
 }
