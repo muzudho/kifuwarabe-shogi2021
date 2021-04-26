@@ -117,4 +117,8 @@ movelist
 # 詰んでいる局面（頭金）
 position sfen 4k4/9/9/9/9/9/4p4/4g4/4K4 b - 1
 movelist
+
+# 王手されている局面（頭金、逃げ場所あり）
+position sfen 4k4/9/9/9/9/4p4/4g4/4K4/9 b - 1
+movelist
 ```

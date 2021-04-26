@@ -229,7 +229,7 @@ func GenMoveList(pPos *Position) []Move {
 								move := NewMoveValue2(from, to)
 								pPos.DoMove(move)
 
-								if pPos.ControlBoards[opponent-1][friendKingSq] == 0 {
+								if pPos.ControlBoards[opponent-1][to] == 0 {
 									// 王手が解除されてるから採用（＾～＾）
 									move_list = append(move_list, move)
 								}
