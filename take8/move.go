@@ -31,7 +31,7 @@ const (
 // 1～7bit: 移動元(0～127)
 // 8～14bit: 移動先(0～127)
 // 15bit: 成(0～1)
-type Move uint32
+type Move uint16
 
 // 0 は 投了ということにするぜ（＾～＾）
 const ResignMove = Move(0)
