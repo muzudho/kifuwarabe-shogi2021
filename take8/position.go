@@ -880,6 +880,9 @@ func (pPos *Position) DoMove(move Move) {
 		if cap_dst_sq != SQUARE_EMPTY {
 			pPos.CapturedList[pPos.OffsetMovesIndex] = captured
 			pPos.Hands[cap_dst_sq-DROP_ORIGIN] += 1
+		} else {
+			// 取った駒は無かった（＾～＾）
+			pPos.CapturedList[pPos.OffsetMovesIndex] = PIECE_EMPTY
 		}
 	}
 
