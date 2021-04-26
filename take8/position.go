@@ -796,15 +796,21 @@ func (pPos *Position) Sprint() string {
 		//
 		"moves"
 
+	moves_text := pPos.createMovesText()
+
+	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
+	//return s1 + *(*string)(unsafe.Pointer(&moves_text)) + "\n"
+	return s1 + string(moves_text) + "\n"
+}
+
+// CreateMovesList - " 7g7f 3c3d" みたいな部分を返します。最初は半角スペースです
+func (pPos *Position) createMovesText() string {
 	moves_text := make([]byte, 0, MOVES_SIZE*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
 	for i := 0; i < pPos.OffsetMovesIndex; i += 1 {
 		moves_text = append(moves_text, ' ')
 		moves_text = append(moves_text, pPos.Moves[i].ToCode()...)
 	}
-
-	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
-	//return s1 + *(*string)(unsafe.Pointer(&moves_text)) + "\n"
-	return s1 + string(moves_text) + "\n"
+	return string(moves_text)
 }
 
 // SprintControl - 利き数ボード出力（＾ｑ＾）
@@ -1066,7 +1072,10 @@ func (pPos *Position) SprintSfen() string {
 	// 手数
 	movesNum := pPos.StartMovesNum + pPos.OffsetMovesIndex
 
-	return fmt.Sprintf("position sfen %s %s %s %d moves", buf, phaseStr, hands, movesNum)
+	// 指し手
+	moves_text := pPos.createMovesText()
+
+	return fmt.Sprintf("position sfen %s %s %s %d moves%s\n", buf, phaseStr, hands, movesNum, moves_text)
 }
 
 // DoMove - 一手指すぜ（＾～＾）
