@@ -8,8 +8,9 @@ import (
 func Search(pPos *Position) Move {
 
 	// 指し手生成
-	legal_move_list := GenMoveList(pPos)
-	size := len(legal_move_list)
+	// 探索中に削除される指し手を除く
+	move_list := GenMoveList(pPos)
+	size := len(move_list)
 
 	if size == 0 {
 		return ResignMove
@@ -21,5 +22,5 @@ func Search(pPos *Position) Move {
 	//}
 
 	// ゲーム向けの軽い乱数
-	return legal_move_list[rand.Intn(size)]
+	return move_list[rand.Intn(size)]
 }

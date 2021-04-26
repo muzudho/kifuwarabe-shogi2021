@@ -110,6 +110,6 @@ position startpos moves 7g7f 4a5b 6i7h 6a6b 7i6h 5b4b 6h7g 4b5b 5i6h 5a4a 4i5h 2
 ## Test4
 
 ```plain
-# 王手されている局面
+# 王手されている局面（タダの頭金）
 position sfen 4k4/9/9/9/9/9/9/4g4/4K4 b - 1
 ```

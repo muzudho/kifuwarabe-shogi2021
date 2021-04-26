@@ -159,6 +159,14 @@ MainLoop:
 		case "record":
 			// 棋譜表示。取った駒を表示するためのもの（＾～＾）
 			G.Chat.Debug(pPos.SprintRecord())
+		case "movelist":
+			G.Chat.Debug("MoveList\n")
+			G.Chat.Debug("--------\n")
+			move_list := GenMoveList(pPos)
+			for i, move := range move_list {
+				G.Chat.Debug("(%d) %s\n", i, move.ToCode())
+			}
+			G.Chat.Debug("* Except for those to be removed during the search\n")
 		}
 
 		G.Log.FlushAllLogs()
