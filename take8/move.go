@@ -20,7 +20,7 @@ const (
 	DROP_L2        = Square(112)
 	DROP_P2        = Square(113)
 	DROP_ORIGIN    = DROP_R1
-	DROP_TYPE_SIZE = DROP_P1 - DROP_ORIGIN
+	DROP_TYPE_SIZE = DROP_P1 - DROP_ORIGIN + 1
 )
 
 // Move - 指し手

@@ -121,4 +121,12 @@ movelist
 # 王手されている局面（頭金、逃げ場所あり）
 position sfen 4k4/9/9/9/9/4p4/4g4/4K4/9 b - 1
 movelist
+
+# 長い利きで王手（１間、逃げ場所あり）
+position sfen 4k4/9/9/9/9/4l4/9/4K4/9 b - 1
+movelist
+
+# 長い利きで王手（１間打、逃げ場所あり）
+position sfen 4k4/9/9/9/9/9/9/4K4/9 w l 1 moves L*5f
+movelist
 ```
