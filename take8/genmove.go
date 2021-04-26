@@ -225,11 +225,14 @@ func GenMoveList(pPos *Position) []Move {
 					if pieceType == PIECE_TYPE_K {
 						// 玉は自殺手を省きます
 						for _, to := range control_list {
-							if pPos.Hetero(from, to) && pPos.ControlBoards[opponent-1][to] == 0 { // 自駒の上、敵の利きには移動できません
+							// 敵の長い駒の利きは、玉が逃げても伸びてくる方向があるので、
+							// いったん玉を動かしてから 再チェックするぜ（＾～＾）
+							if pPos.Hetero(from, to) { // 自駒の上には移動できません
 								move := NewMoveValue2(from, to)
 								pPos.DoMove(move)
 
 								if pPos.ControlBoards[opponent-1][to] == 0 {
+									// よっしゃ利きから逃げ切った（＾～＾）
 									// 王手が解除されてるから採用（＾～＾）
 									move_list = append(move_list, move)
 								}
@@ -239,15 +242,17 @@ func GenMoveList(pPos *Position) []Move {
 						}
 					} else {
 						for _, to := range control_list {
-							move := NewMoveValue2(from, to)
-							pPos.DoMove(move)
+							if pPos.Hetero(from, to) { // 自駒の上には移動できません
+								move := NewMoveValue2(from, to)
+								pPos.DoMove(move)
 
-							if pPos.ControlBoards[opponent-1][friendKingSq] == 0 {
-								// 王手が解除されてるから採用（＾～＾）
-								move_list = append(move_list, move)
+								if pPos.ControlBoards[opponent-1][friendKingSq] == 0 {
+									// 王手が解除されてるから採用（＾～＾）
+									move_list = append(move_list, move)
+								}
+
+								pPos.UndoMove()
 							}
-
-							pPos.UndoMove()
 						}
 					}
 				}

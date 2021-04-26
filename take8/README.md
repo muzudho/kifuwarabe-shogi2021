@@ -105,6 +105,9 @@ position startpos moves 2g2f 1c1d 6i7h 9a9b 5i6h 4a3b 4i5h 5c5d 6g6f 7a6b 5h6g 6
 # 飛打で王手されたところで、強制終了した（＾～＾）
 # 王手回避を考えてるときに、盤のUndoがちゃんとできてないようだぜ（＾～＾）
 position startpos moves 7g7f 4a5b 6i7h 6a6b 7i6h 5b4b 6h7g 4b5b 5i6h 5a4a 4i5h 2c2d 6g6f 7c7d 5h6g 3a3b 9g9f 6b7c 8i9g 7a6b 6f6e 5c5d 9g8e 5b4b 8e7c+ 2d2e 7c8b 1c1d R*6a
+
+# 逃げなかった（＾～＾）
+position startpos moves 7g7f 3c3d 8h5e 2b5e 7i7h 5e9i+ 3i4h L*7d 7f7e 7d7e 4i5h B*9h 5h6h 7e7h+ 1i1h 7h6i
 ```
 
 ## Test4
@@ -113,18 +116,36 @@ position startpos moves 7g7f 4a5b 6i7h 6a6b 7i6h 5b4b 6h7g 4b5b 5i6h 5a4a 4i5h 2
 # 王手されている局面（タダの頭金）
 position sfen 4k4/9/9/9/9/9/9/4g4/4K4 b - 1
 movelist
+MoveList
+--------
+(0) 5i5h
 
 # 詰んでいる局面（頭金）
 position sfen 4k4/9/9/9/9/9/4p4/4g4/4K4 b - 1
 movelist
+# 指し手なし
 
 # 王手されている局面（頭金、逃げ場所あり）
 position sfen 4k4/9/9/9/9/4p4/4g4/4K4/9 b - 1
 movelist
+MoveList
+--------
+(0) 5h5i
+(1) 5h6i
+(2) 5h4i
 
 # 長い利きで王手（１間、逃げ場所あり）
 position sfen 4k4/9/9/9/9/4l4/9/4K4/9 b - 1
 movelist
+MoveList
+--------
+(0) 5h6g
+(1) 5h4g
+(2) 5h6i
+(3) 5h4i
+(4) 5h6h
+(5) 5h4h
+# 5i に逃げれないことが分かっていればOK
 
 # 長い利きで王手（１間打、逃げ場所あり）
 position sfen 4k4/9/9/9/9/9/9/4K4/9 w l 1 moves L*5f
@@ -136,5 +157,26 @@ movelist
 
 # 桂打で王手（逃げ場所あり、他の自駒あり）
 position sfen 4k4/9/9/9/9/9/4K4/9/7R1 w - 1 moves N*6e
+movelist
+
+# 杏が寄ってきているが王手ではない（逃げ場所あり、他の自駒あり）
+position sfen 4k4/9/9/9/9/9/9/2+lS5/5K3 w - 1 moves 7h6i
+movelist
+
+# 杏が寄ってきているが王手ではない（逃げ場所あり、他の自駒あり）
+position sfen 4k4/9/9/9/9/9/9/2+l1S4/5K3 w - 1 moves 7h6i
+movelist
+
+# 杏が寄ってきて王手（逃げ場所あり、他の自駒あり）
+position sfen 4k4/9/9/9/9/9/9/2+l2G3/4K4 w - 1 moves 7h6i
+movelist
+
+# 杏が寄ってきて王手（逃げ場所あり、他の自駒あり）
+# なぜか玉が逃げない（＾～＾）
+position sfen 4k4/9/9/9/9/9/9/2+lS5/4K4 w - 1 moves 7h6i
+movelist
+
+# 杏が寄ってきて王手（逃げ場所あり、他の自駒あり）
+position sfen 4k4/9/9/9/9/9/9/2+lS1G3/4K4 w - 1 moves 7h6i
 movelist
 ```
