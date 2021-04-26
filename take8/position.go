@@ -93,7 +93,8 @@ type Position struct {
 	// マスへの利き数が入っています
 	ControlBoards [2][BOARD_SIZE]int8
 	// マスへの利き数の差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
-	ControlBoardsDiff [2][BOARD_SIZE]int8
+	// プレイヤー１つにつき、５レイヤーあるぜ（＾～＾）
+	ControlBoardsDiff [2][5][BOARD_SIZE]int8
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
@@ -154,28 +155,128 @@ func (pPos *Position) resetToZero() {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}}
-	pPos.ControlBoardsDiff = [2][BOARD_SIZE]int8{{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	pPos.ControlBoardsDiff = [2][5][BOARD_SIZE]int8{{
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
 	}, {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
 	}}
 	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
 	pPos.KingLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
@@ -198,8 +299,8 @@ func (pPos *Position) resetToZero() {
 	pPos.CapturedList = [MOVES_SIZE]string{}
 }
 
-// resetToStartpos - 初期局面にします。利きの計算はまだ行っていません。
-func (pPos *Position) resetToStartpos() {
+// setToStartpos - 初期局面にします。利きの計算はまだ行っていません。
+func (pPos *Position) setToStartpos() {
 	// 初期局面にします
 	pPos.Board = [BOARD_SIZE]string{
 		"", "a", "b", "c", "d", "e", "f", "g", "h", "i",
@@ -213,93 +314,10 @@ func (pPos *Position) resetToStartpos() {
 		"8", "n", "r", "p", "", "", "", "P", "B", "N",
 		"9", "l", "", "p", "", "", "", "P", "", "L",
 	}
-	pPos.ControlBoards = [2][BOARD_SIZE]int8{{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}, {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}}
-	// pPos.ControlBoards = [2][BOARD_SIZE]int8{{
-	// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	// 	0, 0, 0, 0, 0, 0, 1, 2, 2, 1,
-	// 	0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
-	// 	0, 0, 0, 0, 0, 0, 1, 1, 3, 1,
-	// 	0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
-	// 	0, 0, 0, 0, 0, 0, 1, 0, 4, 1,
-	// 	0, 0, 0, 0, 0, 0, 1, 0, 4, 2,
-	// 	0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
-	// 	0, 0, 0, 0, 0, 0, 1, 0, 2, 0,
-	// 	0, 0, 0, 0, 0, 0, 1, 3, 1, 1,
-	// }, {
-	// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	// 	0, 1, 1, 3, 1, 0, 0, 0, 0, 0,
-	// 	0, 0, 2, 0, 1, 0, 0, 0, 0, 0,
-	// 	0, 2, 3, 2, 1, 0, 0, 0, 0, 0,
-	// 	0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
-	// 	0, 2, 4, 0, 1, 0, 0, 0, 0, 0,
-	// 	0, 1, 4, 0, 1, 0, 0, 0, 0, 0,
-	// 	0, 1, 3, 1, 1, 0, 0, 0, 0, 0,
-	// 	0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
-	// 	0, 0, 2, 2, 1, 0, 0, 0, 0, 0,
-	// }}
-	pPos.ControlBoardsDiff = [2][BOARD_SIZE]int8{{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}, {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}}
 	pPos.KingLocations = [2]Square{Square(59), Square(51)}
 	pPos.RookLocations = [2]Square{28, 82}
 	pPos.BishopLocations = [2]Square{22, 88}
 	pPos.LanceLocations = [4]Square{11, 19, 91, 99}
-
-	// 持ち駒の数
-	pPos.Hands = []int{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}
-	// 先手の局面
-	pPos.Phase = FIRST
-	// 何手目か
-	pPos.StartMovesNum = 1
-	pPos.OffsetMovesIndex = 0
-	// 指し手のリスト
-	pPos.Moves = [MOVES_SIZE]Move{}
-	// 取った駒のリスト
-	pPos.CapturedList = [MOVES_SIZE]string{}
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -308,7 +326,8 @@ func (pPos *Position) ReadPosition(command string) {
 	var i int
 	if strings.HasPrefix(command, "position startpos") {
 		// 平手初期局面をセット（＾～＾）
-		pPos.resetToStartpos()
+		pPos.resetToZero()
+		pPos.setToStartpos()
 		i = 17
 
 		if i < len && command[i] == ' ' {
@@ -571,7 +590,7 @@ func (pPos *Position) ReadPosition(command string) {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			if !pPos.IsEmptySq(sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
-				pPos.AddControlDiff(sq, 1)
+				pPos.AddControlDiff(0, sq, 1)
 			}
 		}
 	}
@@ -792,32 +811,32 @@ func (pPos *Position) Sprint() string {
 //
 // Parameters
 // ----------
-// * `flag` - 1:利き数の差分, それ以外: 利き数ボード
+// * `flag` - 0: 利き数ボード, 1-5:利き数の差分ボードのレイヤー[0]～[4]
 func (pPos *Position) SprintControl(phase Phase, flag int) string {
 	var board [BOARD_SIZE]int8
 	var phase_str string
 	var title string
+
 	switch phase {
 	case FIRST:
 		phase_str = "First"
-		if flag == 1 { // 利き数の差分
-			title = "ControlDiff"
-			board = pPos.ControlBoardsDiff[0]
-		} else {
-			title = "Control"
-			board = pPos.ControlBoards[0]
-		}
 	case SECOND:
 		phase_str = "Second"
-		if flag == 1 {
-			title = "ControlDiff"
-			board = pPos.ControlBoardsDiff[1]
-		} else {
-			title = "Control"
-			board = pPos.ControlBoards[1]
-		}
 	default:
 		return "\n"
+	}
+
+	var ph = phase - 1
+	if 0 <= ph && ph < 2 {
+		if flag == 0 {
+			title = "Control"
+			board = pPos.ControlBoards[ph]
+		} else {
+			// 利き数の差分
+			var layer = flag - 1
+			title = "ControlDiff"
+			board = pPos.ControlBoardsDiff[ph][layer]
+		}
 	}
 
 	return "\n" +
@@ -952,7 +971,7 @@ func (pPos *Position) DoMove(move Move) {
 	pPos.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
-	pPos.AddControlDiffAllSlidingPiece(-1, mov_src_sq)
+	pPos.AddControlDiffAllSlidingPiece(0, -1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	drop := mov_src_sq
@@ -999,7 +1018,7 @@ func (pPos *Position) DoMove(move Move) {
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
-		pPos.AddControlDiff(mov_dst_sq, 1)
+		pPos.AddControlDiff(1, mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -1007,19 +1026,19 @@ func (pPos *Position) DoMove(move Move) {
 		// 移動先に駒があれば、その駒の利きを除外します
 		captured := pPos.Board[mov_dst_sq]
 		if captured != PIECE_EMPTY {
-			pPos.AddControlDiff(mov_dst_sq, -1)
+			pPos.AddControlDiff(1, mov_dst_sq, -1)
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
 
 		// 元位置の駒を除去
-		pPos.AddControlDiff(mov_src_sq, -1)
+		pPos.AddControlDiff(2, mov_src_sq, -1)
 
 		// 行き先の駒の上書きと、元位置の駒の削除pos
 		pPos.Board[mov_dst_sq] = pPos.Board[mov_src_sq]
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
-		pPos.AddControlDiff(mov_dst_sq, 1)
+		pPos.AddControlDiff(3, mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1106,7 +1125,7 @@ func (pPos *Position) DoMove(move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
-	pPos.AddControlDiffAllSlidingPiece(1, mov_dst_sq)
+	pPos.AddControlDiffAllSlidingPiece(4, 1, mov_dst_sq)
 
 	pPos.MergeControlDiff()
 }
@@ -1141,7 +1160,7 @@ func (pPos *Position) UndoMove() {
 	pPos.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
-	pPos.AddControlDiffAllSlidingPiece(-1, mov_dst_sq)
+	pPos.AddControlDiffAllSlidingPiece(0, -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1160,7 +1179,7 @@ func (pPos *Position) UndoMove() {
 
 		// 行き先の駒の除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
-		pPos.AddControlDiff(mov_dst_sq, -1)
+		pPos.AddControlDiff(1, mov_dst_sq, -1)
 
 		// 移動元への駒の配置
 		pPos.Board[mov_src_sq] = pPos.Board[mov_dst_sq]
@@ -1211,8 +1230,8 @@ func (pPos *Position) UndoMove() {
 			// 取った駒を行き先に戻します
 			cap_piece_type = What(captured)
 			pPos.Board[mov_dst_sq] = captured
-			pPos.AddControlDiff(mov_src_sq, 1)
-			pPos.AddControlDiff(mov_dst_sq, 1)
+			pPos.AddControlDiff(2, mov_src_sq, 1)
+			pPos.AddControlDiff(3, mov_dst_sq, 1)
 		} else {
 			pPos.Board[mov_dst_sq] = PIECE_EMPTY
 		}
@@ -1255,32 +1274,32 @@ func (pPos *Position) UndoMove() {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
-	pPos.AddControlDiffAllSlidingPiece(1, mov_src_sq)
+	pPos.AddControlDiffAllSlidingPiece(4, 1, mov_src_sq)
 
 	pPos.MergeControlDiff()
 }
 
 // AddControlDiffAllSlidingPiece - すべての長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPos *Position) AddControlDiffAllSlidingPiece(sign int8, excludeFrom Square) {
+func (pPos *Position) AddControlDiffAllSlidingPiece(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.RookLocations {
 		if from != SQUARE_EMPTY && from != excludeFrom {
-			pPos.AddControlDiff(from, sign)
+			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
 	for _, from := range pPos.BishopLocations {
 		if from != SQUARE_EMPTY && from != excludeFrom {
-			pPos.AddControlDiff(from, sign)
+			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
 	for _, from := range pPos.LanceLocations {
 		if from != SQUARE_EMPTY && from != excludeFrom {
-			pPos.AddControlDiff(from, sign)
+			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
 }
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPos *Position) AddControlDiff(from Square, sign int8) {
+func (pPos *Position) AddControlDiff(layer int, from Square, sign int8) {
 	if from > 99 {
 		// 持ち駒は無視します
 		return
@@ -1299,7 +1318,7 @@ func (pPos *Position) AddControlDiff(from Square, sign int8) {
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: to=%d\n", to)
 		// 差分の方のテーブルを更新（＾～＾）
-		pPos.ControlBoardsDiff[ph][to] += sign * 1
+		pPos.ControlBoardsDiff[ph][layer][to] += sign * 1
 	}
 }
 
@@ -1307,8 +1326,10 @@ func (pPos *Position) AddControlDiff(from Square, sign int8) {
 func (pPos *Position) ClearControlDiff() {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			pPos.ControlBoardsDiff[0][sq] = 0
-			pPos.ControlBoardsDiff[1][sq] = 0
+			for layer := 0; layer < 5; layer += 1 {
+				pPos.ControlBoardsDiff[0][layer][sq] = 0
+				pPos.ControlBoardsDiff[1][layer][sq] = 0
+			}
 		}
 	}
 }
@@ -1317,8 +1338,10 @@ func (pPos *Position) ClearControlDiff() {
 func (pPos *Position) MergeControlDiff() {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			pPos.ControlBoards[0][sq] += pPos.ControlBoardsDiff[0][sq]
-			pPos.ControlBoards[1][sq] += pPos.ControlBoardsDiff[1][sq]
+			for layer := 0; layer < 5; layer += 1 {
+				pPos.ControlBoards[0][sq] += pPos.ControlBoardsDiff[0][layer][sq]
+				pPos.ControlBoards[1][sq] += pPos.ControlBoardsDiff[1][layer][sq]
+			}
 		}
 	}
 }

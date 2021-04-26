@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	l "github.com/muzudho/go-logger"
@@ -123,14 +124,25 @@ MainLoop:
 			// 棋譜を頼りに１手戻すぜ（＾～＾）
 			pPos.UndoMove()
 		case "control":
-			if len(tokens) > 1 && tokens[1] == "diff" {
-				// 利きの差分の表示（＾～＾）
-				G.Chat.Debug(pPos.SprintControl(FIRST, 1))
-				G.Chat.Debug(pPos.SprintControl(SECOND, 1))
-			} else {
+			length := len(tokens)
+			if length == 1 {
 				// 利きの表示（＾～＾）
 				G.Chat.Debug(pPos.SprintControl(FIRST, 0))
 				G.Chat.Debug(pPos.SprintControl(SECOND, 0))
+			} else if length == 3 && tokens[1] == "diff" {
+				// 利きの差分の表示（＾～＾）
+				layer, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				} else {
+					G.Chat.Debug(pPos.SprintControl(FIRST, layer))
+					G.Chat.Debug(pPos.SprintControl(SECOND, layer))
+				}
+			} else {
+				G.Chat.Debug("Format")
+				G.Chat.Debug("------")
+				G.Chat.Debug("control")
+				G.Chat.Debug("control diff {0-4}")
 			}
 		case "location":
 			// あの駒、どこにいんの（＾～＾）？
