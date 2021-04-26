@@ -125,24 +125,30 @@ MainLoop:
 			pPos.UndoMove()
 		case "control":
 			length := len(tokens)
+			fmt.Printf("length=%d", length)
+			ok := false
 			if length == 1 {
 				// 利きの表示（＾～＾）
 				G.Chat.Debug(pPos.SprintControl(FIRST, 0))
 				G.Chat.Debug(pPos.SprintControl(SECOND, 0))
+				ok = true
 			} else if length == 3 && tokens[1] == "diff" {
 				// 利きの差分の表示（＾～＾）
 				layer, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
-				} else {
-					G.Chat.Debug(pPos.SprintControl(FIRST, layer))
-					G.Chat.Debug(pPos.SprintControl(SECOND, layer))
+				} else if 0 <= layer && layer < 5 {
+					G.Chat.Debug(pPos.SprintControl(FIRST, layer+1))
+					G.Chat.Debug(pPos.SprintControl(SECOND, layer+1))
+					ok = true
 				}
-			} else {
-				G.Chat.Debug("Format")
-				G.Chat.Debug("------")
-				G.Chat.Debug("control")
-				G.Chat.Debug("control diff {0-4}")
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("control\n")
+				G.Chat.Debug("control diff {0-4}\n")
 			}
 		case "location":
 			// あの駒、どこにいんの（＾～＾）？

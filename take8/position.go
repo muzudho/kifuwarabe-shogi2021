@@ -834,7 +834,7 @@ func (pPos *Position) SprintControl(phase Phase, flag int) string {
 		} else {
 			// 利き数の差分
 			var layer = flag - 1
-			title = "ControlDiff"
+			title = fmt.Sprintf("ControlDiff%d", layer)
 			board = pPos.ControlBoardsDiff[ph][layer]
 		}
 	}
