@@ -964,7 +964,7 @@ func (pPos *Position) DoMove(move Move) {
 		// 元位置の駒を除去
 		pPos.AddControlDiff(mov_src_sq, -1)
 
-		// 行き先の駒の配置
+		// 行き先の駒の上書きと、元位置の駒の削除pos
 		pPos.Board[mov_dst_sq] = pPos.Board[mov_src_sq]
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
