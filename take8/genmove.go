@@ -219,16 +219,36 @@ func GenMoveList(pPos *Position) []Move {
 				if pPos.Homo(from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
 					control_list := GenControl(pPos, from)
 
-					for _, to := range control_list {
-						move := NewMoveValue2(from, to)
-						pPos.DoMove(move)
+					piece := pPos.Board[from]
+					pieceType := What(piece)
 
-						if pPos.ControlBoards[opponent-1][friendKingSq] == 0 {
-							// 王手が解除されてるから採用（＾～＾）
-							move_list = append(move_list, move)
+					if pieceType == PIECE_TYPE_K {
+						// 玉は自殺手を省きます
+						for _, to := range control_list {
+							if pPos.Hetero(from, to) && pPos.ControlBoards[opponent-1][to] == 0 { // 自駒の上、敵の利きには移動できません
+								move := NewMoveValue2(from, to)
+								pPos.DoMove(move)
+
+								if pPos.ControlBoards[opponent-1][friendKingSq] == 0 {
+									// 王手が解除されてるから採用（＾～＾）
+									move_list = append(move_list, move)
+								}
+
+								pPos.UndoMove()
+							}
 						}
+					} else {
+						for _, to := range control_list {
+							move := NewMoveValue2(from, to)
+							pPos.DoMove(move)
 
-						pPos.UndoMove()
+							if pPos.ControlBoards[opponent-1][friendKingSq] == 0 {
+								// 王手が解除されてるから採用（＾～＾）
+								move_list = append(move_list, move)
+							}
+
+							pPos.UndoMove()
+						}
 					}
 				}
 			}
