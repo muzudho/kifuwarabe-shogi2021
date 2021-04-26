@@ -129,4 +129,12 @@ movelist
 # 長い利きで王手（１間打、逃げ場所あり）
 position sfen 4k4/9/9/9/9/9/9/4K4/9 w l 1 moves L*5f
 movelist
+
+# 桂馬で王手（逃げ場所あり、他の自駒あり）
+position sfen 4k4/9/9/9/3n5/9/4K4/9/7R1 b - 1
+movelist
+
+# 桂打で王手（逃げ場所あり、他の自駒あり）
+position sfen 4k4/9/9/9/9/9/4K4/9/7R1 w - 1 moves N*6e
+movelist
 ```
