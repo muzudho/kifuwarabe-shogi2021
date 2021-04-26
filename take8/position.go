@@ -1023,10 +1023,16 @@ func (pPos *Position) DoMove(move Move) {
 	} else {
 		// 打でないなら
 
-		// 移動先に駒があれば、その駒の利きを除外します
+		// 移動先に駒があれば、その駒の利きを除外します。
 		captured := pPos.Board[mov_dst_sq]
 		if captured != PIECE_EMPTY {
-			pPos.AddControlDiff(1, mov_dst_sq, -1)
+			pieceType := What(captured)
+			switch pieceType {
+			case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
+				// Ignored: 長い利きの駒は 既に除外しているので無視します
+			default:
+				pPos.AddControlDiff(1, mov_dst_sq, -1)
+			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
@@ -1231,7 +1237,15 @@ func (pPos *Position) UndoMove() {
 			cap_piece_type = What(captured)
 			pPos.Board[mov_dst_sq] = captured
 			pPos.AddControlDiff(2, mov_src_sq, 1)
-			pPos.AddControlDiff(3, mov_dst_sq, 1)
+
+			pieceType := What(captured)
+			switch pieceType {
+			case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
+				// Ignored: 長い利きの駒は あとで追加するので、ここでは無視します
+			default:
+				pPos.AddControlDiff(3, mov_dst_sq, 1)
+			}
+
 		} else {
 			pPos.Board[mov_dst_sq] = PIECE_EMPTY
 		}
@@ -1292,7 +1306,7 @@ func (pPos *Position) AddControlDiffAllSlidingPiece(layer int, sign int8, exclud
 		}
 	}
 	for _, from := range pPos.LanceLocations {
-		if from != SQUARE_EMPTY && from != excludeFrom {
+		if from != SQUARE_EMPTY && from != excludeFrom && PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
