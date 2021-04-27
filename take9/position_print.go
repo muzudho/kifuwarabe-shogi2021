@@ -209,8 +209,10 @@ func (pPos *Position) SprintSfen() string {
 			piece := pPos.Board[SquareFrom(file, rank)]
 
 			if piece != PIECE_EMPTY {
-				buf = append(buf, OneDigitNumbers[spaces])
-				spaces = 0
+				if spaces > 0 {
+					buf = append(buf, OneDigitNumbers[spaces])
+					spaces = 0
+				}
 
 				pieceString := piece.ToCode()
 				length := len(pieceString)
