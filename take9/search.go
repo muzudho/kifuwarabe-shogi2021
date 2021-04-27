@@ -1,9 +1,5 @@
 package take8
 
-import (
-	"math/rand"
-)
-
 // Search - 探索部
 func Search(pPos *Position) Move {
 
@@ -16,15 +12,23 @@ func Search(pPos *Position) Move {
 		return ResignMove
 	}
 
+	var bestMove Move
+	var bestVal int16
 	// その手を指してみるぜ（＾～＾）
 	for _, move := range move_list {
 		pPos.DoMove(move)
 
-		// captured := pPos.CapturedList[pPos.OffsetMovesIndex]
+		captured := pPos.CapturedList[pPos.OffsetMovesIndex]
+		materialVal := EvalMaterial(captured)
+
+		if bestVal < materialVal {
+			bestMove = move
+			bestVal = materialVal
+		}
 
 		pPos.UndoMove()
 	}
 
 	// ゲーム向けの軽い乱数
-	return move_list[rand.Intn(size)]
+	return bestMove
 }

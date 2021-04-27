@@ -1009,7 +1009,7 @@ func (pPos *Position) DoMove(move Move) {
 		case PIECE_P2, PIECE_PP2:
 			cap_dst_sq = HAND_P1
 		default:
-			fmt.Printf("Error: Unknown captured=[%s]", captured)
+			fmt.Printf("Error: Unknown captured=[%d]", captured)
 		}
 
 		if cap_dst_sq != SQUARE_EMPTY {
@@ -1163,7 +1163,7 @@ func (pPos *Position) UndoMove() {
 		case PIECE_P2, PIECE_PP2:
 			cap_src_sq = HAND_P1
 		default:
-			fmt.Printf("Error: Unknown captured=[%s]", captured)
+			fmt.Printf("Error: Unknown captured=[%d]", captured)
 		}
 
 		if cap_src_sq != SQUARE_EMPTY {

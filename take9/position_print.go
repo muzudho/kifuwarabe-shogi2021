@@ -26,43 +26,43 @@ func (pPos *Position) Sprint() string {
 		//
 		"\n" +
 		//
-		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pPos.Board[90], pPos.Board[80], pPos.Board[70], pPos.Board[60], pPos.Board[50], pPos.Board[40], pPos.Board[30], pPos.Board[20], pPos.Board[10], pPos.Board[0]) +
+		fmt.Sprintf(" %2s %2s %2s %2s %2s %2s %2s %2s %2s %2s\n", pPos.Board[90].ToCode(), pPos.Board[80].ToCode(), pPos.Board[70].ToCode(), pPos.Board[60].ToCode(), pPos.Board[50].ToCode(), pPos.Board[40].ToCode(), pPos.Board[30].ToCode(), pPos.Board[20].ToCode(), pPos.Board[10].ToCode(), pPos.Board[0].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[91], pPos.Board[81], pPos.Board[71], pPos.Board[61], pPos.Board[51], pPos.Board[41], pPos.Board[31], pPos.Board[21], pPos.Board[11], pPos.Board[1]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[91].ToCode(), pPos.Board[81].ToCode(), pPos.Board[71].ToCode(), pPos.Board[61].ToCode(), pPos.Board[51].ToCode(), pPos.Board[41].ToCode(), pPos.Board[31].ToCode(), pPos.Board[21].ToCode(), pPos.Board[11].ToCode(), pPos.Board[1].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[92], pPos.Board[82], pPos.Board[72], pPos.Board[62], pPos.Board[52], pPos.Board[42], pPos.Board[32], pPos.Board[22], pPos.Board[12], pPos.Board[2]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[92].ToCode(), pPos.Board[82].ToCode(), pPos.Board[72].ToCode(), pPos.Board[62].ToCode(), pPos.Board[52].ToCode(), pPos.Board[42].ToCode(), pPos.Board[32].ToCode(), pPos.Board[22].ToCode(), pPos.Board[12].ToCode(), pPos.Board[2].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[93], pPos.Board[83], pPos.Board[73], pPos.Board[63], pPos.Board[53], pPos.Board[43], pPos.Board[33], pPos.Board[23], pPos.Board[13], pPos.Board[3]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[93].ToCode(), pPos.Board[83].ToCode(), pPos.Board[73].ToCode(), pPos.Board[63].ToCode(), pPos.Board[53].ToCode(), pPos.Board[43].ToCode(), pPos.Board[33].ToCode(), pPos.Board[23].ToCode(), pPos.Board[13].ToCode(), pPos.Board[3].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[94], pPos.Board[84], pPos.Board[74], pPos.Board[64], pPos.Board[54], pPos.Board[44], pPos.Board[34], pPos.Board[24], pPos.Board[14], pPos.Board[4]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[94].ToCode(), pPos.Board[84].ToCode(), pPos.Board[74].ToCode(), pPos.Board[64].ToCode(), pPos.Board[54].ToCode(), pPos.Board[44].ToCode(), pPos.Board[34].ToCode(), pPos.Board[24].ToCode(), pPos.Board[14].ToCode(), pPos.Board[4].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[95], pPos.Board[85], pPos.Board[75], pPos.Board[65], pPos.Board[55], pPos.Board[45], pPos.Board[35], pPos.Board[25], pPos.Board[15], pPos.Board[5]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[95].ToCode(), pPos.Board[85].ToCode(), pPos.Board[75].ToCode(), pPos.Board[65].ToCode(), pPos.Board[55].ToCode(), pPos.Board[45].ToCode(), pPos.Board[35].ToCode(), pPos.Board[25].ToCode(), pPos.Board[15].ToCode(), pPos.Board[5].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[96], pPos.Board[86], pPos.Board[76], pPos.Board[66], pPos.Board[56], pPos.Board[46], pPos.Board[36], pPos.Board[26], pPos.Board[16], pPos.Board[6]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[96].ToCode(), pPos.Board[86].ToCode(), pPos.Board[76].ToCode(), pPos.Board[66].ToCode(), pPos.Board[56].ToCode(), pPos.Board[46].ToCode(), pPos.Board[36].ToCode(), pPos.Board[26].ToCode(), pPos.Board[16].ToCode(), pPos.Board[6].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[97], pPos.Board[87], pPos.Board[77], pPos.Board[67], pPos.Board[57], pPos.Board[47], pPos.Board[37], pPos.Board[27], pPos.Board[17], pPos.Board[7]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[97].ToCode(), pPos.Board[87].ToCode(), pPos.Board[77].ToCode(), pPos.Board[67].ToCode(), pPos.Board[57].ToCode(), pPos.Board[47].ToCode(), pPos.Board[37].ToCode(), pPos.Board[27].ToCode(), pPos.Board[17].ToCode(), pPos.Board[7].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[98], pPos.Board[88], pPos.Board[78], pPos.Board[68], pPos.Board[58], pPos.Board[48], pPos.Board[38], pPos.Board[28], pPos.Board[18], pPos.Board[8]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[98].ToCode(), pPos.Board[88].ToCode(), pPos.Board[78].ToCode(), pPos.Board[68].ToCode(), pPos.Board[58].ToCode(), pPos.Board[48].ToCode(), pPos.Board[38].ToCode(), pPos.Board[28].ToCode(), pPos.Board[18].ToCode(), pPos.Board[8].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[99], pPos.Board[89], pPos.Board[79], pPos.Board[69], pPos.Board[59], pPos.Board[49], pPos.Board[39], pPos.Board[29], pPos.Board[19], pPos.Board[9]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s\n", pPos.Board[99].ToCode(), pPos.Board[89].ToCode(), pPos.Board[79].ToCode(), pPos.Board[69].ToCode(), pPos.Board[59].ToCode(), pPos.Board[49].ToCode(), pPos.Board[39].ToCode(), pPos.Board[29].ToCode(), pPos.Board[19].ToCode(), pPos.Board[9].ToCode()) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
