@@ -5,6 +5,12 @@
 ## Run
 
 ```shell
+# 使っていないパッケージを、インストールのリストから削除するなら
+# go mod tidy
+
+# 自作のパッケージを更新(再インストール)したいなら
+# go get -u all
+
 go build
 
 kifuwarabe-shogi2021

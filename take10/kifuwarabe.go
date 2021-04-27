@@ -132,6 +132,16 @@ MainLoop:
 				G.Chat.Debug(pPos.SprintControl(FIRST, 0))
 				G.Chat.Debug(pPos.SprintControl(SECOND, 0))
 				ok = true
+			} else if length == 2 && tokens[1] == "test" {
+				// 利きのテスト
+				// 現局面の利きを覚え、ムーブ、アンドゥを行って
+				// 元の利きに戻るか確認
+				var pPosT = NewPositionTesting()
+				testOk, message := pPosT.Test(pPos)
+				if !testOk {
+					G.Chat.Debug("error=%s\n", message)
+				}
+				ok = true
 			} else if length == 3 && tokens[1] == "diff" {
 				// 利きの差分の表示（＾～＾）
 				layer, err := strconv.Atoi(tokens[2])

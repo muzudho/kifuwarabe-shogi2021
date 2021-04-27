@@ -6,7 +6,7 @@ import "math/rand"
 func Search(pPos *Position) Move {
 
 	// 指し手生成
-	// 探索中に削除される指し手を除く
+	// 探索中に削除される指し手も入ってるかも
 	move_list := GenMoveList(pPos)
 	size := len(move_list)
 
