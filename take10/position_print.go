@@ -418,8 +418,12 @@ func (pPos *Position) Dump() string {
 	}
 
 	for phase := 0; phase < 2; phase += 1 {
+		// 利きボード
+		buffer.WriteString(pPos.SprintControl(Phase(phase+1), 0))
+		// 利きボードの差分
 		for layer := 0; layer < 5; layer += 1 {
-			buffer.WriteString(fmt.Sprintf("ControlBoardsDiff[%d][%d]:%d\n", phase, layer, pPos.ControlBoardsDiff[phase][layer]))
+			buffer.WriteString(pPos.SprintControl(Phase(phase+1), layer+1))
+			// buffer.WriteString(fmt.Sprintf("ControlBoardsDiff[%d][%d]:%d\n", phase, layer, pPos.ControlBoardsDiff[phase][layer]))
 		}
 	}
 
