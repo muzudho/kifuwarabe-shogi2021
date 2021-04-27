@@ -1,4 +1,4 @@
-package take8
+package take9
 
 // Search - 探索部
 func Search(pPos *Position) Move {

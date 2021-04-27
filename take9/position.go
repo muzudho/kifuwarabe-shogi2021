@@ -1,4 +1,4 @@
-package take8
+package take9
 
 import (
 	"fmt"
@@ -640,7 +640,7 @@ func (pPos *Position) ReadPosition(command string) {
 					}
 				}
 
-				pPos.Hands[drop_index] = number
+				pPos.Hands[drop_index-HAND_ORIGIN] = number
 
 				// 長い利きの駒は位置を覚えておくぜ（＾～＾）
 				switch drop_index {

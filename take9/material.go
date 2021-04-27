@@ -1,5 +1,5 @@
 // 駒の価値
-package take8
+package take9
 
 import "fmt"
 

@@ -3,8 +3,6 @@ package main
 import (
 	"math/rand"
 	"time"
-
-	"github.com/muzudho/kifuwarabe-shogi2021/take8"
 )
 
 // main - 最初に実行されます
@@ -21,5 +19,6 @@ func main() {
 
 	// take6.MainLoop()
 	// take7.MainLoop()
-	take8.MainLoop()
+	// take8.MainLoop()
+	take9.MainLoop()
 }
