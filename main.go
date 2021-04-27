@@ -3,6 +3,8 @@ package main
 import (
 	"math/rand"
 	"time"
+
+	"github.com/muzudho/kifuwarabe-shogi2021/take9"
 )
 
 // main - 最初に実行されます

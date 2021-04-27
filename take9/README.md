@@ -18,5 +18,5 @@ position startpos moves 7g7f 6c6d 6i7h 6a5b 7i6h 1c1d 6h7g 7a6b 5i6h 4a3b 4i5h 1
 
 ```plain
 # 持ち駒がいっぱいある局面（＾～＾）
-position sfen 4k4/9/9/9/9/9/9/9/4K4 b RB2G2S2N2L9Prb2g2s2n2l9p 1
+position sfen 4k4/9/9/9/9/9/9/9/4K4 b RBG2S2N2L2P9rbg2s2n2l2p9 1
 ```

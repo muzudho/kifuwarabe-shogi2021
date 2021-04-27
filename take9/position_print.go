@@ -257,98 +257,98 @@ func (pPos *Position) SprintSfen() string {
 	if num == 1 {
 		hands += "R"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dR", num)
+		hands += fmt.Sprintf("R%d", num)
 	}
 
 	num = pPos.Hands[1]
 	if num == 1 {
 		hands += "B"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dB", num)
+		hands += fmt.Sprintf("B%d", num)
 	}
 
 	num = pPos.Hands[2]
 	if num == 1 {
 		hands += "G"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dG", num)
+		hands += fmt.Sprintf("G%d", num)
 	}
 
 	num = pPos.Hands[3]
 	if num == 1 {
 		hands += "S"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dS", num)
+		hands += fmt.Sprintf("S%d", num)
 	}
 
 	num = pPos.Hands[4]
 	if num == 1 {
 		hands += "N"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dN", num)
+		hands += fmt.Sprintf("N%d", num)
 	}
 
 	num = pPos.Hands[5]
 	if num == 1 {
 		hands += "L"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dL", num)
+		hands += fmt.Sprintf("L%d", num)
 	}
 
 	num = pPos.Hands[6]
 	if num == 1 {
 		hands += "P"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dP", num)
+		hands += fmt.Sprintf("P%d", num)
 	}
 
 	num = pPos.Hands[7]
 	if num == 1 {
 		hands += "r"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dr", num)
+		hands += fmt.Sprintf("r%d", num)
 	}
 
 	num = pPos.Hands[8]
 	if num == 1 {
 		hands += "b"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%db", num)
+		hands += fmt.Sprintf("b%d", num)
 	}
 
 	num = pPos.Hands[9]
 	if num == 1 {
 		hands += "g"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dg", num)
+		hands += fmt.Sprintf("g%d", num)
 	}
 
 	num = pPos.Hands[10]
 	if num == 1 {
 		hands += "s"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%ds", num)
+		hands += fmt.Sprintf("s%d", num)
 	}
 
 	num = pPos.Hands[11]
 	if num == 1 {
 		hands += "n"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dn", num)
+		hands += fmt.Sprintf("n%d", num)
 	}
 
 	num = pPos.Hands[12]
 	if num == 1 {
 		hands += "l"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dl", num)
+		hands += fmt.Sprintf("l%d", num)
 	}
 
 	num = pPos.Hands[13]
 	if num == 1 {
 		hands += "p"
 	} else if num > 1 {
-		hands += fmt.Sprintf("%dp", num)
+		hands += fmt.Sprintf("p%d", num)
 	}
 
 	if hands == "" {
