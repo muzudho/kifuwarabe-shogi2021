@@ -167,6 +167,10 @@ MainLoop:
 				G.Chat.Debug("(%d) %s\n", i, move.ToCode())
 			}
 			G.Chat.Debug("* Except for those to be removed during the search\n")
+		case "dump":
+			// 変数を全部出力してくれだぜ（＾～＾）
+			G.Chat.Debug("Position.Dump()\n")
+			G.Chat.Debug("---------------\n%s", pPos.Dump())
 		}
 
 		G.Log.FlushAllLogs()

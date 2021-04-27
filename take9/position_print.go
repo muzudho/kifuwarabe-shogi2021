@@ -1,6 +1,9 @@
 package take9
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+)
 
 // Print - 局面出力（＾ｑ＾）
 func (pPos *Position) Sprint() string {
@@ -379,4 +382,70 @@ func (pPos *Position) SprintRecord() string {
 	}
 
 	return fmt.Sprintf("Record\n------\n%s", record_text)
+}
+
+// Dump - 内部状態を全部出力しようぜ（＾～＾）？
+func (pPos *Position) Dump() string {
+	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
+	var buffer bytes.Buffer
+
+	buffer.WriteString("Board:")
+	for i := 0; i < BOARD_SIZE; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.Board[i]))
+	}
+	buffer.WriteString("\n")
+
+	buffer.WriteString("KingLocations:")
+	for i := 0; i < 2; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.KingLocations[i]))
+	}
+	buffer.WriteString("\n")
+
+	buffer.WriteString("BishopLocations:")
+	for i := 0; i < 2; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.BishopLocations[i]))
+	}
+	buffer.WriteString("\n")
+
+	buffer.WriteString("LanceLocations:")
+	for i := 0; i < 2; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.LanceLocations[i]))
+	}
+	buffer.WriteString("\n")
+
+	for phase := 0; phase < 2; phase += 1 {
+		buffer.WriteString(fmt.Sprintf("ControlBoards[%d]:%d\n", phase, pPos.ControlBoards[phase]))
+	}
+
+	for phase := 0; phase < 2; phase += 1 {
+		for layer := 0; layer < 5; layer += 1 {
+			buffer.WriteString(fmt.Sprintf("ControlBoardsDiff[%d][%d]:%d\n", phase, layer, pPos.ControlBoardsDiff[phase][layer]))
+		}
+	}
+
+	buffer.WriteString("Hands:")
+	for i := 0; i < 14; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.Hands[i]))
+	}
+	buffer.WriteString("\n")
+
+	buffer.WriteString(fmt.Sprintf("Phase:%d,\n", pPos.Phase))
+
+	buffer.WriteString(fmt.Sprintf("StartMovesNum:%d,\n", pPos.StartMovesNum))
+
+	buffer.WriteString(fmt.Sprintf("OffsetMovesIndex:%d,\n", pPos.OffsetMovesIndex))
+
+	buffer.WriteString("Moves:")
+	for i := 0; i < MOVES_SIZE; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.Moves[i]))
+	}
+	buffer.WriteString("\n")
+
+	buffer.WriteString("CapturedList:")
+	for i := 0; i < MOVES_SIZE; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPos.CapturedList[i]))
+	}
+	buffer.WriteString("\n")
+
+	return buffer.String()
 }
