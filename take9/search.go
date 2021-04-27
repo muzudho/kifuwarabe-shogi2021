@@ -13,7 +13,9 @@ func Search(pPos *Position) Move {
 	}
 
 	var bestMove Move
-	var bestVal int16
+	// 最初に最低値を入れておけば、更新されるだろ（＾～＾）
+	var bestVal int16 = -32768
+
 	// その手を指してみるぜ（＾～＾）
 	for _, move := range move_list {
 		pPos.DoMove(move)

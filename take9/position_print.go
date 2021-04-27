@@ -378,5 +378,5 @@ func (pPos *Position) SprintRecord() string {
 		record_text = append(record_text, '\n')
 	}
 
-	return fmt.Sprintf("record\n------\n%s", record_text)
+	return fmt.Sprintf("Record\n------\n%s", record_text)
 }
