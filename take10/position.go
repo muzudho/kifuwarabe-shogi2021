@@ -230,6 +230,34 @@ const (
 	CONTROL_LAYER_SIZE = 10
 )
 
+// GetControlLayerName - 利きボードのレイヤーの名前
+func GetControlLayerName(layer int) string {
+	switch layer {
+	case CONTROL_LAYER_SUM:
+		return "Sum"
+	case CONTROL_LAYER_DIFF_ROOK_OFF:
+		return "RookOff"
+	case CONTROL_LAYER_DIFF_BISHOP_OFF:
+		return "BishopOff"
+	case CONTROL_LAYER_DIFF_LANCE_OFF:
+		return "LanceOff"
+	case CONTROL_LAYER_DIFF_PUT:
+		return "Put"
+	case CONTROL_LAYER_DIFF_REMOVE:
+		return "Remove"
+	case CONTROL_LAYER_DIFF_CAPTURED:
+		return "Captured"
+	case CONTROL_LAYER_DIFF_LANCE_ON:
+		return "LanceOn"
+	case CONTROL_LAYER_DIFF_BISHOP_ON:
+		return "BishopOn"
+	case CONTROL_LAYER_DIFF_ROOK_ON:
+		return "RookOn"
+	default:
+		panic(fmt.Errorf("Unknown layer=%d", layer))
+	}
+}
+
 // Position - 局面
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
@@ -1430,7 +1458,8 @@ func (pPos *Position) ClearControlDiff() {
 func (pPos *Position) MergeControlDiff() {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			for layer := 0; layer < 5; layer += 1 {
+			// layer 0 を除く
+			for layer := 1; layer < CONTROL_LAYER_SIZE; layer += 1 {
 				pPos.ControlBoards[0][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[0][layer][sq]
 				pPos.ControlBoards[1][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[1][layer][sq]
 			}
