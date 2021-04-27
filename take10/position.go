@@ -1240,11 +1240,13 @@ func (pPos *Position) UndoMove() {
 	mov_piece_type := PIECE_TYPE_EMPTY
 	cap_piece_type := PIECE_TYPE_EMPTY
 
+	// 先に 手目 を１つ戻すぜ（＾～＾）フェーズもひっくり返すぜ（＾～＾）
+	pPos.OffsetMovesIndex -= 1
+	move := pPos.Moves[pPos.OffsetMovesIndex]
 	prev_phase := pPos.Phase
 	pPos.Phase = FlipPhase(pPos.Phase)
 
-	pPos.OffsetMovesIndex -= 1
-	move := pPos.Moves[pPos.OffsetMovesIndex]
+	// 取った駒
 	captured := pPos.CapturedList[pPos.OffsetMovesIndex]
 
 	mov_dst_sq := move.GetDestination()
@@ -1277,11 +1279,11 @@ func (pPos *Position) UndoMove() {
 	default:
 		// 打でないなら
 
-		// 行き先の駒の除去
+		// 行き先に進んでいた自駒の利きの除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		pPos.AddControlDiff(CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
 
-		// 移動元への駒の配置
+		// 自駒を移動元へ戻します
 		if move.GetPromotion() {
 			// 成りを元に戻します
 			pPos.Board[mov_src_sq] = Demote(pPos.Board[mov_dst_sq])
@@ -1332,7 +1334,7 @@ func (pPos *Position) UndoMove() {
 			cap_dst_sq = cap_src_sq
 			pPos.Hands[cap_src_sq-HAND_ORIGIN] -= 1
 
-			// 取った駒を行き先に戻します
+			// 取っていた駒を行き先に戻します
 			cap_piece_type = What(captured)
 			pPos.Board[mov_dst_sq] = captured
 
@@ -1342,15 +1344,15 @@ func (pPos *Position) UndoMove() {
 			// 	// Ignored: 長い利きの駒は あとで追加するので、ここでは無視します
 			// default:
 			// 取った駒は盤上になかったので、ここで利きを復元させます
+			// 行き先にある取られていた駒の利きの復元
 			pPos.AddControlDiff(CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
 			// }
-
-			// 取った駒の利きを復元したあとで、動かす前の駒の利きを復元します
-			pPos.AddControlDiff(CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
-
 		} else {
 			pPos.Board[mov_dst_sq] = PIECE_EMPTY
 		}
+
+		// 元の場所に戻した自駒の利きを復元します
+		pPos.AddControlDiff(CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
