@@ -14,7 +14,11 @@ const (
 	CONTROL_LAYER_DIFF_LANCE_ON
 	CONTROL_LAYER_DIFF_BISHOP_ON
 	CONTROL_LAYER_DIFF_ROOK_ON
-	CONTROL_LAYER_SIZE = 10
+	CONTROL_LAYER_TEST_COPY  // テスト用
+	CONTROL_LAYER_TEST_ERROR // テスト用
+	CONTROL_LAYER_DIFF_START = 1
+	CONTROL_LAYER_DIFF_END   = 10 // この数を含まない。テスト用も含まない
+	CONTROL_LAYER_ALL_SIZE   = 12 // この数を含まない
 )
 
 // GetControlLayerName - 利きボードのレイヤーの名前
@@ -40,6 +44,10 @@ func GetControlLayerName(layer int) string {
 		return "BishopOn"
 	case CONTROL_LAYER_DIFF_ROOK_ON:
 		return "RookOn"
+	case CONTROL_LAYER_TEST_COPY:
+		return "TestCopy"
+	case CONTROL_LAYER_TEST_ERROR:
+		return "TestError"
 	default:
 		panic(fmt.Errorf("Unknown layer=%d", layer))
 	}
@@ -98,13 +106,17 @@ func (pPos *Position) AddControlDiff(layer int, from Square, sign int8) {
 
 // ClearControlDiff - 利きの差分テーブルをクリアーするぜ（＾～＾）
 func (pPos *Position) ClearControlDiff() {
+	// layer 0 を除く
+	for layer := CONTROL_LAYER_DIFF_START; layer < CONTROL_LAYER_DIFF_END; layer += 1 {
+		pPos.ClearControlLayer(layer)
+	}
+}
+
+func (pPos *Position) ClearControlLayer(layer int) {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			// layer 0 を除く
-			for layer := 1; layer < CONTROL_LAYER_SIZE; layer += 1 {
-				pPos.ControlBoards[0][layer][sq] = 0
-				pPos.ControlBoards[1][layer][sq] = 0
-			}
+			pPos.ControlBoards[0][layer][sq] = 0
+			pPos.ControlBoards[1][layer][sq] = 0
 		}
 	}
 }
@@ -114,7 +126,7 @@ func (pPos *Position) MergeControlDiff() {
 	for sq := Square(11); sq < BOARD_SIZE; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// layer 0 を除く
-			for layer := 1; layer < CONTROL_LAYER_SIZE; layer += 1 {
+			for layer := CONTROL_LAYER_DIFF_START; layer < CONTROL_LAYER_DIFF_END; layer += 1 {
 				pPos.ControlBoards[0][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[0][layer][sq]
 				pPos.ControlBoards[1][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[1][layer][sq]
 			}

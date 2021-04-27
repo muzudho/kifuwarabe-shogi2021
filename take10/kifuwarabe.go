@@ -125,7 +125,7 @@ MainLoop:
 			pPos.UndoMove()
 		case "control":
 			length := len(tokens)
-			fmt.Printf("length=%d", length)
+			// fmt.Printf("length=%d", length)
 			ok := false
 			if length == 1 {
 				// 利きの表示（＾～＾）
@@ -136,10 +136,11 @@ MainLoop:
 				// 利きのテスト
 				// 現局面の利きを覚え、ムーブ、アンドゥを行って
 				// 元の利きに戻るか確認
-				var pPosT = NewPositionTesting()
-				testOk, message := pPosT.Test(pPos)
-				if !testOk {
-					G.Chat.Debug("error=%s\n", message)
+				is_error, message := TestControl(pPos)
+				if is_error {
+					G.Chat.Debug("ControlTest: error=%s\n", message)
+					G.Chat.Debug(pPos.SprintControl(FIRST, CONTROL_LAYER_TEST_ERROR))
+					G.Chat.Debug(pPos.SprintControl(SECOND, CONTROL_LAYER_TEST_ERROR))
 				}
 				ok = true
 			} else if length == 3 && tokens[1] == "diff" {

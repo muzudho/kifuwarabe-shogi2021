@@ -412,7 +412,7 @@ func (pPos *Position) Dump() string {
 
 	for phase := 0; phase < 2; phase += 1 {
 		// 利きボード
-		for layer := 0; layer < CONTROL_LAYER_SIZE; layer += 1 {
+		for layer := 0; layer < CONTROL_LAYER_ALL_SIZE; layer += 1 {
 			buffer.WriteString(pPos.SprintControl(Phase(phase+1), layer))
 		}
 	}
