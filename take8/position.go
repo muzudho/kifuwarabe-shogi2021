@@ -450,33 +450,33 @@ func (pPos *Position) ReadPosition(command string) {
 				var piece = command[i]
 				switch piece {
 				case 'R':
-					drop_index = DROP_R1
+					drop_index = HAND_R1
 				case 'B':
-					drop_index = DROP_B1
+					drop_index = HAND_B1
 				case 'G':
-					drop_index = DROP_G1
+					drop_index = HAND_G1
 				case 'S':
-					drop_index = DROP_S1
+					drop_index = HAND_S1
 				case 'N':
-					drop_index = DROP_N1
+					drop_index = HAND_N1
 				case 'L':
-					drop_index = DROP_L1
+					drop_index = HAND_L1
 				case 'P':
-					drop_index = DROP_P1
+					drop_index = HAND_P1
 				case 'r':
-					drop_index = DROP_R2
+					drop_index = HAND_R2
 				case 'b':
-					drop_index = DROP_B2
+					drop_index = HAND_B2
 				case 'g':
-					drop_index = DROP_G2
+					drop_index = HAND_G2
 				case 's':
-					drop_index = DROP_S2
+					drop_index = HAND_S2
 				case 'n':
-					drop_index = DROP_N2
+					drop_index = HAND_N2
 				case 'l':
-					drop_index = DROP_L2
+					drop_index = HAND_L2
 				case 'p':
-					drop_index = DROP_P2
+					drop_index = HAND_P2
 				case ' ':
 					i += 1
 					break HandLoop
@@ -509,21 +509,21 @@ func (pPos *Position) ReadPosition(command string) {
 
 				// 長い利きの駒は位置を覚えておくぜ（＾～＾）
 				switch drop_index {
-				case DROP_R1, DROP_R2:
+				case HAND_R1, HAND_R2:
 					for i, sq := range pPos.RookLocations {
 						if sq == SQUARE_EMPTY {
 							pPos.RookLocations[i] = drop_index
 							break
 						}
 					}
-				case DROP_B1, DROP_B2:
+				case HAND_B1, HAND_B2:
 					for i, sq := range pPos.BishopLocations {
 						if sq == SQUARE_EMPTY {
 							pPos.BishopLocations[i] = drop_index
 							break
 						}
 					}
-				case DROP_L1, DROP_L2:
+				case HAND_L1, HAND_L2:
 					for i, sq := range pPos.LanceLocations {
 						if sq == SQUARE_EMPTY {
 							pPos.LanceLocations[i] = drop_index
@@ -624,25 +624,25 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	switch ch := command[*i]; ch {
 	case 'R':
 		*i += 1
-		hand1 = DROP_R1
+		hand1 = HAND_R1
 	case 'B':
 		*i += 1
-		hand1 = DROP_B1
+		hand1 = HAND_B1
 	case 'G':
 		*i += 1
-		hand1 = DROP_G1
+		hand1 = HAND_G1
 	case 'S':
 		*i += 1
-		hand1 = DROP_S1
+		hand1 = HAND_S1
 	case 'N':
 		*i += 1
-		hand1 = DROP_N1
+		hand1 = HAND_N1
 	case 'L':
 		*i += 1
-		hand1 = DROP_L1
+		hand1 = HAND_L1
 	case 'P':
 		*i += 1
-		hand1 = DROP_P1
+		hand1 = HAND_P1
 	default:
 		// Ignored
 	}
@@ -655,7 +655,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 		case FIRST:
 			move = move.ReplaceSource(hand1)
 		case SECOND:
-			move = move.ReplaceSource(hand1 + DROP_TYPE_SIZE)
+			move = move.ReplaceSource(hand1 + HAND_TYPE_SIZE)
 		default:
 			return *new(Move), fmt.Errorf("Fatal: Unknown phase=%d", phase)
 		}
@@ -764,33 +764,33 @@ func (pPos *Position) DoMove(move Move) {
 	drop := mov_src_sq
 	var piece string
 	switch mov_src_sq {
-	case DROP_R1:
+	case HAND_R1:
 		piece = PIECE_R1
-	case DROP_B1:
+	case HAND_B1:
 		piece = PIECE_B1
-	case DROP_G1:
+	case HAND_G1:
 		piece = PIECE_G1
-	case DROP_S1:
+	case HAND_S1:
 		piece = PIECE_S1
-	case DROP_N1:
+	case HAND_N1:
 		piece = PIECE_N1
-	case DROP_L1:
+	case HAND_L1:
 		piece = PIECE_L1
-	case DROP_P1:
+	case HAND_P1:
 		piece = PIECE_P1
-	case DROP_R2:
+	case HAND_R2:
 		piece = PIECE_R2
-	case DROP_B2:
+	case HAND_B2:
 		piece = PIECE_B2
-	case DROP_G2:
+	case HAND_G2:
 		piece = PIECE_G2
-	case DROP_S2:
+	case HAND_S2:
 		piece = PIECE_S2
-	case DROP_N2:
+	case HAND_N2:
 		piece = PIECE_N2
-	case DROP_L2:
+	case HAND_L2:
 		piece = PIECE_L2
-	case DROP_P2:
+	case HAND_P2:
 		piece = PIECE_P2
 	default:
 		// Not drop
@@ -801,7 +801,7 @@ func (pPos *Position) DoMove(move Move) {
 		// 打なら
 
 		// 持ち駒の数を減らします
-		pPos.Hands[drop-DROP_ORIGIN] -= 1
+		pPos.Hands[drop-HAND_ORIGIN] -= 1
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
@@ -844,42 +844,42 @@ func (pPos *Position) DoMove(move Move) {
 		case PIECE_K1: // Second player win
 			// Lost first king
 		case PIECE_R1, PIECE_PR1:
-			cap_dst_sq = DROP_R2
+			cap_dst_sq = HAND_R2
 		case PIECE_B1, PIECE_PB1:
-			cap_dst_sq = DROP_B2
+			cap_dst_sq = HAND_B2
 		case PIECE_G1:
-			cap_dst_sq = DROP_G2
+			cap_dst_sq = HAND_G2
 		case PIECE_S1, PIECE_PS1:
-			cap_dst_sq = DROP_S2
+			cap_dst_sq = HAND_S2
 		case PIECE_N1, PIECE_PN1:
-			cap_dst_sq = DROP_N2
+			cap_dst_sq = HAND_N2
 		case PIECE_L1, PIECE_PL1:
-			cap_dst_sq = DROP_L2
+			cap_dst_sq = HAND_L2
 		case PIECE_P1, PIECE_PP1:
-			cap_dst_sq = DROP_P2
+			cap_dst_sq = HAND_P2
 		case PIECE_K2: // First player win
 			// Lost second king
 		case PIECE_R2, PIECE_PR2:
-			cap_dst_sq = DROP_R1
+			cap_dst_sq = HAND_R1
 		case PIECE_B2, PIECE_PB2:
-			cap_dst_sq = DROP_B1
+			cap_dst_sq = HAND_B1
 		case PIECE_G2:
-			cap_dst_sq = DROP_G1
+			cap_dst_sq = HAND_G1
 		case PIECE_S2, PIECE_PS2:
-			cap_dst_sq = DROP_S1
+			cap_dst_sq = HAND_S1
 		case PIECE_N2, PIECE_PN2:
-			cap_dst_sq = DROP_N1
+			cap_dst_sq = HAND_N1
 		case PIECE_L2, PIECE_PL2:
-			cap_dst_sq = DROP_L1
+			cap_dst_sq = HAND_L1
 		case PIECE_P2, PIECE_PP2:
-			cap_dst_sq = DROP_P1
+			cap_dst_sq = HAND_P1
 		default:
 			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
 
 		if cap_dst_sq != SQUARE_EMPTY {
 			pPos.CapturedList[pPos.OffsetMovesIndex] = captured
-			pPos.Hands[cap_dst_sq-DROP_ORIGIN] += 1
+			pPos.Hands[cap_dst_sq-HAND_ORIGIN] += 1
 		} else {
 			// 取った駒は無かった（＾～＾）
 			pPos.CapturedList[pPos.OffsetMovesIndex] = PIECE_EMPTY
@@ -967,7 +967,7 @@ func (pPos *Position) UndoMove() {
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
-	case DROP_R1, DROP_B1, DROP_G1, DROP_S1, DROP_N1, DROP_L1, DROP_P1, DROP_R2, DROP_B2, DROP_G2, DROP_S2, DROP_N2, DROP_L2, DROP_P2:
+	case HAND_R1, HAND_B1, HAND_G1, HAND_S1, HAND_N1, HAND_L1, HAND_P1, HAND_R2, HAND_B2, HAND_G2, HAND_S2, HAND_N2, HAND_L2, HAND_P2:
 		// 打なら
 		drop := mov_src_sq
 		// 盤上から駒を除去します
@@ -975,7 +975,7 @@ func (pPos *Position) UndoMove() {
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
-		pPos.Hands[drop-DROP_ORIGIN] += 1
+		pPos.Hands[drop-HAND_ORIGIN] += 1
 		cap_dst_sq = 0
 	default:
 		// 打でないなら
@@ -998,42 +998,42 @@ func (pPos *Position) UndoMove() {
 		case PIECE_K1: // Second player win
 			// Lost first king
 		case PIECE_R1, PIECE_PR1:
-			cap_src_sq = DROP_R2
+			cap_src_sq = HAND_R2
 		case PIECE_B1, PIECE_PB1:
-			cap_src_sq = DROP_B2
+			cap_src_sq = HAND_B2
 		case PIECE_G1:
-			cap_src_sq = DROP_G2
+			cap_src_sq = HAND_G2
 		case PIECE_S1, PIECE_PS1:
-			cap_src_sq = DROP_S2
+			cap_src_sq = HAND_S2
 		case PIECE_N1, PIECE_PN1:
-			cap_src_sq = DROP_N2
+			cap_src_sq = HAND_N2
 		case PIECE_L1, PIECE_PL1:
-			cap_src_sq = DROP_L2
+			cap_src_sq = HAND_L2
 		case PIECE_P1, PIECE_PP1:
-			cap_src_sq = DROP_P2
+			cap_src_sq = HAND_P2
 		case PIECE_K2: // First player win
 			// Lost second king
 		case PIECE_R2, PIECE_PR2:
-			cap_src_sq = DROP_R1
+			cap_src_sq = HAND_R1
 		case PIECE_B2, PIECE_PB2:
-			cap_src_sq = DROP_B1
+			cap_src_sq = HAND_B1
 		case PIECE_G2:
-			cap_src_sq = DROP_G1
+			cap_src_sq = HAND_G1
 		case PIECE_S2, PIECE_PS2:
-			cap_src_sq = DROP_S1
+			cap_src_sq = HAND_S1
 		case PIECE_N2, PIECE_PN2:
-			cap_src_sq = DROP_N1
+			cap_src_sq = HAND_N1
 		case PIECE_L2, PIECE_PL2:
-			cap_src_sq = DROP_L1
+			cap_src_sq = HAND_L1
 		case PIECE_P2, PIECE_PP2:
-			cap_src_sq = DROP_P1
+			cap_src_sq = HAND_P1
 		default:
 			fmt.Printf("Error: Unknown captured=[%s]", captured)
 		}
 
 		if cap_src_sq != SQUARE_EMPTY {
 			cap_dst_sq = cap_src_sq
-			pPos.Hands[cap_src_sq-DROP_ORIGIN] -= 1
+			pPos.Hands[cap_src_sq-HAND_ORIGIN] -= 1
 
 			// 取った駒を行き先に戻します
 			cap_piece_type = What(captured)
@@ -1164,12 +1164,14 @@ func (pPos *Position) MergeControlDiff() {
 }
 
 // Homo - 移動元と移動先の駒を持つプレイヤーが等しければ真。移動先が空なら偽
+// 持ち駒は指定してはいけません。
 func (pPos *Position) Homo(from Square, to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
 	return Who(pPos.Board[from]) == Who(pPos.Board[to])
 }
 
 // Hetero - 移動元と移動先の駒を持つプレイヤーが異なれば真。移動先が空マスでも真
+// 持ち駒は指定してはいけません。
 // Homo の逆だぜ（＾～＾）片方ありゃいいんだけど（＾～＾）
 func (pPos *Position) Hetero(from Square, to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
