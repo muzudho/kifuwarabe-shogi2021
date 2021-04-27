@@ -103,8 +103,8 @@ func (pPos *Position) createMovesText() string {
 //
 // Parameters
 // ----------
-// * `flag` - 0: 利き数ボード, 1-5:利き数の差分ボードのレイヤー[0]～[4]
-func (pPos *Position) SprintControl(phase Phase, flag int) string {
+// * `layer` - 利き数ボードのレイヤー番号（＾～＾）
+func (pPos *Position) SprintControl(phase Phase, layer int) string {
 	var board [BOARD_SIZE]int8
 	var phase_str string
 	var title string
@@ -120,15 +120,8 @@ func (pPos *Position) SprintControl(phase Phase, flag int) string {
 
 	var ph = phase - 1
 	if 0 <= ph && ph < 2 {
-		if flag == 0 {
-			title = "Control"
-			board = pPos.ControlBoards[ph]
-		} else {
-			// 利き数の差分
-			var layer = flag - 1
-			title = fmt.Sprintf("ControlDiff%d", layer)
-			board = pPos.ControlBoardsDiff[ph][layer]
-		}
+		title = fmt.Sprintf("Control%d", layer)
+		board = pPos.ControlBoards[ph][layer]
 	}
 
 	return "\n" +
@@ -419,11 +412,8 @@ func (pPos *Position) Dump() string {
 
 	for phase := 0; phase < 2; phase += 1 {
 		// 利きボード
-		buffer.WriteString(pPos.SprintControl(Phase(phase+1), 0))
-		// 利きボードの差分
-		for layer := 0; layer < 5; layer += 1 {
-			buffer.WriteString(pPos.SprintControl(Phase(phase+1), layer+1))
-			// buffer.WriteString(fmt.Sprintf("ControlBoardsDiff[%d][%d]:%d\n", phase, layer, pPos.ControlBoardsDiff[phase][layer]))
+		for layer := 0; layer < CONTROL_LAYER_SIZE; layer += 1 {
+			buffer.WriteString(pPos.SprintControl(Phase(phase+1), layer))
 		}
 	}
 

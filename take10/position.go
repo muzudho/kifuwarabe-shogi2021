@@ -216,6 +216,20 @@ func PieceFrom(piece string) Piece {
 	}
 }
 
+const (
+	CONTROL_LAYER_SUM = iota
+	CONTROL_LAYER_DIFF_ROOK_OFF
+	CONTROL_LAYER_DIFF_BISHOP_OFF
+	CONTROL_LAYER_DIFF_LANCE_OFF
+	CONTROL_LAYER_DIFF_PUT // 打とか指すとか
+	CONTROL_LAYER_DIFF_REMOVE
+	CONTROL_LAYER_DIFF_CAPTURED
+	CONTROL_LAYER_DIFF_LANCE_ON
+	CONTROL_LAYER_DIFF_BISHOP_ON
+	CONTROL_LAYER_DIFF_ROOK_ON
+	CONTROL_LAYER_SIZE = 10
+)
+
 // Position - 局面
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
@@ -229,12 +243,19 @@ type Position struct {
 	BishopLocations [2]Square
 	// 香の場所。長い利きを消すために必要（＾～＾）
 	LanceLocations [4]Square
+	// マスへの利き数、または差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
 	// 利きテーブル [0]先手 [1]後手
-	// マスへの利き数が入っています
-	ControlBoards [2][BOARD_SIZE]int8
-	// マスへの利き数の差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
-	// プレイヤー１つにつき、５レイヤーあるぜ（＾～＾）
-	ControlBoardsDiff [2][5][BOARD_SIZE]int8
+	// [0] 利き
+	// [1] 飛の利き引く(差分)
+	// [2] 角の利き引く(差分)
+	// [3] 香の利き引く(差分)
+	// [4] ムーブ用(差分)
+	// [5] ムーブ用(差分)
+	// [6] ムーブ用(差分)
+	// [7] 香の利き戻す(差分)
+	// [8] 角の利き戻す(差分)
+	// [9] 飛の利き戻す(差分)
+	ControlBoards [2][CONTROL_LAYER_SIZE][BOARD_SIZE]int8
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
@@ -272,30 +293,67 @@ func (pPos *Position) resetToZero() {
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 	}
-	pPos.ControlBoards = [2][BOARD_SIZE]int8{{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}, {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}}
-	pPos.ControlBoardsDiff = [2][5][BOARD_SIZE]int8{{
+	pPos.ControlBoards = [2][CONTROL_LAYER_SIZE][BOARD_SIZE]int8{{
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -357,6 +415,66 @@ func (pPos *Position) resetToZero() {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		},
 	}, {
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		},
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -730,7 +848,8 @@ func (pPos *Position) ReadPosition(command string) {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			if !pPos.IsEmptySq(sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
-				pPos.AddControlDiff(0, sq, 1)
+				// あとですぐクリアーするので、どのレイヤー使ってても関係ないんで、仮で PUTレイヤーを使っているぜ（＾～＾）
+				pPos.AddControlDiff(CONTROL_LAYER_DIFF_PUT, sq, 1)
 			}
 		}
 	}
@@ -893,7 +1012,9 @@ func (pPos *Position) DoMove(move Move) {
 	pPos.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
-	pPos.AddControlDiffAllSlidingPiece(0, -1, mov_src_sq)
+	pPos.AddControlRook(CONTROL_LAYER_DIFF_ROOK_OFF, -1, mov_src_sq)
+	pPos.AddControlBishop(CONTROL_LAYER_DIFF_BISHOP_OFF, -1, mov_src_sq)
+	pPos.AddControlLance(CONTROL_LAYER_DIFF_LANCE_OFF, -1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	drop := mov_src_sq
@@ -940,7 +1061,7 @@ func (pPos *Position) DoMove(move Move) {
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
-		pPos.AddControlDiff(1, mov_dst_sq, 1)
+		pPos.AddControlDiff(CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -953,14 +1074,14 @@ func (pPos *Position) DoMove(move Move) {
 			case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
 				// Ignored: 長い利きの駒は 既に除外しているので無視します
 			default:
-				pPos.AddControlDiff(1, mov_dst_sq, -1)
+				pPos.AddControlDiff(CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, -1)
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
 
-		// 元位置の駒を除去
-		pPos.AddControlDiff(2, mov_src_sq, -1)
+		// 元位置の駒の利きを除去
+		pPos.AddControlDiff(CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, -1)
 
 		// 行き先の駒の上書き
 		if move.GetPromotion() {
@@ -969,10 +1090,10 @@ func (pPos *Position) DoMove(move Move) {
 		} else {
 			pPos.Board[mov_dst_sq] = pPos.Board[mov_src_sq]
 		}
-		// 元位置の駒の削除pos
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
+		// 元位置の駒を削除してから、移動先の駒の利きを追加
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
-		pPos.AddControlDiff(3, mov_dst_sq, 1)
+		pPos.AddControlDiff(CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1063,7 +1184,9 @@ func (pPos *Position) DoMove(move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
-	pPos.AddControlDiffAllSlidingPiece(4, 1, mov_dst_sq)
+	pPos.AddControlLance(CONTROL_LAYER_DIFF_LANCE_ON, 1, mov_dst_sq)
+	pPos.AddControlBishop(CONTROL_LAYER_DIFF_BISHOP_ON, 1, mov_dst_sq)
+	pPos.AddControlRook(CONTROL_LAYER_DIFF_ROOK_ON, 1, mov_dst_sq)
 
 	pPos.MergeControlDiff()
 }
@@ -1098,15 +1221,19 @@ func (pPos *Position) UndoMove() {
 	pPos.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
-	pPos.AddControlDiffAllSlidingPiece(0, -1, mov_dst_sq)
+	// アンドゥなので逆さになっているぜ（＾～＾）
+	pPos.AddControlRook(CONTROL_LAYER_DIFF_ROOK_ON, -1, mov_dst_sq)
+	pPos.AddControlBishop(CONTROL_LAYER_DIFF_BISHOP_ON, -1, mov_dst_sq)
+	pPos.AddControlLance(CONTROL_LAYER_DIFF_LANCE_ON, -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
 	case HAND_R1, HAND_B1, HAND_G1, HAND_S1, HAND_N1, HAND_L1, HAND_P1, HAND_R2, HAND_B2, HAND_G2, HAND_S2, HAND_N2, HAND_L2, HAND_P2:
 		// 打なら
 		drop := mov_src_sq
-		// 盤上から駒を除去します
+		// 行き先から駒を除去します
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
+		pPos.AddControlDiff(CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
@@ -1117,7 +1244,7 @@ func (pPos *Position) UndoMove() {
 
 		// 行き先の駒の除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
-		pPos.AddControlDiff(1, mov_dst_sq, -1)
+		pPos.AddControlDiff(CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
 
 		// 移動元への駒の配置
 		if move.GetPromotion() {
@@ -1173,7 +1300,6 @@ func (pPos *Position) UndoMove() {
 			// 取った駒を行き先に戻します
 			cap_piece_type = What(captured)
 			pPos.Board[mov_dst_sq] = captured
-			pPos.AddControlDiff(2, mov_src_sq, 1)
 
 			// pieceType := What(captured)
 			// switch pieceType {
@@ -1181,8 +1307,11 @@ func (pPos *Position) UndoMove() {
 			// 	// Ignored: 長い利きの駒は あとで追加するので、ここでは無視します
 			// default:
 			// 取った駒は盤上になかったので、ここで利きを復元させます
-			pPos.AddControlDiff(3, mov_dst_sq, 1)
+			pPos.AddControlDiff(CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
 			// }
+
+			// 取った駒の利きを復元したあとで、動かす前の駒の利きを復元します
+			pPos.AddControlDiff(CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
 
 		} else {
 			pPos.Board[mov_dst_sq] = PIECE_EMPTY
@@ -1226,23 +1355,34 @@ func (pPos *Position) UndoMove() {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
-	pPos.AddControlDiffAllSlidingPiece(4, 1, mov_src_sq)
+	// アンドゥなので逆さになっているぜ（＾～＾）
+	pPos.AddControlLance(CONTROL_LAYER_DIFF_LANCE_OFF, 1, mov_src_sq)
+	pPos.AddControlBishop(CONTROL_LAYER_DIFF_BISHOP_OFF, 1, mov_src_sq)
+	pPos.AddControlRook(CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
 
 	pPos.MergeControlDiff()
 }
 
-// AddControlDiffAllSlidingPiece - すべての長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPos *Position) AddControlDiffAllSlidingPiece(layer int, sign int8, excludeFrom Square) {
+// AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
+func (pPos *Position) AddControlRook(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.RookLocations {
 		if OnBoard(from) && from != excludeFrom {
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
+}
+
+// AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
+func (pPos *Position) AddControlBishop(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.BishopLocations {
 		if OnBoard(from) && from != excludeFrom {
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
+}
+
+// AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
+func (pPos *Position) AddControlLance(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.LanceLocations {
 		if OnBoard(from) && from != excludeFrom && PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
 			pPos.AddControlDiff(layer, from, sign)
@@ -1270,7 +1410,7 @@ func (pPos *Position) AddControlDiff(layer int, from Square, sign int8) {
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: to=%d\n", to)
 		// 差分の方のテーブルを更新（＾～＾）
-		pPos.ControlBoardsDiff[ph][layer][to] += sign * 1
+		pPos.ControlBoards[ph][layer][to] += sign * 1
 	}
 }
 
@@ -1279,8 +1419,8 @@ func (pPos *Position) ClearControlDiff() {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			for layer := 0; layer < 5; layer += 1 {
-				pPos.ControlBoardsDiff[0][layer][sq] = 0
-				pPos.ControlBoardsDiff[1][layer][sq] = 0
+				pPos.ControlBoards[0][layer][sq] = 0
+				pPos.ControlBoards[1][layer][sq] = 0
 			}
 		}
 	}
@@ -1291,8 +1431,8 @@ func (pPos *Position) MergeControlDiff() {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			for layer := 0; layer < 5; layer += 1 {
-				pPos.ControlBoards[0][sq] += pPos.ControlBoardsDiff[0][layer][sq]
-				pPos.ControlBoards[1][sq] += pPos.ControlBoardsDiff[1][layer][sq]
+				pPos.ControlBoards[0][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[0][layer][sq]
+				pPos.ControlBoards[1][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[1][layer][sq]
 			}
 		}
 	}

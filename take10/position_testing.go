@@ -43,7 +43,7 @@ func (pPosT *PositionTesting) Test(pPos *Position) (bool, string) {
 	// 利きをコピー
 	for phase := 0; phase < 2; phase += 1 {
 		for sq := 0; sq < BOARD_SIZE; sq += 1 {
-			pPosT.ControlBoards[phase][sq] = pPos.ControlBoards[phase][sq]
+			pPosT.ControlBoards[phase][sq] = pPos.ControlBoards[phase][CONTROL_LAYER_SUM][sq]
 		}
 	}
 
@@ -73,7 +73,7 @@ func (pPosT *PositionTesting) Test(pPos *Position) (bool, string) {
 func (pPosT *PositionTesting) Check(pPos *Position, move_seq int, move_total int, move Move) (bool, string) {
 	for phase := 0; phase < 2; phase += 1 {
 		for sq := 0; sq < BOARD_SIZE; sq += 1 {
-			if pPosT.ControlBoards[phase][sq] != pPos.ControlBoards[phase][sq] {
+			if pPosT.ControlBoards[phase][sq] != pPos.ControlBoards[phase][CONTROL_LAYER_SUM][sq] {
 				return false, fmt.Sprintf("Error! move_seq=(%d/%d) move=%s phase=%d sq=%d", move_seq, move_total, move.ToCode(), phase, sq)
 			}
 		}
