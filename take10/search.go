@@ -14,6 +14,8 @@ func Search(pPos *Position) Move {
 		return ResignMove
 	}
 
+	nodesNum := 0
+
 	// 同じ価値のベストムーブがいっぱいあるかも（＾～＾）
 	var bestMoveList []Move
 	// 最初に最低値を入れておけば、更新されるだろ（＾～＾）
@@ -22,8 +24,10 @@ func Search(pPos *Position) Move {
 	// その手を指してみるぜ（＾～＾）
 	for _, move := range move_list {
 		pPos.DoMove(move)
+		nodesNum += 1
 
-		captured := pPos.CapturedList[pPos.OffsetMovesIndex]
+		// 取った駒は棋譜の１手前に記録されています
+		captured := pPos.CapturedList[pPos.OffsetMovesIndex-1]
 		materialVal := EvalMaterial(captured)
 
 		if bestVal < materialVal {
@@ -39,6 +43,12 @@ func Search(pPos *Position) Move {
 		pPos.UndoMove()
 	}
 
+	// 0件にはならないはず（＾～＾）
+	currMove := bestMoveList[rand.Intn(len(bestMoveList))]
+
+	// 評価値出力（＾～＾）
+	G.Chat.Print("info depth 0 nodes %d score cp %d currmove %s pv %s\n", nodesNum, bestVal, currMove.ToCode(), currMove.ToCode())
+
 	// ゲーム向けの軽い乱数
-	return bestMoveList[rand.Intn(size)]
+	return currMove
 }
