@@ -371,12 +371,14 @@ func GenMoveList(pPos *Position) []Move {
 		// 駒台もスキャンしよ（＾～＾）
 		phase_index := Square(pPos.Phase - 1)
 		for hand := Square(phase_index * HAND_TYPE_SIZE); hand < (phase_index+1)*HAND_TYPE_SIZE; hand += 1 {
-			hand_sq := hand + HAND_ORIGIN
-			control_list := GenControl(pPos, hand_sq)
+			if pPos.Hands[hand] > 0 {
+				hand_sq := hand + HAND_ORIGIN
+				control_list := GenControl(pPos, hand_sq)
 
-			for _, to := range control_list {
-				if pPos.IsEmptySq(to) { // 駒の上には打てません
-					move_list = append(move_list, NewMoveValue2(hand_sq, to))
+				for _, to := range control_list {
+					if pPos.IsEmptySq(to) { // 駒の上には打てません
+						move_list = append(move_list, NewMoveValue2(hand_sq, to))
+					}
 				}
 			}
 		}
