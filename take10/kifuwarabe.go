@@ -143,14 +143,14 @@ MainLoop:
 					G.Chat.Debug(pPos.SprintControl(SECOND, CONTROL_LAYER_TEST_ERROR))
 				}
 				ok = true
-			} else if length == 3 && tokens[1] == "diff" {
-				// 利きの差分の表示（＾～＾）
+			} else if length == 3 && tokens[1] == "layer" {
+				// 利きテーブルの表示（＾～＾）
 				layer, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
-				} else if 0 <= layer && layer < 5 {
-					G.Chat.Debug(pPos.SprintControl(FIRST, layer+1))
-					G.Chat.Debug(pPos.SprintControl(SECOND, layer+1))
+				} else if 0 <= layer && layer < CONTROL_LAYER_ALL_SIZE {
+					G.Chat.Debug(pPos.SprintControl(FIRST, layer))
+					G.Chat.Debug(pPos.SprintControl(SECOND, layer))
 					ok = true
 				}
 			}
@@ -182,6 +182,9 @@ MainLoop:
 
 			for i := 0; i < 100; i += 1 {
 				G.Chat.Debug(pPos.Sprint())
+				// あの駒、どこにいんの（＾～＾）？
+				G.Chat.Debug(pPos.SprintLocation())
+
 				moveList(pPos)
 				bestmove := Search(pPos)
 				G.Chat.Print("bestmove %s\n", bestmove.ToCode())

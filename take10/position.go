@@ -222,7 +222,7 @@ type Position struct {
 	// [19] は １九、 [91] は ９一（＾～＾）反時計回りに９０°回転した将棋盤の状態で入ってるぜ（＾～＾）想像しろだぜ（＾～＾）
 	Board [BOARD_SIZE]Piece
 	// [0]先手 [1]後手
-	KingLocations [2]Square
+	kingLocations [2]Square
 	// 飛車の場所。長い利きを消すために必要（＾～＾）
 	RookLocations [2]Square
 	// 角の場所。長い利きを消すために必要（＾～＾）
@@ -273,6 +273,10 @@ func (pPos *Position) FlipPhase() {
 // GetPhase - フェーズ
 func (pPos *Position) GetPhase() Phase {
 	return pPos.phase
+}
+
+func (pPos *Position) GetKingLocations() (Square, Square) {
+	return pPos.kingLocations[0], pPos.kingLocations[1]
 }
 
 // ResetToStartpos - 駒を置いていな状態でリセットします
@@ -582,7 +586,7 @@ func (pPos *Position) resetToZero() {
 		},
 	}}
 	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
-	pPos.KingLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
+	pPos.kingLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
 	pPos.RookLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
 	pPos.BishopLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
 	pPos.LanceLocations = [4]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
@@ -617,7 +621,7 @@ func (pPos *Position) setToStartpos() {
 		PIECE_EMPTY, PIECE_N2, PIECE_R2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_B1, PIECE_N1,
 		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
 	}
-	pPos.KingLocations = [2]Square{59, 51}
+	pPos.kingLocations = [2]Square{59, 51}
 	pPos.RookLocations = [2]Square{28, 82}
 	pPos.BishopLocations = [2]Square{22, 88}
 	pPos.LanceLocations = [4]Square{11, 19, 91, 99}
@@ -688,9 +692,9 @@ func (pPos *Position) ReadPosition(command string) {
 			// 玉と、長い利きの駒は位置を覚えておくぜ（＾～＾）
 			switch command[i-1] {
 			case 'K':
-				pPos.KingLocations[0] = Square((file+1)*10 + rank)
+				pPos.kingLocations[0] = Square((file+1)*10 + rank)
 			case 'k':
-				pPos.KingLocations[1] = Square((file+1)*10 + rank)
+				pPos.kingLocations[1] = Square((file+1)*10 + rank)
 			case 'R', 'r': // 成も兼ねてる（＾～＾）
 				for i, sq := range pPos.RookLocations {
 					if sq == SQUARE_EMPTY {
@@ -1202,9 +1206,9 @@ func (pPos *Position) DoMove(move Move) {
 		case PIECE_TYPE_K:
 			switch prev_phase {
 			case FIRST:
-				pPos.KingLocations[prev_phase-1] = dst_sq_list[j]
+				pPos.kingLocations[0] = dst_sq_list[j]
 			case SECOND:
-				pPos.KingLocations[prev_phase-1] = dst_sq_list[j]
+				pPos.kingLocations[1] = dst_sq_list[j]
 			default:
 				panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
 			}
@@ -1254,7 +1258,7 @@ func (pPos *Position) UndoMove() {
 	// 先に 手目 を１つ戻すぜ（＾～＾）UndoMoveでフェーズもひっくり返すぜ（＾～＾）
 	pPos.OffsetMovesIndex -= 1
 	move := pPos.Moves[pPos.OffsetMovesIndex]
-	prev_phase := pPos.GetPhase()
+	// next_phase := pPos.GetPhase()
 	pPos.FlipPhase()
 
 	// 取った駒
@@ -1373,13 +1377,13 @@ func (pPos *Position) UndoMove() {
 	for j, moving_piece_type := range piece_type_list {
 		switch moving_piece_type {
 		case PIECE_TYPE_K:
-			switch prev_phase {
+			switch pPos.phase { // next_phase
 			case FIRST:
-				pPos.KingLocations[prev_phase-1] = src_sq_list[j]
+				pPos.kingLocations[0] = src_sq_list[j]
 			case SECOND:
-				pPos.KingLocations[prev_phase-1] = src_sq_list[j]
+				pPos.kingLocations[1] = src_sq_list[j]
 			default:
-				panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
+				panic(fmt.Errorf("Unknown pPos.phase=%d", pPos.phase))
 			}
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
 			for i, sq := range pPos.RookLocations {

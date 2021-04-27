@@ -283,16 +283,26 @@ func GenMoveList(pPos *Position) []Move {
 	move_list := []Move{}
 
 	// 王手をされているときは、自玉を逃がす必要があります
-	friendKingSq := pPos.KingLocations[pPos.GetPhase()-1]
+	friend := pPos.GetPhase()
 	opponent := FlipPhase(pPos.GetPhase())
+	var friendKingSq Square
+	var opponentKingSq Square
+	if friend == FIRST {
+		friendKingSq, opponentKingSq = pPos.GetKingLocations()
+	} else if friend == SECOND {
+		opponentKingSq, friendKingSq = pPos.GetKingLocations()
+	} else {
+		panic(fmt.Errorf("Unknown phase=%d", friend))
+	}
 
 	if pPos.ControlBoards[opponent-1][CONTROL_LAYER_SUM][friendKingSq] > 0 {
 		// 王手されています
+		fmt.Printf("Debug: Checked friendKingSq=%d opponentKingSq=%d friend=%d opponent=%d\n", friendKingSq, opponentKingSq, friend, opponent)
 		// TODO アタッカーがどの駒か調べたいが……。一手前に動かした駒か、空き王手のどちらかしかなくないか（＾～＾）？
 		// 王手されているところが開始局面だと、一手前を調べることができないので、やっぱ調べるしか（＾～＾）
 		// 空き王手を利用して、2箇所から 長い利きが飛んでくることはある（＾～＾）
 
-		// 駒を動かしてみて、王手が解除されるか調べるか（＾～＾）
+		// 盤上の駒を動かしてみて、王手が解除されるか調べるか（＾～＾）
 		for rank := 1; rank < 10; rank += 1 {
 			for file := 1; file < 10; file += 1 {
 				from := Square(file*10 + rank)
@@ -338,8 +348,13 @@ func GenMoveList(pPos *Position) []Move {
 				}
 			}
 		}
+
+		// TODO 打もやりたい（＾～＾）
+
 	} else {
 		// 王手されていないぜ（＾～＾）
+		fmt.Printf("Debug: Not checked\n")
+
 		// 盤面スキャンしたくないけど、駒の位置インデックスを作ってないから 仕方ない（＾～＾）
 		for rank := 1; rank < 10; rank += 1 {
 			for file := 1; file < 10; file += 1 {
@@ -383,8 +398,6 @@ func GenMoveList(pPos *Position) []Move {
 			}
 		}
 	}
-
-	// TODO 打もやりたい（＾～＾）
 
 	return move_list
 }

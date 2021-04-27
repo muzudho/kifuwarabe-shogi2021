@@ -178,6 +178,7 @@ func (pPos *Position) SprintControl(phase Phase, layer int) string {
 
 // SprintLocation - あの駒どこにいんの？を表示
 func (pPos *Position) SprintLocation() string {
+	king1, king2 := pPos.GetKingLocations()
 	return "\n" +
 		//
 		" K   k      R          B          L\n" +
@@ -185,7 +186,7 @@ func (pPos *Position) SprintLocation() string {
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		// 持ち駒は３桁になるぜ（＾～＾）
 		fmt.Sprintf("|%3d|%3d|  |%3d|%3d|  |%3d|%3d|  |%3d|%3d|%3d|%3d|\n",
-			pPos.KingLocations[0], pPos.KingLocations[1],
+			king1, king2,
 			pPos.RookLocations[0], pPos.RookLocations[1],
 			pPos.BishopLocations[0], pPos.BishopLocations[1],
 			pPos.LanceLocations[0], pPos.LanceLocations[1],
@@ -391,11 +392,8 @@ func (pPos *Position) Dump() string {
 	}
 	buffer.WriteString("\n")
 
-	buffer.WriteString("KingLocations:")
-	for i := 0; i < 2; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.KingLocations[i]))
-	}
-	buffer.WriteString("\n")
+	king1, king2 := pPos.GetKingLocations()
+	buffer.WriteString(fmt.Sprintf("KingLocations:%d,%d,\n", king1, king2))
 
 	buffer.WriteString("BishopLocations:")
 	for i := 0; i < 2; i += 1 {
