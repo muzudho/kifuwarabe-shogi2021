@@ -171,17 +171,30 @@ MainLoop:
 			// 棋譜表示。取った駒を表示するためのもの（＾～＾）
 			G.Chat.Debug(pPos.SprintRecord())
 		case "movelist":
-			G.Chat.Debug("MoveList\n")
-			G.Chat.Debug("--------\n")
-			move_list := GenMoveList(pPos)
-			for i, move := range move_list {
-				G.Chat.Debug("(%d) %s\n", i, move.ToCode())
-			}
-			G.Chat.Debug("* Except for those to be removed during the search\n")
+			moveList(pPos)
 		case "dump":
 			// 変数を全部出力してくれだぜ（＾～＾）
 			G.Chat.Debug("Position.Dump()\n")
 			G.Chat.Debug("---------------\n%s", pPos.Dump())
+		case "playout":
+			// とにかく１００手進めるぜ（＾～＾）
+			G.Chat.Debug("Playout start\n")
+
+			for i := 0; i < 100; i += 1 {
+				G.Chat.Debug(pPos.Sprint())
+				moveList(pPos)
+				bestmove := Search(pPos)
+				G.Chat.Print("bestmove %s\n", bestmove.ToCode())
+
+				if bestmove == Move(SQUARE_EMPTY) {
+					// 投了
+					break
+				}
+
+				pPos.DoMove(bestmove)
+			}
+
+			G.Chat.Debug("Playout finished\n")
 		}
 
 		G.Log.FlushAllLogs()
@@ -189,4 +202,15 @@ MainLoop:
 
 	G.Log.Trace("Finished\n")
 	G.Log.FlushAllLogs()
+}
+
+// moveList - 指し手リスト出力
+func moveList(pPos *Position) {
+	G.Chat.Debug("MoveList\n")
+	G.Chat.Debug("--------\n")
+	move_list := GenMoveList(pPos)
+	for i, move := range move_list {
+		G.Chat.Debug("(%d) %s\n", i, move.ToCode())
+	}
+	G.Chat.Debug("* Except for those to be removed during the search\n")
 }

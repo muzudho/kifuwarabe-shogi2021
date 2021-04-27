@@ -1177,6 +1177,7 @@ func (pPos *Position) DoMove(move Move) {
 		}
 	}
 
+	// フェーズを１つ進めます
 	pPos.Moves[pPos.OffsetMovesIndex] = move
 	pPos.OffsetMovesIndex += 1
 	prev_phase := pPos.Phase
