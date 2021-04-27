@@ -454,7 +454,7 @@ func (pPos *Position) setToStartpos() {
 		PIECE_EMPTY, PIECE_N2, PIECE_R2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_B1, PIECE_N1,
 		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
 	}
-	pPos.KingLocations = [2]Square{Square(59), Square(51)}
+	pPos.KingLocations = [2]Square{59, 51}
 	pPos.RookLocations = [2]Square{28, 82}
 	pPos.BishopLocations = [2]Square{22, 88}
 	pPos.LanceLocations = [4]Square{11, 19, 91, 99}
