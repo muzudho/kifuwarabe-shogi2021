@@ -88,7 +88,8 @@ func (move Move) ToCode() string {
 	}
 
 	if count == 1 {
-		str = append(str, '+')
+		// 打
+		str = append(str, '*')
 	}
 
 	for count < 2 {
