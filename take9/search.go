@@ -1,5 +1,7 @@
 package take9
 
+import "math/rand"
+
 // Search - 探索部
 func Search(pPos *Position) Move {
 
@@ -12,7 +14,8 @@ func Search(pPos *Position) Move {
 		return ResignMove
 	}
 
-	var bestMove Move
+	// 同じ価値のベストムーブがいっぱいあるかも（＾～＾）
+	var bestMoveList []Move
 	// 最初に最低値を入れておけば、更新されるだろ（＾～＾）
 	var bestVal int16 = -32768
 
@@ -24,13 +27,18 @@ func Search(pPos *Position) Move {
 		materialVal := EvalMaterial(captured)
 
 		if bestVal < materialVal {
-			bestMove = move
+			// より高い価値が見つかったら更新
+			bestMoveList = nil
+			bestMoveList = append(bestMoveList, move)
 			bestVal = materialVal
+		} else if bestVal == materialVal {
+			// 最高値が並んだら配列の要素として追加
+			bestMoveList = append(bestMoveList, move)
 		}
 
 		pPos.UndoMove()
 	}
 
 	// ゲーム向けの軽い乱数
-	return bestMove
+	return bestMoveList[rand.Intn(size)]
 }
