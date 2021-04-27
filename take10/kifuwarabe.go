@@ -183,9 +183,9 @@ MainLoop:
 			for i := 0; i < 100; i += 1 {
 				G.Chat.Debug(pPos.Sprint())
 				// あの駒、どこにいんの（＾～＾）？
-				G.Chat.Debug(pPos.SprintLocation())
+				// G.Chat.Debug(pPos.SprintLocation())
 
-				moveList(pPos)
+				// moveList(pPos)
 				bestmove := Search(pPos)
 				G.Chat.Print("bestmove %s\n", bestmove.ToCode())
 
