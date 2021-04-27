@@ -247,7 +247,7 @@ type Position struct {
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p
 	Hands []int
 	// 先手が1、後手が2（＾～＾）
-	Phase Phase
+	phase Phase
 	// 開始局面の時点で何手目か（＾～＾）これは表示のための飾りのようなものだぜ（＾～＾）
 	StartMovesNum int
 	// 開始局面から数えて何手目か（＾～＾）0から始まるぜ（＾～＾）
@@ -263,6 +263,16 @@ func NewPosition() *Position {
 	var ins = new(Position)
 	ins.resetToZero()
 	return ins
+}
+
+// FlipPhase - フェーズをひっくり返すぜ（＾～＾）
+func (pPos *Position) FlipPhase() {
+	pPos.phase = FlipPhase(pPos.phase)
+}
+
+// GetPhase - フェーズ
+func (pPos *Position) GetPhase() Phase {
+	return pPos.phase
 }
 
 // ResetToStartpos - 駒を置いていな状態でリセットします
@@ -582,7 +592,7 @@ func (pPos *Position) resetToZero() {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}
 	// 先手の局面
-	pPos.Phase = FIRST
+	pPos.phase = FIRST
 	// 何手目か
 	pPos.StartMovesNum = 1
 	pPos.OffsetMovesIndex = 0
@@ -708,10 +718,10 @@ func (pPos *Position) ReadPosition(command string) {
 		// 手番
 		switch command[i] {
 		case 'b':
-			pPos.Phase = FIRST
+			pPos.phase = FIRST
 			i += 1
 		case 'w':
-			pPos.Phase = SECOND
+			pPos.phase = SECOND
 			i += 1
 		default:
 			panic("Fatal: Unknown phase")
@@ -850,7 +860,7 @@ func (pPos *Position) ReadPosition(command string) {
 
 	// fmt.Printf("command[i:]=[%s]\n", command[i:])
 
-	start_phase := pPos.Phase
+	start_phase := pPos.GetPhase()
 	if strings.HasPrefix(command[i:], "moves") {
 		i += 5
 
@@ -862,7 +872,7 @@ func (pPos *Position) ReadPosition(command string) {
 			i += 1
 
 			// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
-			var move, err = ParseMove(command, &i, pPos.Phase)
+			var move, err = ParseMove(command, &i, pPos.GetPhase())
 			if err != nil {
 				fmt.Println(err)
 				fmt.Println(pPos.Sprint())
@@ -870,7 +880,7 @@ func (pPos *Position) ReadPosition(command string) {
 			}
 			pPos.Moves[pPos.OffsetMovesIndex] = move
 			pPos.OffsetMovesIndex += 1
-			pPos.Phase = FlipPhase(pPos.Phase)
+			pPos.FlipPhase()
 		}
 	}
 
@@ -895,7 +905,7 @@ func (pPos *Position) ReadPosition(command string) {
 	moves_size := pPos.OffsetMovesIndex
 	// 一旦 0 リセットするぜ（＾～＾）
 	pPos.OffsetMovesIndex = 0
-	pPos.Phase = start_phase
+	pPos.phase = start_phase
 	for i = 0; i < moves_size; i += 1 {
 		pPos.DoMove(pPos.Moves[i])
 	}
@@ -1177,11 +1187,11 @@ func (pPos *Position) DoMove(move Move) {
 		}
 	}
 
-	// フェーズを１つ進めます
+	// DoMoveでフェーズを１つ進めます
 	pPos.Moves[pPos.OffsetMovesIndex] = move
 	pPos.OffsetMovesIndex += 1
-	prev_phase := pPos.Phase
-	pPos.Phase = FlipPhase(pPos.Phase)
+	prev_phase := pPos.GetPhase()
+	pPos.FlipPhase()
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
 	piece_type_list := []PieceType{mov_piece_type, cap_piece_type}
@@ -1241,11 +1251,11 @@ func (pPos *Position) UndoMove() {
 	mov_piece_type := PIECE_TYPE_EMPTY
 	cap_piece_type := PIECE_TYPE_EMPTY
 
-	// 先に 手目 を１つ戻すぜ（＾～＾）フェーズもひっくり返すぜ（＾～＾）
+	// 先に 手目 を１つ戻すぜ（＾～＾）UndoMoveでフェーズもひっくり返すぜ（＾～＾）
 	pPos.OffsetMovesIndex -= 1
 	move := pPos.Moves[pPos.OffsetMovesIndex]
-	prev_phase := pPos.Phase
-	pPos.Phase = FlipPhase(pPos.Phase)
+	prev_phase := pPos.GetPhase()
+	pPos.FlipPhase()
 
 	// 取った駒
 	captured := pPos.CapturedList[pPos.OffsetMovesIndex]

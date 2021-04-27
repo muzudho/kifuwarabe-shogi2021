@@ -283,8 +283,8 @@ func GenMoveList(pPos *Position) []Move {
 	move_list := []Move{}
 
 	// 王手をされているときは、自玉を逃がす必要があります
-	friendKingSq := pPos.KingLocations[pPos.Phase-1]
-	opponent := FlipPhase(pPos.Phase)
+	friendKingSq := pPos.KingLocations[pPos.GetPhase()-1]
+	opponent := FlipPhase(pPos.GetPhase())
 
 	if pPos.ControlBoards[opponent-1][CONTROL_LAYER_SUM][friendKingSq] > 0 {
 		// 王手されています
@@ -369,7 +369,7 @@ func GenMoveList(pPos *Position) []Move {
 		}
 
 		// 駒台もスキャンしよ（＾～＾）
-		phase_index := Square(pPos.Phase - 1)
+		phase_index := Square(pPos.GetPhase() - 1)
 		for hand := Square(phase_index * HAND_TYPE_SIZE); hand < (phase_index+1)*HAND_TYPE_SIZE; hand += 1 {
 			if pPos.Hands[hand] > 0 {
 				hand_sq := hand + HAND_ORIGIN

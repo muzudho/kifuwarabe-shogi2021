@@ -7,11 +7,14 @@ import (
 
 // Print - 局面出力（＾ｑ＾）
 func (pPos *Position) Sprint() string {
-	var phase_str = "?"
-	if pPos.Phase == FIRST {
+	var phase_str string
+	switch pPos.GetPhase() {
+	case FIRST:
 		phase_str = "First"
-	} else if pPos.Phase == SECOND {
+	case SECOND:
 		phase_str = "Second"
+	default:
+		phase_str = "?"
 	}
 
 	var s1 = "\n" +
@@ -240,13 +243,13 @@ func (pPos *Position) SprintSfen() string {
 
 	// 手番
 	var phaseStr string
-	switch pPos.Phase {
+	switch pPos.GetPhase() {
 	case FIRST:
 		phaseStr = "b"
 	case SECOND:
 		phaseStr = "w"
 	default:
-		panic(fmt.Errorf("LogicalError: Unknows phase=[%d]", pPos.Phase))
+		panic(fmt.Errorf("LogicalError: Unknows phase=[%d]", pPos.GetPhase()))
 	}
 
 	// 持ち駒
@@ -407,10 +410,6 @@ func (pPos *Position) Dump() string {
 	buffer.WriteString("\n")
 
 	for phase := 0; phase < 2; phase += 1 {
-		buffer.WriteString(fmt.Sprintf("ControlBoards[%d]:%d\n", phase, pPos.ControlBoards[phase]))
-	}
-
-	for phase := 0; phase < 2; phase += 1 {
 		// 利きボード
 		for layer := 0; layer < CONTROL_LAYER_ALL_SIZE; layer += 1 {
 			buffer.WriteString(pPos.SprintControl(Phase(phase+1), layer))
@@ -423,7 +422,7 @@ func (pPos *Position) Dump() string {
 	}
 	buffer.WriteString("\n")
 
-	buffer.WriteString(fmt.Sprintf("Phase:%d,\n", pPos.Phase))
+	buffer.WriteString(fmt.Sprintf("Phase:%d,\n", pPos.GetPhase()))
 
 	buffer.WriteString(fmt.Sprintf("StartMovesNum:%d,\n", pPos.StartMovesNum))
 
