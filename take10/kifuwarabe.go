@@ -239,6 +239,8 @@ MainLoop:
 			}
 
 			G.Chat.Debug("Playout finished\n")
+		case "shuffle":
+			ShuffleBoard(pPos)
 		}
 
 		G.Log.FlushAllLogs()
