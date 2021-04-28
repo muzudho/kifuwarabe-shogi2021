@@ -78,19 +78,19 @@ func What(piece Piece) PieceType {
 // WhatHand - 持ち駒のマス番号から、先後なしの駒種類を返します
 func WhatHand(hand Square) PieceType {
 	switch hand {
-	case HAND_R1, HAND_R2:
+	case SQ_R1, SQ_R2:
 		return PIECE_TYPE_R
-	case HAND_B1, HAND_B2:
+	case SQ_B1, SQ_B2:
 		return PIECE_TYPE_B
-	case HAND_G1, HAND_G2:
+	case SQ_G1, SQ_G2:
 		return PIECE_TYPE_G
-	case HAND_S1, HAND_S2:
+	case SQ_S1, SQ_S2:
 		return PIECE_TYPE_S
-	case HAND_N1, HAND_N2:
+	case SQ_N1, SQ_N2:
 		return PIECE_TYPE_N
-	case HAND_L1, HAND_L2:
+	case SQ_L1, SQ_L2:
 		return PIECE_TYPE_L
-	case HAND_P1, HAND_P2:
+	case SQ_P1, SQ_P2:
 		return PIECE_TYPE_P
 	default:
 		panic(fmt.Errorf("Error: Unknown hand=[%d]", hand))

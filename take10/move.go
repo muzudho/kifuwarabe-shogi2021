@@ -5,22 +5,43 @@ import "fmt"
 const (
 	// 持ち駒を打つ 100～113
 	// 先手飛打
-	HAND_R1        = Square(100)
-	HAND_B1        = Square(101)
-	HAND_G1        = Square(102)
-	HAND_S1        = Square(103)
-	HAND_N1        = Square(104)
-	HAND_L1        = Square(105)
-	HAND_P1        = Square(106)
-	HAND_R2        = Square(107)
-	HAND_B2        = Square(108)
-	HAND_G2        = Square(109)
-	HAND_S2        = Square(110)
-	HAND_N2        = Square(111)
-	HAND_L2        = Square(112)
-	HAND_P2        = Square(113)
-	HAND_ORIGIN    = HAND_R1
-	HAND_TYPE_SIZE = HAND_P1 - HAND_ORIGIN + 1
+	SQ_R1         = Square(100)
+	SQ_B1         = Square(101)
+	SQ_G1         = Square(102)
+	SQ_S1         = Square(103)
+	SQ_N1         = Square(104)
+	SQ_L1         = Square(105)
+	SQ_P1         = Square(106)
+	SQ_R2         = Square(107)
+	SQ_B2         = Square(108)
+	SQ_G2         = Square(109)
+	SQ_S2         = Square(110)
+	SQ_N2         = Square(111)
+	SQ_L2         = Square(112)
+	SQ_P2         = Square(113)
+	SQ_HAND_START = SQ_R1
+	SQ_HAND_END   = SQ_P2 + 1 // この数を含まない
+)
+
+const (
+	// 持ち駒を打つ 0～13 (Index)
+	HAND_R1_IDX    = 0 // 先手飛打
+	HAND_B1_IDX    = 1
+	HAND_G1_IDX    = 2
+	HAND_S1_IDX    = 3
+	HAND_N1_IDX    = 4
+	HAND_L1_IDX    = 5
+	HAND_P1_IDX    = 6
+	HAND_R2_IDX    = 7
+	HAND_B2_IDX    = 8
+	HAND_G2_IDX    = 9
+	HAND_S2_IDX    = 10
+	HAND_N2_IDX    = 11
+	HAND_L2_IDX    = 12
+	HAND_P2_IDX    = 13
+	HAND_IDX_START = HAND_R1_IDX
+	HAND_IDX_END   = HAND_P2_IDX - 1 // この数を含まない
+	HAND_TYPE_SIZE = 7
 )
 
 // Move - 指し手
@@ -62,25 +83,25 @@ func (move Move) ToCode() string {
 	// 移動元マス(Source square)
 	source_sq := Square(move.GetSource())
 	switch source_sq {
-	case HAND_R1, HAND_R2:
+	case SQ_R1, SQ_R2:
 		str = append(str, 'R')
 		count = 1
-	case HAND_B1, HAND_B2:
+	case SQ_B1, SQ_B2:
 		str = append(str, 'B')
 		count = 1
-	case HAND_G1, HAND_G2:
+	case SQ_G1, SQ_G2:
 		str = append(str, 'G')
 		count = 1
-	case HAND_S1, HAND_S2:
+	case SQ_S1, SQ_S2:
 		str = append(str, 'S')
 		count = 1
-	case HAND_N1, HAND_N2:
+	case SQ_N1, SQ_N2:
 		str = append(str, 'N')
 		count = 1
-	case HAND_L1, HAND_L2:
+	case SQ_L1, SQ_L2:
 		str = append(str, 'L')
 		count = 1
-	case HAND_P1, HAND_P2:
+	case SQ_P1, SQ_P2:
 		str = append(str, 'P')
 		count = 1
 	default:

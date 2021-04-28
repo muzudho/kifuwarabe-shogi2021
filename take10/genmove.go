@@ -205,19 +205,19 @@ func GenControl(pPos *Position, from Square) []Square {
 		var end_rank Square
 
 		switch from {
-		case HAND_R1, HAND_B1, HAND_G1, HAND_S1, HAND_R2, HAND_B2, HAND_G2, HAND_S2: // 81マスに打てる
+		case SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_R2, SQ_B2, SQ_G2, SQ_S2: // 81マスに打てる
 			start_rank = 1
 			end_rank = 10
-		case HAND_N1: // 3～9段目に打てる
+		case SQ_N1: // 3～9段目に打てる
 			start_rank = 3
 			end_rank = 10
-		case HAND_L1, HAND_P1: // 2～9段目に打てる
+		case SQ_L1, SQ_P1: // 2～9段目に打てる
 			start_rank = 2
 			end_rank = 10
-		case HAND_N2: // 1～7段目に打てる
+		case SQ_N2: // 1～7段目に打てる
 			start_rank = 1
 			end_rank = 8
-		case HAND_L2, HAND_P2: // 1～8段目に打てる
+		case SQ_L2, SQ_P2: // 1～8段目に打てる
 			start_rank = 1
 			end_rank = 9
 		default:
@@ -225,7 +225,7 @@ func GenControl(pPos *Position, from Square) []Square {
 		}
 
 		switch from {
-		case HAND_P1:
+		case SQ_P1:
 			// TODO 打ち歩詰め禁止
 			for rank := Square(start_rank); rank < end_rank; rank += 1 {
 				for file := Square(9); file > 0; file-- {
@@ -234,7 +234,7 @@ func GenControl(pPos *Position, from Square) []Square {
 					}
 				}
 			}
-		case HAND_P2:
+		case SQ_P2:
 			// TODO 打ち歩詰め禁止
 			for rank := Square(start_rank); rank < end_rank; rank += 1 {
 				for file := Square(9); file > 0; file-- {
@@ -384,10 +384,9 @@ func GenMoveList(pPos *Position) []Move {
 		}
 
 		// 駒台もスキャンしよ（＾～＾）
-		phase_index := Square(pPos.GetPhase() - 1)
-		for hand := Square(phase_index * HAND_TYPE_SIZE); hand < (phase_index+1)*HAND_TYPE_SIZE; hand += 1 {
-			if pPos.Hands[hand] > 0 {
-				hand_sq := hand + HAND_ORIGIN
+		for hand_index := HAND_IDX_START; hand_index < HAND_IDX_END; hand_index += 1 {
+			if pPos.Hands[hand_index] > 0 {
+				hand_sq := Square(hand_index) + SQ_HAND_START
 				control_list := GenControl(pPos, hand_sq)
 
 				for _, to := range control_list {
