@@ -91,8 +91,8 @@ func ShuffleBoard(pPos *Position) {
 	for i := 0; i < 200; i += 1 {
 
 		// 盤から駒台の方向
-		for rank := Square(0); rank < 10; rank += 1 {
-			for file := Square(0); file < 10; file += 1 {
+		for rank := Square(1); rank < 10; rank += 1 {
+			for file := Square(9); file > 0; file -= 1 {
 				sq := SquareFrom(file, rank)
 
 				// 10マスに1マスは駒台へ
@@ -183,7 +183,7 @@ func ShuffleBoard(pPos *Position) {
 			if num > 0 {
 				sq := Square(rand.Intn(100))
 				// うまく空マスなら移動成功
-				if !OnHands(sq) && pPos.IsEmptySq(sq) {
+				if OnBoard(sq) && pPos.IsEmptySq(sq) {
 					pPos.Board[sq] = HandPieceMap[hand_index]
 					pPos.Hands[hand_index] -= 1
 				}
@@ -203,7 +203,7 @@ func ShuffleBoard(pPos *Position) {
 	for i := 0; i < 81*80; i += 1 {
 		sq1 := Square(rand.Intn(100))
 		sq2 := Square(rand.Intn(100))
-		if !OnHands(sq1) && !OnHands(sq2) && !pPos.IsEmptySq(sq1) {
+		if OnBoard(sq1) && OnBoard(sq2) && !pPos.IsEmptySq(sq1) {
 			piece := pPos.Board[sq1]
 			// 位置スワップ
 			pPos.Board[sq1] = pPos.Board[sq2]
@@ -258,14 +258,14 @@ func ShuffleBoard(pPos *Position) {
 	// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
 	G.Chat.Debug(pPos.Sprint())
 
-	if true {
+	if false {
 		var countList [8]int
 
 		if true {
 			countList = [8]int{}
 
 			// 盤上
-			for rank := Square(0); rank < 10; rank += 1 {
+			for rank := Square(1); rank < 10; rank += 1 {
 				for file := Square(9); file > 0; file -= 1 {
 					sq := SquareFrom(file, rank)
 
@@ -351,8 +351,8 @@ func CountAllPieces(pPos *Position) [8]int {
 	countList := [8]int{}
 
 	// 盤上
-	for rank := Square(0); rank < 10; rank += 1 {
-		for file := Square(0); file < 10; file += 1 {
+	for rank := Square(1); rank < 10; rank += 1 {
+		for file := Square(9); file > 0; file -= 1 {
 			sq := SquareFrom(file, rank)
 
 			piece := What(pPos.Board[sq])
