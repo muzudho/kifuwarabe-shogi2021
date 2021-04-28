@@ -79,12 +79,17 @@ func SumAbsControl(pPos *Position, layer1 int) [2]int {
 }
 
 // ShuffleBoard - 盤上の駒、持ち駒をシャッフルします
-// 利きは再計算します
+// ゲーム中にはできない動きをするので、利きの計算は無視します。
+// 最後に利きは再計算します
 func ShuffleBoard(pPos *Position) {
+
+	// 駒の数を数えます
+	countList1 := CountAllPieces(pPos)
 
 	// 盤と駒台との移動
 	// 適当な回数
 	for i := 0; i < 200; i += 1 {
+
 		// 盤から駒台の方向
 		for rank := Square(0); rank < 10; rank += 1 {
 			for file := Square(0); file < 10; file += 1 {
@@ -165,6 +170,13 @@ func ShuffleBoard(pPos *Position) {
 			}
 		}
 
+		// 駒の数を数えます
+		countList2 := CountAllPieces(pPos)
+		countError := CountErrorCountLists(countList1, countList2)
+		if countError != 0 {
+			panic(fmt.Errorf("Shuffle: (1) countError=%d", countError))
+		}
+
 		// 駒台から盤の方向
 		for hand_index := HAND_IDX_START; hand_index < HAND_IDX_END; hand_index += 1 {
 			num := pPos.Hands[hand_index]
@@ -176,6 +188,13 @@ func ShuffleBoard(pPos *Position) {
 					pPos.Hands[hand_index] -= 1
 				}
 			}
+		}
+
+		// 駒の数を数えます
+		countList2 = CountAllPieces(pPos)
+		countError = CountErrorCountLists(countList1, countList2)
+		if countError != 0 {
+			panic(fmt.Errorf("Shuffle: (2) countError=%d", countError))
 		}
 	}
 
@@ -215,6 +234,13 @@ func ShuffleBoard(pPos *Position) {
 				pPos.Board[sq2] = PieceFromPhPt(phase, pieceType)
 			}
 		}
+
+		// 駒の数を数えます
+		countList2 := CountAllPieces(pPos)
+		countError := CountErrorCountLists(countList1, countList2)
+		if countError != 0 {
+			panic(fmt.Errorf("Shuffle: (3) countError=%d", countError))
+		}
 	}
 
 	// 手番のシャッフル
@@ -229,10 +255,27 @@ func ShuffleBoard(pPos *Position) {
 	pPos.StartMovesNum = 1
 	pPos.OffsetMovesIndex = 0
 
+	// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
+	G.Chat.Debug(pPos.Sprint())
+
 	// position sfen 文字列を取得
 	command := pPos.SprintSfen()
+	G.Chat.Debug("#command=%s", command)
 	// 利きの再計算もやってくれる
 	pPos.ReadPosition(command)
+
+	// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
+	G.Chat.Debug(pPos.Sprint())
+
+	command2 := pPos.SprintSfen()
+	G.Chat.Debug("#command2=%s", command2)
+
+	// 駒の数を数えます
+	countList2 := CountAllPieces(pPos)
+	countError := CountErrorCountLists(countList1, countList2)
+	if countError != 0 {
+		panic(fmt.Errorf("Shuffle: (4) countError=%d", countError))
+	}
 }
 
 // CountAllPieces - 駒の数を確認するぜ（＾～＾）
@@ -279,4 +322,13 @@ func CountAllPieces(pPos *Position) [8]int {
 	countList[7] += pPos.Hands[6] + pPos.Hands[13]
 
 	return countList
+}
+
+// CountErrorCountLists - 数えた駒の枚数を比較します
+func CountErrorCountLists(countList1 [8]int, countList2 [8]int) int {
+	sum := 0
+	for i := 0; i < 8; i += 1 {
+		sum += int(math.Abs(float64(countList1[i] - countList2[i])))
+	}
+	return sum
 }

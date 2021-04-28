@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // 電竜戦が一番長いだろ（＾～＾）
@@ -850,94 +851,109 @@ func (pPos *Position) ReadPosition(command string) {
 			}
 			i += 1
 		} else {
+
+			// R なら竜1枚
+			// R2 なら竜2枚
+			// P10 なら歩10枚。数が2桁になるのは歩だけ（＾～＾）
+			// {アルファベット１文字}{数字1～2文字} になっている
+			// アルファベットまたは半角スペースを見つけた時点で、以前の取り込み分が確定する
+			var hand_index int = 999 //存在しない数
+			var number = 0
+
 		HandLoop:
 			for {
-				var hand_index int
 				var piece = command[i]
-				switch piece {
-				case 'R':
-					hand_index = HAND_R1_IDX
-				case 'B':
-					hand_index = HAND_B1_IDX
-				case 'G':
-					hand_index = HAND_G1_IDX
-				case 'S':
-					hand_index = HAND_S1_IDX
-				case 'N':
-					hand_index = HAND_N1_IDX
-				case 'L':
-					hand_index = HAND_L1_IDX
-				case 'P':
-					hand_index = HAND_P1_IDX
-				case 'r':
-					hand_index = HAND_R2_IDX
-				case 'b':
-					hand_index = HAND_B2_IDX
-				case 'g':
-					hand_index = HAND_G2_IDX
-				case 's':
-					hand_index = HAND_S2_IDX
-				case 'n':
-					hand_index = HAND_N2_IDX
-				case 'l':
-					hand_index = HAND_L2_IDX
-				case 'p':
-					hand_index = HAND_P2_IDX
-				case ' ':
-					i += 1
-					break HandLoop
-				default:
-					panic(fmt.Errorf("Fatal: Unknown piece=%c", piece))
-				}
-				i += 1
 
-				var number = 0
-			NumberLoop:
-				for {
-					switch figure := command[i]; figure {
+				if unicode.IsLetter(rune(piece)) || piece == ' ' {
+					if number == 0 {
+						number = 1
+					}
+
+					if hand_index == 999 {
+
+					} else {
+						pPos.Hands[hand_index] = number
+						number = 0
+
+						// 長い利きの駒は位置を覚えておくぜ（＾～＾）
+						switch hand_index {
+						case HAND_R1_IDX, HAND_R2_IDX:
+							for i, sq := range pPos.RookLocations {
+								if sq == SQUARE_EMPTY { // 空いているところから埋めていくぜ（＾～＾）
+									pPos.RookLocations[i] = Square(hand_index) + SQ_HAND_START
+									break
+								}
+							}
+						case HAND_B1_IDX, HAND_B2_IDX:
+							for i, sq := range pPos.BishopLocations {
+								if sq == SQUARE_EMPTY {
+									pPos.BishopLocations[i] = Square(hand_index) + SQ_HAND_START
+									break
+								}
+							}
+						case HAND_L1_IDX, HAND_L2_IDX:
+							for i, sq := range pPos.LanceLocations {
+								if sq == SQUARE_EMPTY {
+									pPos.LanceLocations[i] = Square(hand_index) + SQ_HAND_START
+									break
+								}
+							}
+						}
+					}
+					i += 1
+
+					switch piece {
+					case 'R':
+						hand_index = HAND_R1_IDX
+					case 'B':
+						hand_index = HAND_B1_IDX
+					case 'G':
+						hand_index = HAND_G1_IDX
+					case 'S':
+						hand_index = HAND_S1_IDX
+					case 'N':
+						hand_index = HAND_N1_IDX
+					case 'L':
+						hand_index = HAND_L1_IDX
+					case 'P':
+						hand_index = HAND_P1_IDX
+					case 'r':
+						hand_index = HAND_R2_IDX
+					case 'b':
+						hand_index = HAND_B2_IDX
+					case 'g':
+						hand_index = HAND_G2_IDX
+					case 's':
+						hand_index = HAND_S2_IDX
+					case 'n':
+						hand_index = HAND_N2_IDX
+					case 'l':
+						hand_index = HAND_L2_IDX
+					case 'p':
+						hand_index = HAND_P2_IDX
+					case ' ':
+						// ループを抜けます
+						break HandLoop
+					default:
+						panic(fmt.Errorf("Fatal: Unknown piece=%c", piece))
+					}
+				} else if unicode.IsNumber(rune(piece)) {
+					switch piece {
 					case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-						num, err := strconv.Atoi(string(figure))
+						num, err := strconv.Atoi(string(piece))
 						if err != nil {
 							panic(err)
 						}
 						i += 1
 						number *= 10
 						number += num
-					case ' ':
-						i += 1
-						break HandLoop
 					default:
-						break NumberLoop
+						panic(fmt.Errorf("Fatal: Unknown number character=%c", piece))
 					}
+
+				} else {
+					panic(fmt.Errorf("Fatal: Unknown piece=%c", piece))
 				}
-
-				pPos.Hands[hand_index] = number
-
-				// 長い利きの駒は位置を覚えておくぜ（＾～＾）
-				switch hand_index {
-				case HAND_R1_IDX, HAND_R2_IDX:
-					for i, sq := range pPos.RookLocations {
-						if sq == SQUARE_EMPTY {
-							pPos.RookLocations[i] = Square(hand_index) + SQ_HAND_START
-							break
-						}
-					}
-				case HAND_B1_IDX, HAND_B2_IDX:
-					for i, sq := range pPos.BishopLocations {
-						if sq == SQUARE_EMPTY {
-							pPos.BishopLocations[i] = Square(hand_index) + SQ_HAND_START
-							break
-						}
-					}
-				case HAND_L1_IDX, HAND_L2_IDX:
-					for i, sq := range pPos.LanceLocations {
-						if sq == SQUARE_EMPTY {
-							pPos.LanceLocations[i] = Square(hand_index) + SQ_HAND_START
-							break
-						}
-					}
-				}
-
 			}
 		}
 
