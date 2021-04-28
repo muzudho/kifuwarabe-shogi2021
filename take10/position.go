@@ -243,6 +243,7 @@ type Position struct {
 	// [9] 飛の利き戻す(差分)
 	// [10] テスト用
 	// [11] テスト用
+	// [12] テスト用(再計算)
 	ControlBoards [2][CONTROL_LAYER_ALL_SIZE][BOARD_SIZE]int8
 
 	// 持ち駒の数だぜ（＾～＾） R, B, G, S, N, L, P, r, b, g, s, n, l, p

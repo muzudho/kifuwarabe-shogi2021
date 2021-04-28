@@ -155,3 +155,19 @@ func (pPos *Position) RecalculateControl() {
 		}
 	}
 }
+
+// DiffControl - 利きテーブルの差分計算
+func (pPos *Position) DiffControl(layer1 int, layer2 int, layer3 int) {
+
+	pPos.ClearControlLayer(layer3)
+
+	for phase := 0; phase < 2; phase += 1 {
+		for from := Square(11); from < BOARD_SIZE; from += 1 {
+			if File(from) != 0 && Rank(from) != 0 {
+
+				pPos.ControlBoards[phase][layer3][from] = pPos.ControlBoards[phase][layer1][from] - pPos.ControlBoards[phase][layer2][from]
+
+			}
+		}
+	}
+}

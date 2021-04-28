@@ -143,6 +143,24 @@ MainLoop:
 					G.Chat.Debug(pPos.SprintControl(SECOND, CONTROL_LAYER_TEST_ERROR))
 				}
 				ok = true
+			} else if length == 5 && tokens[1] == "diff" {
+				// control diff 11 0 12
+				// 利きボード 11番 から 0番を引いた結果を 12番へ入れる。
+				layer1, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+				layer2, err := strconv.Atoi(tokens[3])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+				layer3, err := strconv.Atoi(tokens[4])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+
+				pPos.DiffControl(layer1, layer2, layer3)
+				ok = true
 			} else if length == 2 && tokens[1] == "recalc" {
 				// 利きの再計算
 				pPos.RecalculateControl()
@@ -165,6 +183,7 @@ MainLoop:
 				G.Chat.Debug("control\n")
 				G.Chat.Debug("control layer {number}\n")
 				G.Chat.Debug("control recalc\n")
+				G.Chat.Debug("control diff {layer_number} {layer_number} {layer_number}\n")
 			}
 		case "location":
 			// あの駒、どこにいんの（＾～＾）？
