@@ -870,13 +870,16 @@ func (pPos *Position) ReadPosition(command string) {
 				var piece = command[i]
 
 				if unicode.IsLetter(rune(piece)) || piece == ' ' {
-					if number == 0 {
-						number = 1
-					}
 
 					if hand_index == 999 {
+						// ループの１週目は無視します
 
 					} else {
+						// 数字が書いてなかったら１個
+						if number == 0 {
+							number = 1
+						}
+
 						pPos.Hands[hand_index] = number
 						number = 0
 
