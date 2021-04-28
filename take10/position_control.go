@@ -14,11 +14,12 @@ const (
 	CONTROL_LAYER_DIFF_LANCE_ON
 	CONTROL_LAYER_DIFF_BISHOP_ON
 	CONTROL_LAYER_DIFF_ROOK_ON
-	CONTROL_LAYER_TEST_COPY  // テスト用
-	CONTROL_LAYER_TEST_ERROR // テスト用
-	CONTROL_LAYER_DIFF_START = 1
-	CONTROL_LAYER_DIFF_END   = 10 // この数を含まない。テスト用も含まない
-	CONTROL_LAYER_ALL_SIZE   = 12 // この数を含まない
+	CONTROL_LAYER_TEST_COPY          // テスト用
+	CONTROL_LAYER_TEST_ERROR         // テスト用
+	CONTROL_LAYER_TEST_RECALCULATION // テスト用 再計算
+	CONTROL_LAYER_DIFF_START         = 1
+	CONTROL_LAYER_DIFF_END           = 10 // この数を含まない。テスト用も含まない
+	CONTROL_LAYER_ALL_SIZE           = 13 // この数を含まない
 )
 
 // GetControlLayerName - 利きボードのレイヤーの名前
@@ -48,6 +49,8 @@ func GetControlLayerName(layer int) string {
 		return "TestCopy"
 	case CONTROL_LAYER_TEST_ERROR:
 		return "TestError"
+	case CONTROL_LAYER_TEST_RECALCULATION:
+		return "TestRecalc"
 	default:
 		panic(fmt.Errorf("Unknown layer=%d", layer))
 	}
@@ -129,6 +132,25 @@ func (pPos *Position) MergeControlDiff() {
 			for layer := CONTROL_LAYER_DIFF_START; layer < CONTROL_LAYER_DIFF_END; layer += 1 {
 				pPos.ControlBoards[0][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[0][layer][sq]
 				pPos.ControlBoards[1][CONTROL_LAYER_SUM][sq] += pPos.ControlBoards[1][layer][sq]
+			}
+		}
+	}
+}
+
+// RecalculateControl - 利きの再計算
+func (pPos *Position) RecalculateControl() {
+
+	pPos.ClearControlLayer(CONTROL_LAYER_TEST_RECALCULATION)
+
+	for phase := 0; phase < 2; phase += 1 {
+		for from := Square(11); from < BOARD_SIZE; from += 1 {
+			if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
+				sq_list := GenControl(pPos, from)
+
+				for _, to := range sq_list {
+					pPos.ControlBoards[phase][CONTROL_LAYER_TEST_RECALCULATION][to] += 1
+				}
+
 			}
 		}
 	}

@@ -143,6 +143,10 @@ MainLoop:
 					G.Chat.Debug(pPos.SprintControl(SECOND, CONTROL_LAYER_TEST_ERROR))
 				}
 				ok = true
+			} else if length == 2 && tokens[1] == "recalc" {
+				// 利きの再計算
+				pPos.RecalculateControl()
+				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 利きテーブルの表示（＾～＾）
 				layer, err := strconv.Atoi(tokens[2])
@@ -159,7 +163,8 @@ MainLoop:
 				G.Chat.Debug("Format\n")
 				G.Chat.Debug("------\n")
 				G.Chat.Debug("control\n")
-				G.Chat.Debug("control diff {0-4}\n")
+				G.Chat.Debug("control layer {number}\n")
+				G.Chat.Debug("control recalc\n")
 			}
 		case "location":
 			// あの駒、どこにいんの（＾～＾）？

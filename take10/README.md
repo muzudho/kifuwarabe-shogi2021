@@ -18,4 +18,16 @@ go btime 75000 wtime 74000 binc 2000 winc 2000
 # 飛打されてなぜか即投了（＾～＾）->利きボードの内容がおかしい
 position startpos moves 7g7f 3c3d 2g2f 2b8h 7i8h 1c1d B*4e B*7h 6i7h 8c8d 4e6c+ 3d3e 6c5c 8b6b 5c6b 5a6b R*6d
 go btime 69000 wtime 68000 binc 2000 winc 2000
+# 手を戻してみよ（＾～＾）馬で王手されてるな（＾～＾）
+position startpos moves 7g7f 3c3d 2g2f 2b8h 7i8h 1c1d B*4e B*7h 6i7h 8c8d 4e6c+ 3d3e 6c5c 8b6b 5c6b
+movelist
+MoveList
+--------
+(0) 5a6b
+(1) 5a4b
+* Except for those to be removed during the search
+
+# 強制終了
+position startpos moves 7i6h 4a3b 2h3h 6a5b 3h4h 3a4b 3i3h 7a7b 2g2f 3c3d 6h7i 4b3c 8g8f 5a4b 6i5h 3d3e 7i6h 8c8d 5i6i 7b8c 9i9h 9c9d 9g9f 5c5d 8h7i 8c7d 4i3i 7d7e 2f2e 7e8f 7g7f 8f8g 6h7g 8g9h+ 4g4f L*8e 5g5f 8e8i+ 7g8f 8i7i 6i7i N*8e 8f8e 8d8e N*4g 8e8f 4g3e 8f8g+ 3e2c 8g7h
+go
 ```
