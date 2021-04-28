@@ -167,13 +167,15 @@ func ShuffleBoard(pPos *Position) {
 		// 駒台から盤の方向
 		for phase := 0; phase < 2; phase += 1 {
 			for j := 0; j < 7; j += 1 {
-				num := pPos.Hands[phase*int(HAND_TYPE_SIZE)+j]
+				hand_index := phase*int(HAND_TYPE_SIZE) + j
+				num := pPos.Hands[hand_index]
 				if num > 0 {
 					sq := Square(rand.Intn(100))
 					if File(sq) != 0 && Rank(sq) != 0 {
 						// うまく空マスなら移動成功
 						if pPos.IsEmptySq(sq) {
 							pPos.Board[sq] = HandPieceMap[phase*int(HAND_TYPE_SIZE)+j]
+							pPos.Hands[hand_index] -= 1
 						}
 					}
 				}
