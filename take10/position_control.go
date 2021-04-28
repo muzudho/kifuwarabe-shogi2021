@@ -59,7 +59,9 @@ func GetControlLayerName(layer int) string {
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pPos *Position) AddControlRook(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.RookLocations {
-		if !OnHands(from) && from != excludeFrom {
+		if !OnHands(from) && // 持ち駒は除外
+			!pPos.IsEmptySq(from) && // 飛落ちも考えて 空マスは除外
+			from != excludeFrom { // 除外マスは除外
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
@@ -68,7 +70,9 @@ func (pPos *Position) AddControlRook(layer int, sign int8, excludeFrom Square) {
 // AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pPos *Position) AddControlBishop(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.BishopLocations {
-		if !OnHands(from) && from != excludeFrom {
+		if !OnHands(from) && // 持ち駒は除外
+			!pPos.IsEmptySq(from) && // 角落ちも考えて 空マスは除外
+			from != excludeFrom { // 除外マスは除外
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
@@ -77,7 +81,11 @@ func (pPos *Position) AddControlBishop(layer int, sign int8, excludeFrom Square)
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pPos *Position) AddControlLance(layer int, sign int8, excludeFrom Square) {
 	for _, from := range pPos.LanceLocations {
-		if !OnHands(from) && from != excludeFrom && PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
+
+		if !OnHands(from) && // 持ち駒は除外
+			!pPos.IsEmptySq(from) && // 香落ちも考えて 空マスは除外
+			from != excludeFrom && // 除外マスは除外
+			PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
 			pPos.AddControlDiff(layer, from, sign)
 		}
 	}
