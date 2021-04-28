@@ -1,8 +1,12 @@
 // 利きのテスト
 package take10
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
+// TestControl
 func TestControl(pPos *Position) (bool, string) {
 	pPos.ClearControlLayer(CONTROL_LAYER_TEST_COPY)
 	pPos.ClearControlLayer(CONTROL_LAYER_TEST_ERROR)
@@ -53,4 +57,22 @@ func checkControl(pPos *Position, move_seq int, move_total int, move Move) bool 
 	}
 
 	return is_error
+}
+
+// SumAbsControl - 利きテーブルの各マスを絶対値にし、その総和を返します
+func SumAbsControl(pPos *Position, layer1 int) [2]int {
+
+	sumList := [2]int{0, 0}
+
+	for phase := 0; phase < 2; phase += 1 {
+		for from := Square(11); from < BOARD_SIZE; from += 1 {
+			if File(from) != 0 && Rank(from) != 0 {
+
+				sumList[phase] += int(math.Abs(float64(pPos.ControlBoards[phase][layer1][from])))
+
+			}
+		}
+	}
+
+	return sumList
 }

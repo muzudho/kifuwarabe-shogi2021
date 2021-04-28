@@ -161,9 +161,14 @@ MainLoop:
 
 				pPos.DiffControl(layer1, layer2, layer3)
 				ok = true
-			} else if length == 2 && tokens[1] == "recalc" {
+			} else if length == 3 && tokens[1] == "recalc" {
+				// control recalc 12
 				// 利きの再計算
-				pPos.RecalculateControl()
+				layer1, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+				pPos.RecalculateControl(layer1)
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 利きテーブルの表示（＾～＾）
@@ -175,6 +180,17 @@ MainLoop:
 					G.Chat.Debug(pPos.SprintControl(SECOND, layer))
 					ok = true
 				}
+			} else if length == 3 && tokens[1] == "sumabs" {
+				layer1, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+				// 利きのテスト
+				// 現局面の利きを覚え、ムーブ、アンドゥを行って
+				// 元の利きに戻るか確認
+				sumList := SumAbsControl(pPos, layer1)
+				G.Chat.Debug("ControlTest: SumAbs=%d,%d\n", sumList[0], sumList[1])
+				ok = true
 			}
 
 			if !ok {
@@ -182,8 +198,9 @@ MainLoop:
 				G.Chat.Debug("------\n")
 				G.Chat.Debug("control\n")
 				G.Chat.Debug("control layer {number}\n")
-				G.Chat.Debug("control recalc\n")
+				G.Chat.Debug("control recalc {number}\n")
 				G.Chat.Debug("control diff {layer_number} {layer_number} {layer_number}\n")
+				G.Chat.Debug("control sumabs {number}\n")
 			}
 		case "location":
 			// あの駒、どこにいんの（＾～＾）？

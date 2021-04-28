@@ -138,20 +138,20 @@ func (pPos *Position) MergeControlDiff() {
 }
 
 // RecalculateControl - 利きの再計算
-func (pPos *Position) RecalculateControl() {
+func (pPos *Position) RecalculateControl(layer1 int) {
 
-	pPos.ClearControlLayer(CONTROL_LAYER_TEST_RECALCULATION)
+	pPos.ClearControlLayer(layer1)
 
-	for phase := 0; phase < 2; phase += 1 {
-		for from := Square(11); from < BOARD_SIZE; from += 1 {
-			if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
-				sq_list := GenControl(pPos, from)
+	for from := Square(11); from < BOARD_SIZE; from += 1 {
+		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
+			piece := pPos.Board[from]
+			phase := Who(piece)
+			sq_list := GenControl(pPos, from)
 
-				for _, to := range sq_list {
-					pPos.ControlBoards[phase][CONTROL_LAYER_TEST_RECALCULATION][to] += 1
-				}
-
+			for _, to := range sq_list {
+				pPos.ControlBoards[phase-1][layer1][to] += 1
 			}
+
 		}
 	}
 }
