@@ -223,3 +223,49 @@ func ShuffleBoard(pPos *Position) {
 	}
 
 }
+
+// CountAllPieces - 駒の数を確認するぜ（＾～＾）
+func CountAllPieces(pPos *Position) [8]int {
+
+	countList := [8]int{}
+
+	// 盤上
+	for rank := Square(0); rank < 10; rank += 1 {
+		for file := Square(0); file < 10; file += 1 {
+			sq := SquareFrom(file, rank)
+
+			piece := What(pPos.Board[sq])
+			switch piece {
+			case PIECE_TYPE_K:
+				countList[0] += 1
+			case PIECE_TYPE_R, PIECE_TYPE_PR:
+				countList[1] += 1
+			case PIECE_TYPE_B, PIECE_TYPE_PB:
+				countList[2] += 1
+			case PIECE_TYPE_G:
+				countList[3] += 1
+			case PIECE_TYPE_S, PIECE_TYPE_PS:
+				countList[4] += 1
+			case PIECE_TYPE_N, PIECE_TYPE_PN:
+				countList[5] += 1
+			case PIECE_TYPE_L, PIECE_TYPE_PL:
+				countList[6] += 1
+			case PIECE_TYPE_P, PIECE_TYPE_PP:
+				countList[7] += 1
+			default:
+				// Ignore
+			}
+		}
+	}
+
+	// 駒台
+	countList[1] += pPos.Hands[0] + pPos.Hands[7]
+	countList[2] += pPos.Hands[1] + pPos.Hands[8]
+	countList[3] += pPos.Hands[2] + pPos.Hands[9]
+	countList[4] += pPos.Hands[3] + pPos.Hands[10]
+	countList[5] += pPos.Hands[4] + pPos.Hands[11]
+	countList[6] += pPos.Hands[5] + pPos.Hands[12]
+	countList[7] += pPos.Hands[6] + pPos.Hands[13]
+
+	return countList
+}
