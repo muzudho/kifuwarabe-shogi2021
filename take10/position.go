@@ -31,9 +31,9 @@ func SquareFrom(file Square, rank Square) Square {
 	return Square(file*10 + rank)
 }
 
-// 盤上なら真。ラベルのとこを指定しても場所によっては真だがめんどくさいんでOKで（＾～＾）
-func OnBoard(sq Square) bool {
-	return 10 < sq && sq < 100
+// OnHands - 持ち駒なら真
+func OnHands(sq Square) bool {
+	return 99 < sq && sq < 114
 }
 
 // マス番号を指定しないことを意味するマス番号

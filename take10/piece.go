@@ -139,7 +139,7 @@ func Demote(piece Piece) Piece {
 		PIECE_K2, PIECE_R2, PIECE_B2, PIECE_G2, PIECE_S2, PIECE_N2, PIECE_L2, PIECE_P2: // 裏返さずにそのまま返す駒
 		return piece
 	case PIECE_PR1:
-		return PIECE_P1
+		return PIECE_R1
 	case PIECE_PB1:
 		return PIECE_B1
 	case PIECE_PS1:

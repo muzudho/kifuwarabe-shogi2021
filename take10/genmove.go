@@ -18,7 +18,58 @@ func GenControl(pPos *Position, from Square) []Square {
 
 	if from == SQUARE_EMPTY {
 		panic(fmt.Errorf("GenControl has empty square"))
-	} else if OnBoard(from) {
+	} else if OnHands(from) {
+		// どこに打てるか
+		var start_rank Square
+		var end_rank Square
+
+		switch from {
+		case SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_R2, SQ_B2, SQ_G2, SQ_S2: // 81マスに打てる
+			start_rank = 1
+			end_rank = 10
+		case SQ_N1: // 3～9段目に打てる
+			start_rank = 3
+			end_rank = 10
+		case SQ_L1, SQ_P1: // 2～9段目に打てる
+			start_rank = 2
+			end_rank = 10
+		case SQ_N2: // 1～7段目に打てる
+			start_rank = 1
+			end_rank = 8
+		case SQ_L2, SQ_P2: // 1～8段目に打てる
+			start_rank = 1
+			end_rank = 9
+		default:
+			panic(fmt.Errorf("Unknown hand from=%d", from))
+		}
+
+		switch from {
+		case SQ_P1:
+			// TODO 打ち歩詰め禁止
+			for rank := Square(start_rank); rank < end_rank; rank += 1 {
+				for file := Square(9); file > 0; file-- {
+					if !NifuFirst(pPos, file) { // ２歩禁止
+						sq_list = append(sq_list, SquareFrom(file, rank))
+					}
+				}
+			}
+		case SQ_P2:
+			// TODO 打ち歩詰め禁止
+			for rank := Square(start_rank); rank < end_rank; rank += 1 {
+				for file := Square(9); file > 0; file-- {
+					if !NifuSecond(pPos, file) { // ２歩禁止
+						sq_list = append(sq_list, SquareFrom(file, rank))
+					}
+				}
+			}
+		default:
+			for rank := Square(start_rank); rank < end_rank; rank += 1 {
+				for file := Square(9); file > 0; file-- {
+					sq_list = append(sq_list, SquareFrom(file, rank))
+				}
+			}
+		}
+	} else {
 		// 盤上の駒の利き
 		piece := pPos.Board[from]
 
@@ -198,57 +249,6 @@ func GenControl(pPos *Position, from Square) []Square {
 			}
 		default:
 			// Ignored
-		}
-	} else {
-		// どこに打てるか
-		var start_rank Square
-		var end_rank Square
-
-		switch from {
-		case SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_R2, SQ_B2, SQ_G2, SQ_S2: // 81マスに打てる
-			start_rank = 1
-			end_rank = 10
-		case SQ_N1: // 3～9段目に打てる
-			start_rank = 3
-			end_rank = 10
-		case SQ_L1, SQ_P1: // 2～9段目に打てる
-			start_rank = 2
-			end_rank = 10
-		case SQ_N2: // 1～7段目に打てる
-			start_rank = 1
-			end_rank = 8
-		case SQ_L2, SQ_P2: // 1～8段目に打てる
-			start_rank = 1
-			end_rank = 9
-		default:
-			panic(fmt.Errorf("Unknown hand from=%d", from))
-		}
-
-		switch from {
-		case SQ_P1:
-			// TODO 打ち歩詰め禁止
-			for rank := Square(start_rank); rank < end_rank; rank += 1 {
-				for file := Square(9); file > 0; file-- {
-					if !NifuFirst(pPos, file) { // ２歩禁止
-						sq_list = append(sq_list, SquareFrom(file, rank))
-					}
-				}
-			}
-		case SQ_P2:
-			// TODO 打ち歩詰め禁止
-			for rank := Square(start_rank); rank < end_rank; rank += 1 {
-				for file := Square(9); file > 0; file-- {
-					if !NifuSecond(pPos, file) { // ２歩禁止
-						sq_list = append(sq_list, SquareFrom(file, rank))
-					}
-				}
-			}
-		default:
-			for rank := Square(start_rank); rank < end_rank; rank += 1 {
-				for file := Square(9); file > 0; file-- {
-					sq_list = append(sq_list, SquareFrom(file, rank))
-				}
-			}
 		}
 	}
 

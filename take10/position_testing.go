@@ -79,11 +79,12 @@ func SumAbsControl(pPos *Position, layer1 int) [2]int {
 }
 
 // ShuffleBoard - 盤上の駒、持ち駒をシャッフルします
+// 利きは再計算します
 func ShuffleBoard(pPos *Position) {
 
 	// 盤と駒台との移動
 	// 適当な回数
-	for i := 0; i < 100; i += 1 {
+	for i := 0; i < 200; i += 1 {
 		// 盤から駒台の方向
 		for rank := Square(0); rank < 10; rank += 1 {
 			for file := Square(0); file < 10; file += 1 {
@@ -170,7 +171,7 @@ func ShuffleBoard(pPos *Position) {
 			if num > 0 {
 				sq := Square(rand.Intn(100))
 				// うまく空マスなら移動成功
-				if OnBoard(sq) && pPos.IsEmptySq(sq) {
+				if !OnHands(sq) && pPos.IsEmptySq(sq) {
 					pPos.Board[sq] = HandPieceMap[hand_index]
 					pPos.Hands[hand_index] -= 1
 				}
@@ -178,27 +179,27 @@ func ShuffleBoard(pPos *Position) {
 		}
 	}
 
+	// 盤上での移動
 	// 適当に大きな回数
 	for i := 0; i < 81*80; i += 1 {
-		square1 := Square(rand.Intn(100))
-		square2 := Square(rand.Intn(100))
-		if File(square1) != 0 && Rank(square1) != 0 && File(square2) != 0 && Rank(square2) != 0 {
-			piece := pPos.Board[square1]
-
+		sq1 := Square(rand.Intn(100))
+		sq2 := Square(rand.Intn(100))
+		if !OnHands(sq1) && !OnHands(sq2) && !pPos.IsEmptySq(sq1) {
+			piece := pPos.Board[sq1]
 			// 位置スワップ
-			pPos.Board[square1] = pPos.Board[square2]
-			pPos.Board[square2] = piece
+			pPos.Board[sq1] = pPos.Board[sq2]
+			pPos.Board[sq2] = piece
 
 			// 成／不成 変更
 			promote := Square(rand.Intn(10))
 			if promote == 0 {
-				pPos.Board[square1] = Promote(pPos.Board[square1])
+				pPos.Board[sq2] = Promote(pPos.Board[sq2])
 			} else if promote == 1 {
-				pPos.Board[square1] = Demote(pPos.Board[square1])
+				pPos.Board[sq2] = Demote(pPos.Board[sq2])
 			}
 
-			// TODO 駒の先後変更（玉除く）
-			piece = pPos.Board[square1]
+			// 駒の先後変更（玉除く）
+			piece = pPos.Board[sq2]
 			switch What(piece) {
 			case PIECE_TYPE_K, PIECE_TYPE_EMPTY:
 				// Ignored
@@ -211,12 +212,27 @@ func ShuffleBoard(pPos *Position) {
 					phase = FlipPhase(phase)
 				}
 
-				pPos.Board[square1] = PieceFromPhPt(phase, pieceType)
+				pPos.Board[sq2] = PieceFromPhPt(phase, pieceType)
 			}
-
 		}
 	}
 
+	// 手番のシャッフル
+	switch rand.Intn(2) {
+	case 0:
+		pPos.phase = FIRST
+	default:
+		pPos.phase = SECOND
+	}
+
+	// 手目は 1 に戻します
+	pPos.StartMovesNum = 1
+	pPos.OffsetMovesIndex = 0
+
+	// position sfen 文字列を取得
+	command := pPos.SprintSfen()
+	// 利きの再計算もやってくれる
+	pPos.ReadPosition(command)
 }
 
 // CountAllPieces - 駒の数を確認するぜ（＾～＾）
