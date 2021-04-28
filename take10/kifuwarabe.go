@@ -242,19 +242,7 @@ MainLoop:
 		case "shuffle":
 			ShuffleBoard(pPos)
 		case "count":
-			countList := CountAllPieces(pPos)
-			G.Chat.Debug("Count\n")
-			G.Chat.Debug("-----\n")
-			G.Chat.Debug("King  :%3d\n", countList[0])
-			G.Chat.Debug("Rook  :%3d\n", countList[1])
-			G.Chat.Debug("Bishop:%3d\n", countList[2])
-			G.Chat.Debug("Gold  :%3d\n", countList[3])
-			G.Chat.Debug("Silver:%3d\n", countList[4])
-			G.Chat.Debug("Knight:%3d\n", countList[5])
-			G.Chat.Debug("Lance :%3d\n", countList[6])
-			G.Chat.Debug("Pawn  :%3d\n", countList[7])
-			G.Chat.Debug("----------\n")
-			G.Chat.Debug("Total :%3d\n", countList[0]+countList[1]+countList[2]+countList[3]+countList[4]+countList[5]+countList[6]+countList[7])
+			ShowAllPiecesCount(pPos)
 		}
 
 		G.Log.FlushAllLogs()
@@ -273,4 +261,21 @@ func moveList(pPos *Position) {
 		G.Chat.Debug("(%d) %s\n", i, move.ToCode())
 	}
 	G.Chat.Debug("* Except for those to be removed during the search\n")
+}
+
+// ShowAllPiecesCount - 駒の枚数表示
+func ShowAllPiecesCount(pPos *Position) {
+	countList := CountAllPieces(pPos)
+	G.Chat.Debug("Count\n")
+	G.Chat.Debug("-----\n")
+	G.Chat.Debug("King  :%3d\n", countList[0])
+	G.Chat.Debug("Rook  :%3d\n", countList[1])
+	G.Chat.Debug("Bishop:%3d\n", countList[2])
+	G.Chat.Debug("Gold  :%3d\n", countList[3])
+	G.Chat.Debug("Silver:%3d\n", countList[4])
+	G.Chat.Debug("Knight:%3d\n", countList[5])
+	G.Chat.Debug("Lance :%3d\n", countList[6])
+	G.Chat.Debug("Pawn  :%3d\n", countList[7])
+	G.Chat.Debug("----------\n")
+	G.Chat.Debug("Total :%3d\n", countList[0]+countList[1]+countList[2]+countList[3]+countList[4]+countList[5]+countList[6]+countList[7])
 }
