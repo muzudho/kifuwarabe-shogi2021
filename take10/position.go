@@ -1054,26 +1054,19 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	// file
 	switch ch := command[*i]; ch {
 	case 'R':
-		*i += 1
-		hand_sq = HAND_R1_IDX
+		hand_sq = SQ_R1
 	case 'B':
-		*i += 1
-		hand_sq = HAND_B1_IDX
+		hand_sq = SQ_B1
 	case 'G':
-		*i += 1
-		hand_sq = HAND_G1_IDX
+		hand_sq = SQ_G1
 	case 'S':
-		*i += 1
-		hand_sq = HAND_S1_IDX
+		hand_sq = SQ_S1
 	case 'N':
-		*i += 1
-		hand_sq = HAND_N1_IDX
+		hand_sq = SQ_N1
 	case 'L':
-		*i += 1
-		hand_sq = HAND_L1_IDX
+		hand_sq = SQ_L1
 	case 'P':
-		*i += 1
-		hand_sq = HAND_P1_IDX
+		hand_sq = SQ_P1
 	default:
 		// Ignored
 	}
@@ -1082,6 +1075,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 	var count = 0
 
 	if hand_sq != SQUARE_EMPTY {
+		*i += 1
 		switch phase {
 		case FIRST:
 			move = move.ReplaceSource(hand_sq)
