@@ -45,7 +45,7 @@ func SquareFrom(file Square, rank Square) Square {
 
 // OnHands - 持ち駒なら真
 func OnHands(sq Square) bool {
-	return 99 < sq && sq < 114
+	return SQ_HAND_START <= sq && sq < SQ_HAND_END
 }
 
 // OnBoard - 盤上なら真
@@ -310,9 +310,33 @@ func PieceFromPhPt(phase Phase, pieceType PieceType) Piece {
 	}
 }
 
-var HandPieceMap = [14]Piece{
-	PIECE_R1, PIECE_B1, PIECE_G1, PIECE_S1, PIECE_N1, PIECE_L1, PIECE_P1,
-	PIECE_R2, PIECE_B2, PIECE_G2, PIECE_S2, PIECE_N2, PIECE_L2, PIECE_P2}
+const (
+	// 持ち駒を打つ 0～15 (Index)
+	HAND_K1_IDX    = 0
+	HAND_R1_IDX    = 1 // 先手飛打
+	HAND_B1_IDX    = 2
+	HAND_G1_IDX    = 3
+	HAND_S1_IDX    = 4
+	HAND_N1_IDX    = 5
+	HAND_L1_IDX    = 6
+	HAND_P1_IDX    = 7
+	HAND_K2_IDX    = 8
+	HAND_R2_IDX    = 9
+	HAND_B2_IDX    = 10
+	HAND_G2_IDX    = 11
+	HAND_S2_IDX    = 12
+	HAND_N2_IDX    = 13
+	HAND_L2_IDX    = 14
+	HAND_P2_IDX    = 15
+	HAND_SIZE      = 16
+	HAND_TYPE_SIZE = 8
+	HAND_IDX_START = HAND_K1_IDX
+	HAND_IDX_END   = HAND_SIZE // この数を含まない
+)
+
+var HandPieceMap1 = [HAND_SIZE]Piece{
+	PIECE_K1, PIECE_R1, PIECE_B1, PIECE_G1, PIECE_S1, PIECE_N1, PIECE_L1, PIECE_P1,
+	PIECE_K2, PIECE_R2, PIECE_B2, PIECE_G2, PIECE_S2, PIECE_N2, PIECE_L2, PIECE_P2}
 
 // Piece location
 const (
@@ -862,7 +886,7 @@ func (pPosSys *PositionSystem) ReadPosition(pPos *Position, command string) {
 							number = 1
 						}
 
-						pPos.Hands[hand_index] = number
+						pPos.Hands1[hand_index] = number
 						number = 0
 
 						// 長い利きの駒は位置を覚えておくぜ（＾～＾）
@@ -1217,7 +1241,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		// 打なら
 
 		// 持ち駒の数を減らします
-		pPos.Hands[sq_drop-SQ_HAND_START] -= 1
+		pPos.Hands1[sq_drop-SQ_HAND_START] -= 1
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
@@ -1258,7 +1282,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
-			// Lost first king
+			cap_dst_sq = SQ_K2
 		case PIECE_R1, PIECE_PR1:
 			cap_dst_sq = SQ_R2
 		case PIECE_B1, PIECE_PB1:
@@ -1274,7 +1298,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		case PIECE_P1, PIECE_PP1:
 			cap_dst_sq = SQ_P2
 		case PIECE_K2: // First player win
-			// Lost second king
+			cap_dst_sq = SQ_K1
 		case PIECE_R2, PIECE_PR2:
 			cap_dst_sq = SQ_R1
 		case PIECE_B2, PIECE_PB2:
@@ -1295,7 +1319,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 
 		if cap_dst_sq != SQUARE_EMPTY {
 			pPosSys.CapturedList[pPosSys.OffsetMovesIndex] = captured
-			pPos.Hands[cap_dst_sq-SQ_HAND_START] += 1
+			pPos.Hands1[cap_dst_sq-SQ_HAND_START] += 1
 		} else {
 			// 取った駒は無かった（＾～＾）
 			pPosSys.CapturedList[pPosSys.OffsetMovesIndex] = PIECE_EMPTY
@@ -1391,7 +1415,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
-	case SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_N1, SQ_L1, SQ_P1, SQ_R2, SQ_B2, SQ_G2, SQ_S2, SQ_N2, SQ_L2, SQ_P2:
+	case SQ_K1, SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_N1, SQ_L1, SQ_P1, SQ_K2, SQ_R2, SQ_B2, SQ_G2, SQ_S2, SQ_N2, SQ_L2, SQ_P2:
 		// 打なら
 		drop := mov_src_sq
 		// 行き先から駒を除去します
@@ -1400,7 +1424,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
-		pPos.Hands[drop-SQ_HAND_START] += 1
+		pPos.Hands1[drop-SQ_HAND_START] += 1
 	default:
 		// 打でないなら
 
@@ -1514,7 +1538,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
-			// Lost first king
+			hand_sq = SQ_K2
 		case PIECE_R1, PIECE_PR1:
 			hand_sq = SQ_R2
 		case PIECE_B1, PIECE_PB1:
@@ -1530,7 +1554,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 		case PIECE_P1, PIECE_PP1:
 			hand_sq = SQ_P2
 		case PIECE_K2: // First player win
-			// Lost second king
+			hand_sq = SQ_K1
 		case PIECE_R2, PIECE_PR2:
 			hand_sq = SQ_R1
 		case PIECE_B2, PIECE_PB2:
@@ -1552,7 +1576,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 		// fmt.Printf("Debug: hand_sq=%d\n", hand_sq)
 
 		if hand_sq != SQUARE_EMPTY {
-			pPos.Hands[hand_sq-SQ_HAND_START] -= 1
+			pPos.Hands1[hand_sq-SQ_HAND_START] -= 1
 
 			// 取っていた駒を行き先に戻します
 			cap_piece_type = What(captured)

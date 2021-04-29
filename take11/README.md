@@ -107,3 +107,24 @@ location 0
 # | 59| 42|  | 48| 82|  | 22| 88|  | 11| 14| 91| 99|
 # +---+---+  +---+---+  +---+---+  +---+---+---+---+
 ```
+
+## Test5
+
+```shell
+position startpos moves 7g7f 7a6b 6i7h 5c5d 7i6h 6a7a 6h7g 4a4b 5i6h 8b9b 4i5h 1c1d 3i3h 2b1c 1g1f 9c9d 1f1e 1d1e 1i1e 5d5e 1e1c 2a1c P*1d 1c2e 2g2f L*6a 2f2e P*1e N*5d 4b4a 5d6b+ 5a6b 1d1c+ 1a1c B*3e 4c4d 3e1c+ 3a3b 1c4f 9b8b 4f5e N*9e 5e4d P*5c P*1b
+
+pos
+
+# 強制終了（玉を取ってしまうらしい）
+go
+
+position sfen 4k4/9/9/9/9/9/9/4p4/4K4 w - 1
+location 0
+# らいおんきゃっち
+do 5h5i
+location 0
+undo
+# 玉が戻ってない
+pos
+location 0
+```

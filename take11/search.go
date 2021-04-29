@@ -91,8 +91,8 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 				bestMoveList = nil
 				bestMoveList = append(bestMoveList, move)
 				opponentWorstVal = opponentVal
-			} else if bestVal == materialVal {
-				// 最高値が並んだら配列の要素として追加
+			} else if opponentVal == opponentWorstVal {
+				// 最低値が並んだら配列の要素として追加
 				bestMoveList = append(bestMoveList, move)
 			}
 

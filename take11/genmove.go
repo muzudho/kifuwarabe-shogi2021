@@ -357,7 +357,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 
 		// 自分の駒台もスキャンしよ（＾～＾）
 		for hand_index := hand_start; hand_index < hand_end; hand_index += 1 {
-			if pPos.Hands[hand_index] > 0 {
+			if pPos.Hands1[hand_index] > 0 {
 				hand_sq := Square(hand_index) + SQ_HAND_START
 				control_list := GenControl(pPos, hand_sq)
 
@@ -412,7 +412,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 
 		// 自分の駒台もスキャンしよ（＾～＾）
 		for hand_index := hand_start; hand_index < hand_end; hand_index += 1 {
-			if pPos.Hands[hand_index] > 0 {
+			if pPos.Hands1[hand_index] > 0 {
 				hand_sq := Square(hand_index) + SQ_HAND_START
 				control_list := GenControl(pPos, hand_sq)
 

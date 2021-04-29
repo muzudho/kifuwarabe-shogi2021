@@ -108,52 +108,58 @@ func ShuffleBoard(pPosSys *PositionSystem, pPos *Position) {
 						switch phase {
 						case FIRST:
 							switch pieceType {
+							case PIECE_TYPE_K:
+								pPos.Hands1[HAND_K1_IDX] += 1
+								ok = true
 							case PIECE_TYPE_R, PIECE_TYPE_PR:
-								pPos.Hands[HAND_R1_IDX] += 1
+								pPos.Hands1[HAND_R1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_B, PIECE_TYPE_PB:
-								pPos.Hands[HAND_B1_IDX] += 1
+								pPos.Hands1[HAND_B1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_G:
-								pPos.Hands[HAND_G1_IDX] += 1
+								pPos.Hands1[HAND_G1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_S, PIECE_TYPE_PS:
-								pPos.Hands[HAND_S1_IDX] += 1
+								pPos.Hands1[HAND_S1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_N, PIECE_TYPE_PN:
-								pPos.Hands[HAND_N1_IDX] += 1
+								pPos.Hands1[HAND_N1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_L, PIECE_TYPE_PL:
-								pPos.Hands[HAND_L1_IDX] += 1
+								pPos.Hands1[HAND_L1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_P, PIECE_TYPE_PP:
-								pPos.Hands[HAND_P1_IDX] += 1
+								pPos.Hands1[HAND_P1_IDX] += 1
 								ok = true
 							default:
 								// Ignored
 							}
 						case SECOND:
 							switch pieceType {
+							case PIECE_TYPE_K:
+								pPos.Hands1[HAND_K2_IDX] += 1
+								ok = true
 							case PIECE_TYPE_R, PIECE_TYPE_PR:
-								pPos.Hands[HAND_R2_IDX] += 1
+								pPos.Hands1[HAND_R2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_B, PIECE_TYPE_PB:
-								pPos.Hands[HAND_B2_IDX] += 1
+								pPos.Hands1[HAND_B2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_G:
-								pPos.Hands[HAND_G2_IDX] += 1
+								pPos.Hands1[HAND_G2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_S, PIECE_TYPE_PS:
-								pPos.Hands[HAND_S2_IDX] += 1
+								pPos.Hands1[HAND_S2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_N, PIECE_TYPE_PN:
-								pPos.Hands[HAND_N2_IDX] += 1
+								pPos.Hands1[HAND_N2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_L, PIECE_TYPE_PL:
-								pPos.Hands[HAND_L2_IDX] += 1
+								pPos.Hands1[HAND_L2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_P, PIECE_TYPE_PP:
-								pPos.Hands[HAND_P2_IDX] += 1
+								pPos.Hands1[HAND_P2_IDX] += 1
 								ok = true
 							default:
 								// Ignored
@@ -180,13 +186,13 @@ func ShuffleBoard(pPosSys *PositionSystem, pPos *Position) {
 
 		// 駒台から盤の方向
 		for hand_index := HAND_IDX_START; hand_index < HAND_IDX_END; hand_index += 1 {
-			num := pPos.Hands[hand_index]
+			num := pPos.Hands1[hand_index]
 			if num > 0 {
 				sq := Square(rand.Intn(100))
 				// うまく空マスなら移動成功
 				if OnBoard(sq) && pPos.IsEmptySq(sq) {
-					pPos.Board[sq] = HandPieceMap[hand_index]
-					pPos.Hands[hand_index] -= 1
+					pPos.Board[sq] = HandPieceMap1[hand_index]
+					pPos.Hands1[hand_index] -= 1
 				}
 			}
 		}
@@ -302,13 +308,14 @@ func ShuffleBoard(pPosSys *PositionSystem, pPos *Position) {
 			}
 
 			// 駒台
-			countList[1] += pPos.Hands[0] + pPos.Hands[7]
-			countList[2] += pPos.Hands[1] + pPos.Hands[8]
-			countList[3] += pPos.Hands[2] + pPos.Hands[9]
-			countList[4] += pPos.Hands[3] + pPos.Hands[10]
-			countList[5] += pPos.Hands[4] + pPos.Hands[11]
-			countList[6] += pPos.Hands[5] + pPos.Hands[12]
-			countList[7] += pPos.Hands[6] + pPos.Hands[13]
+			countList[0] += pPos.Hands1[HAND_K1_IDX] + pPos.Hands1[HAND_K2_IDX]
+			countList[1] += pPos.Hands1[HAND_R1_IDX] + pPos.Hands1[HAND_R2_IDX]
+			countList[2] += pPos.Hands1[HAND_B1_IDX] + pPos.Hands1[HAND_B2_IDX]
+			countList[3] += pPos.Hands1[HAND_G1_IDX] + pPos.Hands1[HAND_G2_IDX]
+			countList[4] += pPos.Hands1[HAND_S1_IDX] + pPos.Hands1[HAND_S2_IDX]
+			countList[5] += pPos.Hands1[HAND_N1_IDX] + pPos.Hands1[HAND_N2_IDX]
+			countList[6] += pPos.Hands1[HAND_L1_IDX] + pPos.Hands1[HAND_L2_IDX]
+			countList[7] += pPos.Hands1[HAND_P1_IDX] + pPos.Hands1[HAND_P2_IDX]
 		} else {
 			countList = CountAllPieces(pPos)
 		}
@@ -389,13 +396,14 @@ func CountAllPieces(pPos *Position) [8]int {
 	}
 
 	// 駒台
-	countList[1] += pPos.Hands[0] + pPos.Hands[7]
-	countList[2] += pPos.Hands[1] + pPos.Hands[8]
-	countList[3] += pPos.Hands[2] + pPos.Hands[9]
-	countList[4] += pPos.Hands[3] + pPos.Hands[10]
-	countList[5] += pPos.Hands[4] + pPos.Hands[11]
-	countList[6] += pPos.Hands[5] + pPos.Hands[12]
-	countList[7] += pPos.Hands[6] + pPos.Hands[13]
+	countList[0] += pPos.Hands1[HAND_K1_IDX] + pPos.Hands1[HAND_K2_IDX]
+	countList[1] += pPos.Hands1[HAND_R1_IDX] + pPos.Hands1[HAND_R2_IDX]
+	countList[2] += pPos.Hands1[HAND_B1_IDX] + pPos.Hands1[HAND_B2_IDX]
+	countList[3] += pPos.Hands1[HAND_G1_IDX] + pPos.Hands1[HAND_G2_IDX]
+	countList[4] += pPos.Hands1[HAND_S1_IDX] + pPos.Hands1[HAND_S2_IDX]
+	countList[5] += pPos.Hands1[HAND_N1_IDX] + pPos.Hands1[HAND_N2_IDX]
+	countList[6] += pPos.Hands1[HAND_L1_IDX] + pPos.Hands1[HAND_L2_IDX]
+	countList[7] += pPos.Hands1[HAND_P1_IDX] + pPos.Hands1[HAND_P2_IDX]
 
 	return countList
 }
@@ -415,7 +423,7 @@ func copyBoard(pPos0 *Position, pPos1 *Position) {
 		pPos1.Board[sq] = pPos0.Board[sq]
 	}
 
-	pPos1.Hands = pPos0.Hands
+	pPos1.Hands1 = pPos0.Hands1
 	for i := PCLOC_START; i < PCLOC_END; i += 1 {
 		pPos1.PieceLocations[i] = pPos0.PieceLocations[i]
 	}
@@ -439,14 +447,14 @@ func diffBoard(pPos0 *Position, pPos1 *Position, pPos2 *Position, pPos3 *Positio
 
 	// 駒台
 	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPos0.Hands[i] == pPos1.Hands[i] {
+		if pPos0.Hands1[i] == pPos1.Hands1[i] {
 			// 等しければゼロ
-			pPos2.Hands[i] = 0
-			pPos3.Hands[i] = 0
+			pPos2.Hands1[i] = 0
+			pPos3.Hands1[i] = 0
 		} else {
 			// 異なればその数
-			pPos2.Hands[i] = pPos0.Hands[i]
-			pPos3.Hands[i] = pPos1.Hands[i]
+			pPos2.Hands1[i] = pPos0.Hands1[i]
+			pPos3.Hands1[i] = pPos1.Hands1[i]
 		}
 	}
 
@@ -479,7 +487,7 @@ func errorBoard(pPos0 *Position, pPos1 *Position, pPos2 *Position, pPos3 *Positi
 
 	// 駒台
 	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPos2.Hands[i] != pPos3.Hands[i] {
+		if pPos2.Hands1[i] != pPos3.Hands1[i] {
 			errorNum += 1
 		}
 	}

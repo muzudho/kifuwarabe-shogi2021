@@ -40,18 +40,18 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	lines = append(lines, "\n")
 	lines = append(lines, fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPosSys.StartMovesNum, (pPosSys.StartMovesNum+pPosSys.OffsetMovesIndex), phase_str))
 	lines = append(lines, "\n")
-	lines = append(lines, "    r    b    g    s    n    l    p\n")
-	lines = append(lines, "+----+----+----+----+----+----+----+\n")
+	lines = append(lines, "    k    r    b    g    s    n    l    p\n")
+	lines = append(lines, "+----+----+----+----+----+----+----+----+\n")
 
 	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
 	var buf bytes.Buffer
-	for i := 0; i < 7; i++ {
-		buf.WriteString(fmt.Sprintf("|%2d%2d", pPosSys.PPosition[b1].Hands[i+7], pPosSys.PPosition[b2].Hands[i+7]))
+	for i := HAND_TYPE_SIZE; i < HAND_IDX_END; i++ {
+		buf.WriteString(fmt.Sprintf("|%2d%2d", pPosSys.PPosition[b1].Hands1[i], pPosSys.PPosition[b2].Hands1[i]))
 	}
 	buf.WriteString("|\n")
 	lines = append(lines, buf.String())
 
-	lines = append(lines, "+----+----+----+----+----+----+----+\n")
+	lines = append(lines, "+----+----+----+----+----+----+----+----+\n")
 
 	buf.Reset()
 	for i := 0; i < 10; i += 1 {
@@ -152,18 +152,18 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
 	lines = append(lines, "\n")
-	lines = append(lines, "          R    B    G    S    N    L    P\n")
-	lines = append(lines, "      +----+----+----+----+----+----+----+\n")
+	lines = append(lines, "     K    R    B    G    S    N    L    P\n")
+	lines = append(lines, " +----+----+----+----+----+----+----+----+\n")
 
 	buf.Reset()
-	buf.WriteString("      ")
-	for i := 0; i < 7; i++ {
-		buf.WriteString(fmt.Sprintf("|%2d%2d", pPosSys.PPosition[b1].Hands[i], pPosSys.PPosition[b2].Hands[i]))
+	buf.WriteString(" ")
+	for i := HAND_IDX_START; i < HAND_TYPE_SIZE; i++ {
+		buf.WriteString(fmt.Sprintf("|%2d%2d", pPosSys.PPosition[b1].Hands1[i], pPosSys.PPosition[b2].Hands1[i]))
 	}
 	buf.WriteString("|\n")
 	lines = append(lines, buf.String())
 
-	lines = append(lines, "      +----+----+----+----+----+----+----+\n")
+	lines = append(lines, " +----+----+----+----+----+----+----+----+\n")
 	lines = append(lines, "\n")
 	lines = append(lines, "moves")
 
@@ -319,98 +319,115 @@ func (pPosSys *PositionSystem) SprintSfen(pPos *Position) string {
 
 	// 持ち駒
 	hands := ""
-	num := pPos.Hands[0]
+
+	// 玉は出力できません
+	// num := pPos.Hands1[HAND_K1_IDX]
+	// if num == 1 {
+	// 	hands += "K"
+	// } else if num > 1 {
+	// 	hands += fmt.Sprintf("K%d", num)
+	// }
+
+	num := pPos.Hands1[HAND_R1_IDX]
 	if num == 1 {
 		hands += "R"
 	} else if num > 1 {
 		hands += fmt.Sprintf("R%d", num)
 	}
 
-	num = pPos.Hands[1]
+	num = pPos.Hands1[HAND_B1_IDX]
 	if num == 1 {
 		hands += "B"
 	} else if num > 1 {
 		hands += fmt.Sprintf("B%d", num)
 	}
 
-	num = pPos.Hands[2]
+	num = pPos.Hands1[HAND_G1_IDX]
 	if num == 1 {
 		hands += "G"
 	} else if num > 1 {
 		hands += fmt.Sprintf("G%d", num)
 	}
 
-	num = pPos.Hands[3]
+	num = pPos.Hands1[HAND_S1_IDX]
 	if num == 1 {
 		hands += "S"
 	} else if num > 1 {
 		hands += fmt.Sprintf("S%d", num)
 	}
 
-	num = pPos.Hands[4]
+	num = pPos.Hands1[HAND_N1_IDX]
 	if num == 1 {
 		hands += "N"
 	} else if num > 1 {
 		hands += fmt.Sprintf("N%d", num)
 	}
 
-	num = pPos.Hands[5]
+	num = pPos.Hands1[HAND_L1_IDX]
 	if num == 1 {
 		hands += "L"
 	} else if num > 1 {
 		hands += fmt.Sprintf("L%d", num)
 	}
 
-	num = pPos.Hands[6]
+	num = pPos.Hands1[HAND_P1_IDX]
 	if num == 1 {
 		hands += "P"
 	} else if num > 1 {
 		hands += fmt.Sprintf("P%d", num)
 	}
 
-	num = pPos.Hands[7]
+	// 玉は出力できません
+	// num := pPos.Hands1[HAND_K2_IDX]
+	// if num == 1 {
+	// 	hands += "k"
+	// } else if num > 1 {
+	// 	hands += fmt.Sprintf("k%d", num)
+	// }
+
+	num = pPos.Hands1[HAND_R2_IDX]
 	if num == 1 {
 		hands += "r"
 	} else if num > 1 {
 		hands += fmt.Sprintf("r%d", num)
 	}
 
-	num = pPos.Hands[8]
+	num = pPos.Hands1[HAND_B2_IDX]
 	if num == 1 {
 		hands += "b"
 	} else if num > 1 {
 		hands += fmt.Sprintf("b%d", num)
 	}
 
-	num = pPos.Hands[9]
+	num = pPos.Hands1[HAND_G2_IDX]
 	if num == 1 {
 		hands += "g"
 	} else if num > 1 {
 		hands += fmt.Sprintf("g%d", num)
 	}
 
-	num = pPos.Hands[10]
+	num = pPos.Hands1[HAND_S2_IDX]
 	if num == 1 {
 		hands += "s"
 	} else if num > 1 {
 		hands += fmt.Sprintf("s%d", num)
 	}
 
-	num = pPos.Hands[11]
+	num = pPos.Hands1[HAND_N2_IDX]
 	if num == 1 {
 		hands += "n"
 	} else if num > 1 {
 		hands += fmt.Sprintf("n%d", num)
 	}
 
-	num = pPos.Hands[12]
+	num = pPos.Hands1[HAND_L2_IDX]
 	if num == 1 {
 		hands += "l"
 	} else if num > 1 {
 		hands += fmt.Sprintf("l%d", num)
 	}
 
-	num = pPos.Hands[13]
+	num = pPos.Hands1[HAND_P2_IDX]
 	if num == 1 {
 		hands += "p"
 	} else if num > 1 {
@@ -471,8 +488,8 @@ func (pPosSys *PositionSystem) Dump() string {
 	}
 
 	buffer.WriteString("Hands:")
-	for i := 0; i < 14; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPosSys.PPosition[i].Hands))
+	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
+		buffer.WriteString(fmt.Sprintf("%d,", pPosSys.PPosition[i].Hands1))
 	}
 	buffer.WriteString("\n")
 

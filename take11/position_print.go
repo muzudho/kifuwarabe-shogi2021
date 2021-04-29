@@ -88,10 +88,10 @@ func (pPos *Position) Sprint(phase Phase, startMovesNum int, offsetMovesIndex in
 		//
 		"\n" +
 		//
-		"  r  b  g  s  n  l  p\n" +
-		"+--+--+--+--+--+--+--+\n" +
+		"  k  r  b  g  s  n  l  p\n" +
+		"+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[7], pPos.Hands[8], pPos.Hands[9], pPos.Hands[10], pPos.Hands[11], pPos.Hands[12], pPos.Hands[13]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands1[8], pPos.Hands1[9], pPos.Hands1[10], pPos.Hands1[11], pPos.Hands1[12], pPos.Hands1[13], pPos.Hands1[14], pPos.Hands1[15]) +
 		//
 		"+--+--+--+--+--+--+--+\n" +
 		//
@@ -139,12 +139,12 @@ func (pPos *Position) Sprint(phase Phase, startMovesNum int, offsetMovesIndex in
 		//
 		"\n" +
 		//
-		"        R  B  G  S  N  L  P\n" +
-		"      +--+--+--+--+--+--+--+\n" +
+		"     K  R  B  G  S  N  L  P\n" +
+		"   +--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[0], pPos.Hands[1], pPos.Hands[2], pPos.Hands[3], pPos.Hands[4], pPos.Hands[5], pPos.Hands[6]) +
+		fmt.Sprintf("   |%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands1[0], pPos.Hands1[1], pPos.Hands1[2], pPos.Hands1[3], pPos.Hands1[4], pPos.Hands1[5], pPos.Hands1[6], pPos.Hands1[7]) +
 		//
-		"      +--+--+--+--+--+--+--+\n" +
+		"   +--+--+--+--+--+--+--+--+\n" +
 		//
 		"\n" +
 		//

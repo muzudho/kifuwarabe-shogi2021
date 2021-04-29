@@ -3,45 +3,26 @@ package take11
 import "fmt"
 
 const (
-	// 持ち駒を打つ 100～113
+	// 持ち駒を打つ 100～115
 	// 先手飛打
-	SQ_R1         = Square(100)
-	SQ_B1         = Square(101)
-	SQ_G1         = Square(102)
-	SQ_S1         = Square(103)
-	SQ_N1         = Square(104)
-	SQ_L1         = Square(105)
-	SQ_P1         = Square(106)
-	SQ_R2         = Square(107)
-	SQ_B2         = Square(108)
-	SQ_G2         = Square(109)
-	SQ_S2         = Square(110)
-	SQ_N2         = Square(111)
-	SQ_L2         = Square(112)
-	SQ_P2         = Square(113)
-	SQ_HAND_START = SQ_R1
+	SQ_K1         = Square(100)
+	SQ_R1         = Square(101)
+	SQ_B1         = Square(102)
+	SQ_G1         = Square(103)
+	SQ_S1         = Square(104)
+	SQ_N1         = Square(105)
+	SQ_L1         = Square(106)
+	SQ_P1         = Square(107)
+	SQ_K2         = Square(108)
+	SQ_R2         = Square(109)
+	SQ_B2         = Square(110)
+	SQ_G2         = Square(111)
+	SQ_S2         = Square(112)
+	SQ_N2         = Square(113)
+	SQ_L2         = Square(114)
+	SQ_P2         = Square(115)
+	SQ_HAND_START = SQ_K1
 	SQ_HAND_END   = SQ_P2 + 1 // この数を含まない
-)
-
-const (
-	// 持ち駒を打つ 0～13 (Index)
-	HAND_R1_IDX    = 0 // 先手飛打
-	HAND_B1_IDX    = 1
-	HAND_G1_IDX    = 2
-	HAND_S1_IDX    = 3
-	HAND_N1_IDX    = 4
-	HAND_L1_IDX    = 5
-	HAND_P1_IDX    = 6
-	HAND_R2_IDX    = 7
-	HAND_B2_IDX    = 8
-	HAND_G2_IDX    = 9
-	HAND_S2_IDX    = 10
-	HAND_N2_IDX    = 11
-	HAND_L2_IDX    = 12
-	HAND_P2_IDX    = 13
-	HAND_IDX_START = HAND_R1_IDX
-	HAND_IDX_END   = HAND_P2_IDX - 1 // この数を含まない
-	HAND_TYPE_SIZE = 7
 )
 
 // Move - 指し手
