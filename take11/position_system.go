@@ -1328,6 +1328,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 				sq := pPos.PieceLocations[i]
 				if sq == src_sq_list[j] {
 					pPos.PieceLocations[i] = dst_sq_list[j]
+					break
 				}
 			}
 		case PIECE_TYPE_B, PIECE_TYPE_PB:
@@ -1335,6 +1336,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 				sq := pPos.PieceLocations[i]
 				if sq == src_sq_list[j] {
 					pPos.PieceLocations[i] = dst_sq_list[j]
+					break
 				}
 			}
 		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
@@ -1342,6 +1344,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 				sq := pPos.PieceLocations[i]
 				if sq == src_sq_list[j] {
 					pPos.PieceLocations[i] = dst_sq_list[j]
+					break
 				}
 			}
 		}
@@ -1435,6 +1438,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			sq := pPos.PieceLocations[i]
 			if sq == mov_dst_sq {
 				pPos.PieceLocations[i] = mov_src_sq
+				break
 			}
 		}
 	case PIECE_TYPE_B, PIECE_TYPE_PB:
@@ -1442,6 +1446,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			sq := pPos.PieceLocations[i]
 			if sq == mov_dst_sq {
 				pPos.PieceLocations[i] = mov_src_sq
+				break
 			}
 		}
 	case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
@@ -1449,6 +1454,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			sq := pPos.PieceLocations[i]
 			if sq == mov_dst_sq {
 				pPos.PieceLocations[i] = mov_src_sq
+				break
 			}
 		}
 	}
@@ -1481,7 +1487,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 取った駒
 	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
-	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
+	// fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
 
 	// 取った駒に関係するのは行き先だけ（＾～＾）
 	mov_dst_sq := move.GetDestination()
@@ -1572,6 +1578,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			sq := pPos.PieceLocations[i]
 			if sq == hand_sq {
 				pPos.PieceLocations[i] = mov_dst_sq
+				break
 			}
 		}
 	case PIECE_TYPE_B, PIECE_TYPE_PB:
@@ -1579,6 +1586,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			sq := pPos.PieceLocations[i]
 			if sq == hand_sq {
 				pPos.PieceLocations[i] = mov_dst_sq
+				break
 			}
 		}
 	case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
@@ -1586,6 +1594,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			sq := pPos.PieceLocations[i]
 			if sq == hand_sq {
 				pPos.PieceLocations[i] = mov_dst_sq
+				break
 			}
 		}
 	}
