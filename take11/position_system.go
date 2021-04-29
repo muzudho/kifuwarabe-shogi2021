@@ -1511,7 +1511,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 取った駒
 	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
-	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
+	// fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
 
 	// 取った駒に関係するのは行き先だけ（＾～＾）
 	mov_dst_sq := move.GetDestination()
@@ -1531,10 +1531,10 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	switch mov_src_sq {
 	case SQ_K1, SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_N1, SQ_L1, SQ_P1, SQ_K2, SQ_R2, SQ_B2, SQ_G2, SQ_S2, SQ_N2, SQ_L2, SQ_P2:
 		// 打で取れる駒はないぜ（＾～＾）
-		fmt.Printf("Debug: Drop mov_src_sq=%d\n", mov_src_sq)
+		// fmt.Printf("Debug: Drop mov_src_sq=%d\n", mov_src_sq)
 	default:
 		// 打でないなら
-		fmt.Printf("Debug: Not drop mov_src_sq=%d\n", mov_src_sq)
+		// fmt.Printf("Debug: Not drop mov_src_sq=%d\n", mov_src_sq)
 
 		// 取った相手の駒があれば、自分の駒台から下ろします
 		switch captured {
@@ -1575,7 +1575,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			fmt.Printf("Error: Unknown captured=[%d]", captured)
 		}
 
-		fmt.Printf("Debug: hand_sq=%d\n", hand_sq)
+		// fmt.Printf("Debug: hand_sq=%d\n", hand_sq)
 
 		if hand_sq != SQUARE_EMPTY {
 			pPos.Hands1[hand_sq-SQ_HAND_START] -= 1
