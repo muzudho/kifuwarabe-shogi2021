@@ -6,7 +6,7 @@ import (
 )
 
 // Print - 局面出力（＾ｑ＾）
-func (pPosSys *PositionSystem) Sprint(b BoardLayerT) string {
+func (pPosSys *PositionSystem) Sprint(b PosLayerT) string {
 	var phase_str string
 	switch pPosSys.GetPhase() {
 	case FIRST:
@@ -157,7 +157,7 @@ func (pPosSys *PositionSystem) Sprint(b BoardLayerT) string {
 }
 
 // Print - ２局面の比較用画面出力（＾ｑ＾）
-func (pPosSys *PositionSystem) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
+func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	var phase_str string
 	switch pPosSys.GetPhase() {
 	case FIRST:
@@ -413,7 +413,7 @@ func (pPosSys *PositionSystem) SprintControl(phase Phase, c ControlLayerT) strin
 }
 
 // SprintLocation - あの駒どこにいんの？を表示
-func (pPosSys *PositionSystem) SprintLocation(b BoardLayerT) string {
+func (pPosSys *PositionSystem) SprintLocation(b PosLayerT) string {
 	return "\n" +
 		//
 		" K   k      R          B          L\n" +
@@ -433,7 +433,7 @@ func (pPosSys *PositionSystem) SprintLocation(b BoardLayerT) string {
 }
 
 // SprintSfen - SFEN文字列返せよ（＾～＾）
-func (pPosSys *PositionSystem) SprintSfen(b BoardLayerT) string {
+func (pPosSys *PositionSystem) SprintSfen(b PosLayerT) string {
 	// 9x9=81 + 8slash = 89 文字 なんだが成り駒で増えるし めんどくさ（＾～＾）多めに取っとくか（＾～＾）
 	// 成り駒２文字なんで、byte型だとめんどくさ（＾～＾）
 	buf := make([]byte, 0, 200)
@@ -621,7 +621,7 @@ func (pPosSys *PositionSystem) Dump() string {
 	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
 	var buffer bytes.Buffer
 
-	for b := BoardLayerT(0); b < 2; b += 1 {
+	for b := PosLayerT(0); b < 2; b += 1 {
 		buffer.WriteString(fmt.Sprintf("Board[%d]:", b))
 		for i := 0; i < BOARD_SIZE; i += 1 {
 			buffer.WriteString(fmt.Sprintf("%d,", pPosSys.Board[i]))

@@ -60,7 +60,7 @@ func GetControlLayerName(c ControlLayerT) string {
 }
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlRook(b BoardLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
+func (pPosSys *PositionSystem) AddControlRook(b PosLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
 		from := pPosSys.PieceLocations[b][i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -72,7 +72,7 @@ func (pPosSys *PositionSystem) AddControlRook(b BoardLayerT, c ControlLayerT, si
 }
 
 // AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlBishop(b BoardLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
+func (pPosSys *PositionSystem) AddControlBishop(b PosLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
 	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
 		from := pPosSys.PieceLocations[b][i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -84,7 +84,7 @@ func (pPosSys *PositionSystem) AddControlBishop(b BoardLayerT, c ControlLayerT, 
 }
 
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlLance(b BoardLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
+func (pPosSys *PositionSystem) AddControlLance(b PosLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
 	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
 		from := pPosSys.PieceLocations[b][i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -97,7 +97,7 @@ func (pPosSys *PositionSystem) AddControlLance(b BoardLayerT, c ControlLayerT, s
 }
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlDiff(b BoardLayerT, c ControlLayerT, from Square, sign int8) {
+func (pPosSys *PositionSystem) AddControlDiff(b PosLayerT, c ControlLayerT, from Square, sign int8) {
 	if from > 99 {
 		// 持ち駒は無視します
 		return
@@ -151,7 +151,7 @@ func (pPosSys *PositionSystem) MergeControlDiff() {
 }
 
 // RecalculateControl - 利きの再計算
-func (pPosSys *PositionSystem) RecalculateControl(b BoardLayerT, c1 ControlLayerT) {
+func (pPosSys *PositionSystem) RecalculateControl(b PosLayerT, c1 ControlLayerT) {
 
 	pPosSys.ClearControlLayer(c1)
 

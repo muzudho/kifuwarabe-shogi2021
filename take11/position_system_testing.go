@@ -8,7 +8,7 @@ import (
 )
 
 // TestControl
-func TestControl(pPosSys *PositionSystem, b BoardLayerT) (bool, string) {
+func TestControl(pPosSys *PositionSystem, b PosLayerT) (bool, string) {
 	pPosSys.ClearControlLayer(CONTROL_LAYER_TEST_COPY)
 	pPosSys.ClearControlLayer(CONTROL_LAYER_TEST_ERROR)
 
@@ -81,7 +81,7 @@ func SumAbsControl(pPosSys *PositionSystem, layer1 int) [2]int {
 // ShuffleBoard - 盤上の駒、持ち駒をシャッフルします
 // ゲーム中にはできない動きをするので、利きの計算は無視します。
 // 最後に利きは再計算します
-func ShuffleBoard(pPosSys *PositionSystem, b BoardLayerT) {
+func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 
 	// 駒の数を数えます
 	countList1 := CountAllPieces(pPosSys, b)
@@ -346,7 +346,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b BoardLayerT) {
 }
 
 // CountAllPieces - 駒の数を確認するぜ（＾～＾）
-func CountAllPieces(pPosSys *PositionSystem, b BoardLayerT) [8]int {
+func CountAllPieces(pPosSys *PositionSystem, b PosLayerT) [8]int {
 
 	countList := [8]int{}
 
@@ -401,7 +401,7 @@ func CountErrorCountLists(countList1 [8]int, countList2 [8]int) int {
 }
 
 // copyBoard - 盤[b0] を 盤[b1] にコピーします
-func copyBoard(pPosSys *PositionSystem, b0 BoardLayerT, b1 BoardLayerT) {
+func copyBoard(pPosSys *PositionSystem, b0 PosLayerT, b1 PosLayerT) {
 	for sq := 0; sq < 100; sq += 1 {
 		pPosSys.Board[b1][sq] = pPosSys.Board[b0][sq]
 	}
@@ -413,7 +413,7 @@ func copyBoard(pPosSys *PositionSystem, b0 BoardLayerT, b1 BoardLayerT) {
 }
 
 // copyBoard - 盤[0] を 盤[1] で異なるマスを 盤[2] 盤[3] にセットします
-func diffBoard(pPosSys *PositionSystem, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) {
+func diffBoard(pPosSys *PositionSystem, b0 PosLayerT, b1 PosLayerT, b2 PosLayerT, b3 PosLayerT) {
 	// 盤上
 	for sq := 0; sq < 100; sq += 1 {
 		if pPosSys.Board[b1][sq] == pPosSys.Board[b0][sq] {
@@ -456,7 +456,7 @@ func diffBoard(pPosSys *PositionSystem, b0 BoardLayerT, b1 BoardLayerT, b2 Board
 }
 
 // ２つのボードの違いを数えるぜ（＾～＾）
-func errorBoard(pPosSys *PositionSystem, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) int {
+func errorBoard(pPosSys *PositionSystem, b0 PosLayerT, b1 PosLayerT, b2 PosLayerT, b3 PosLayerT) int {
 	diffBoard(pPosSys, b0, b1, b2, b3)
 
 	errorNum := 0
