@@ -1380,7 +1380,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	mov_dst_sq := move.GetDestination()
 	mov_src_sq := move.GetSource()
-	var cap_dst_sq Square
+	var cap_dst_sq = SQUARE_EMPTY
 	var cap_src_sq = SQUARE_EMPTY
 
 	// 利きの差分テーブルをクリアー（＾～＾）
@@ -1404,7 +1404,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 		// 駒台に駒を戻します
 		pPos.Hands[drop-SQ_HAND_START] += 1
-		cap_dst_sq = 0
+		cap_dst_sq = SQUARE_EMPTY
 	default:
 		// 打でないなら
 
@@ -1426,46 +1426,46 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		case PIECE_K1: // Second player win
 			// Lost first king
 		case PIECE_R1, PIECE_PR1:
-			cap_src_sq = SQ_R2
+			cap_dst_sq = SQ_R2
 		case PIECE_B1, PIECE_PB1:
-			cap_src_sq = SQ_B2
+			cap_dst_sq = SQ_B2
 		case PIECE_G1:
-			cap_src_sq = SQ_G2
+			cap_dst_sq = SQ_G2
 		case PIECE_S1, PIECE_PS1:
-			cap_src_sq = SQ_S2
+			cap_dst_sq = SQ_S2
 		case PIECE_N1, PIECE_PN1:
-			cap_src_sq = SQ_N2
+			cap_dst_sq = SQ_N2
 		case PIECE_L1, PIECE_PL1:
-			cap_src_sq = SQ_L2
+			cap_dst_sq = SQ_L2
 		case PIECE_P1, PIECE_PP1:
-			cap_src_sq = SQ_P2
+			cap_dst_sq = SQ_P2
 		case PIECE_K2: // First player win
 			// Lost second king
 		case PIECE_R2, PIECE_PR2:
-			cap_src_sq = SQ_R1
+			cap_dst_sq = SQ_R1
 		case PIECE_B2, PIECE_PB2:
-			cap_src_sq = SQ_B1
+			cap_dst_sq = SQ_B1
 		case PIECE_G2:
-			cap_src_sq = SQ_G1
+			cap_dst_sq = SQ_G1
 		case PIECE_S2, PIECE_PS2:
-			cap_src_sq = SQ_S1
+			cap_dst_sq = SQ_S1
 		case PIECE_N2, PIECE_PN2:
-			cap_src_sq = SQ_N1
+			cap_dst_sq = SQ_N1
 		case PIECE_L2, PIECE_PL2:
-			cap_src_sq = SQ_L1
+			cap_dst_sq = SQ_L1
 		case PIECE_P2, PIECE_PP2:
-			cap_src_sq = SQ_P1
+			cap_dst_sq = SQ_P1
 		default:
 			fmt.Printf("Error: Unknown captured=[%d]", captured)
 		}
 
-		if cap_src_sq != SQUARE_EMPTY {
-			cap_dst_sq = cap_src_sq
-			pPos.Hands[cap_src_sq-SQ_HAND_START] -= 1
+		if cap_dst_sq != SQUARE_EMPTY {
+			cap_src_sq = mov_dst_sq
+			pPos.Hands[cap_dst_sq-SQ_HAND_START] -= 1
 
 			// 取っていた駒を行き先に戻します
 			cap_piece_type = What(captured)
-			pPos.Board[mov_dst_sq] = captured
+			pPos.Board[cap_src_sq] = captured
 
 			// pieceType := What(captured)
 			// switch pieceType {
@@ -1474,7 +1474,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			// default:
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
-			pPosSys.AddControlDiff(pPos, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
+			pPosSys.AddControlDiff(pPos, CONTROL_LAYER_DIFF_CAPTURED, cap_src_sq, 1)
 			// }
 		} else {
 			pPos.Board[mov_dst_sq] = PIECE_EMPTY
