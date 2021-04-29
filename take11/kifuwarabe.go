@@ -107,8 +107,29 @@ MainLoop:
 			break MainLoop
 		// 以下、きふわらべ独自拡張コマンド
 		case "pos":
-			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
-			G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
+			length := len(tokens)
+			ok := false
+			if length == 1 {
+				// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
+				G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
+				ok = true
+			} else if length == 2 {
+				// 盤番号
+				b1, err := strconv.Atoi(tokens[1])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				} else {
+					G.Chat.Debug(pPos.Sprint(BoardLayerT(b1)))
+					ok = true
+				}
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("pos\n")
+				G.Chat.Debug("pos {boardNumber}\n")
+			}
 		case "do":
 			// １手指すぜ（＾～＾）
 			// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
@@ -243,6 +264,20 @@ MainLoop:
 			ShuffleBoard(pPos, BOARD_LAYER_MAIN)
 		case "count":
 			ShowAllPiecesCount(pPos, BOARD_LAYER_MAIN)
+		case "board":
+			length := len(tokens)
+			ok := false
+			if length == 2 && tokens[1] == "copy" {
+				copyBoard(pPos)
+				ok = true
+			} else {
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("board copy\n")
+			}
 		}
 
 		G.Log.FlushAllLogs()
@@ -278,4 +313,11 @@ func ShowAllPiecesCount(pPos *Position, b BoardLayerT) {
 	G.Chat.Debug("Pawn  :%3d\n", countList[7])
 	G.Chat.Debug("----------\n")
 	G.Chat.Debug("Total :%3d\n", countList[0]+countList[1]+countList[2]+countList[3]+countList[4]+countList[5]+countList[6]+countList[7])
+}
+
+// copyBoard - 盤[0] を 盤[1] にコピーします
+func copyBoard(pPos *Position) {
+	for sq := 0; sq < 100; sq += 1 {
+		pPos.Board[1][sq] = pPos.Board[0][sq]
+	}
 }

@@ -17,4 +17,10 @@ position startpos moves 1g1f 4a3b 1f1e 6a5b 2g2f 2c2d 3g3f 5a4b 3f3e 4c4d 4g4f 5
 go btime 86000 wtime 83000 binc 2000 winc 2000
 Error: 59 square is empty
 quit
+
+# 盤をコピー（＾～＾）
+board copy
+
+# 盤[1]を表示（＾～＾）
+pos 1
 ```
