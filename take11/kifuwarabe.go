@@ -271,7 +271,7 @@ MainLoop:
 				copyBoard(pPos)
 				ok = true
 			} else if length == 2 && tokens[1] == "diff" {
-				diffBoard(pPos)
+				diffBoard(pPos, BoardLayerT(0), BoardLayerT(1), BoardLayerT(2), BoardLayerT(3))
 				ok = true
 			}
 
@@ -303,6 +303,51 @@ MainLoop:
 				G.Chat.Debug("Format\n")
 				G.Chat.Debug("------\n")
 				G.Chat.Debug("posdiff {boardIndex1} {boardIndex2}\n")
+			}
+		case "error":
+			// 2つのものを比較して、違いが何個あったか返すぜ（＾ｑ＾）
+			length := len(tokens)
+			ok := false
+			if length == 6 && tokens[1] == "board" {
+				// 2つの盤を比較するぜ（＾～＾）これを使うには一時テーブルとしてさらに２つ指定しろだぜ（＾～＾）
+				// 盤番号
+				b0, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b1, err := strconv.Atoi(tokens[3])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b2, err := strconv.Atoi(tokens[4])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b3, err := strconv.Atoi(tokens[5])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				errorNum := errorBoard(pPos, BoardLayerT(b0), BoardLayerT(b1), BoardLayerT(b2), BoardLayerT(b3))
+				if errorNum == 0 {
+					G.Chat.Debug("ok\n")
+				} else {
+					G.Chat.Debug("error=%d\n", errorNum)
+				}
+				ok = true
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("error board {*1} {*2} {*3} {*4}\n")
+				G.Chat.Debug("    *1 boardLayerIndex Compare 1\n")
+				G.Chat.Debug("    *2 boardLayerIndex Compare 2\n")
+				G.Chat.Debug("    *3 boardLayerIndex Temp\n")
+				G.Chat.Debug("    *4 boardLayerIndex Temp\n")
 			}
 		default:
 			fmt.Printf("Unknown command=%s\n", command)
@@ -356,44 +401,74 @@ func copyBoard(pPos *Position) {
 }
 
 // copyBoard - 盤[0] を 盤[1] で異なるマスを 盤[2] 盤[3] にセットします
-func diffBoard(pPos *Position) {
+func diffBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) {
 	// 盤上
 	for sq := 0; sq < 100; sq += 1 {
-		if pPos.Board[1][sq] == pPos.Board[0][sq] {
+		if pPos.Board[b1][sq] == pPos.Board[b0][sq] {
 			// 等しければ空マス
-			pPos.Board[2][sq] = PIECE_EMPTY
-			pPos.Board[3][sq] = PIECE_EMPTY
+			pPos.Board[b2][sq] = PIECE_EMPTY
+			pPos.Board[b3][sq] = PIECE_EMPTY
 
 		} else {
 			// 異なったら
-			pPos.Board[2][sq] = pPos.Board[0][sq]
-			pPos.Board[3][sq] = pPos.Board[1][sq]
+			pPos.Board[b2][sq] = pPos.Board[b0][sq]
+			pPos.Board[b3][sq] = pPos.Board[b1][sq]
 		}
 	}
 
 	// 駒台
 	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPos.Hands[0][i] == pPos.Hands[1][i] {
+		if pPos.Hands[b0][i] == pPos.Hands[b1][i] {
 			// 等しければゼロ
-			pPos.Hands[2][i] = 0
-			pPos.Hands[3][i] = 0
+			pPos.Hands[b2][i] = 0
+			pPos.Hands[b3][i] = 0
 		} else {
 			// 異なればその数
-			pPos.Hands[2][i] = pPos.Hands[0][i]
-			pPos.Hands[3][i] = pPos.Hands[1][i]
+			pPos.Hands[b2][i] = pPos.Hands[b0][i]
+			pPos.Hands[b3][i] = pPos.Hands[b1][i]
 		}
 	}
 
 	// 位置
 	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		if pPos.PieceLocations[0][i] == pPos.PieceLocations[1][i] {
+		if pPos.PieceLocations[b0][i] == pPos.PieceLocations[b1][i] {
 			// 等しければゼロ
-			pPos.PieceLocations[2][i] = 0
-			pPos.PieceLocations[3][i] = 0
+			pPos.PieceLocations[b2][i] = 0
+			pPos.PieceLocations[b3][i] = 0
 		} else {
 			// 異なればその数
-			pPos.PieceLocations[2][i] = pPos.PieceLocations[0][i]
-			pPos.PieceLocations[3][i] = pPos.PieceLocations[1][i]
+			pPos.PieceLocations[b2][i] = pPos.PieceLocations[b0][i]
+			pPos.PieceLocations[b3][i] = pPos.PieceLocations[b1][i]
 		}
 	}
+}
+
+// ２つのボードの違いを数えるぜ（＾～＾）
+func errorBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) int {
+	diffBoard(pPos, b0, b1, b2, b3)
+
+	errorNum := 0
+
+	// 盤上
+	for sq := 0; sq < 100; sq += 1 {
+		if pPos.Board[b2][sq] != pPos.Board[b3][sq] {
+			errorNum += 1
+		}
+	}
+
+	// 駒台
+	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
+		if pPos.Hands[b2][i] != pPos.Hands[b3][i] {
+			errorNum += 1
+		}
+	}
+
+	// 位置
+	for i := PCLOC_START; i < PCLOC_END; i += 1 {
+		if pPos.PieceLocations[b2][i] == pPos.PieceLocations[b3][i] {
+			errorNum += 1
+		}
+	}
+
+	return errorNum
 }

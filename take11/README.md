@@ -31,4 +31,7 @@ board diff
 
 # 盤[2], [3] の比較
 posdiff 2 3
+
+# 盤[0], [1] の異なる箇所の数
+error board 0 1 2 3
 ```
