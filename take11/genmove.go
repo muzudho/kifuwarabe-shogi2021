@@ -13,7 +13,7 @@ func Rank(sq Square) Square {
 }
 
 // GenControl - 利いているマスの一覧を返します。動けるマスではありません。
-func GenControl(pPosSys *PositionSystem, b BoardLayerT, from Square) []Square {
+func GenControl(pPosSys *PositionSystem, b PosLayerT, from Square) []Square {
 	sq_list := []Square{}
 
 	if from == SQUARE_EMPTY {
@@ -71,7 +71,7 @@ func GenControl(pPosSys *PositionSystem, b BoardLayerT, from Square) []Square {
 		}
 	} else {
 		// 盤上の駒の利き
-		piece := pPosSys.Board[b][from]
+		piece := pPosSys.PPosition[b].Board[from]
 
 		// ２つ先のマスから斜めに長い利き
 		switch piece {
@@ -256,9 +256,9 @@ func GenControl(pPosSys *PositionSystem, b BoardLayerT, from Square) []Square {
 }
 
 // NifuFirst - 先手で二歩になるか筋調べ
-func NifuFirst(pPosSys *PositionSystem, b BoardLayerT, file Square) bool {
+func NifuFirst(pPosSys *PositionSystem, b PosLayerT, file Square) bool {
 	for rank := Square(2); rank < 10; rank += 1 {
-		if pPosSys.Board[b][SquareFrom(file, rank)] == PIECE_P1 {
+		if pPosSys.PPosition[b].Board[SquareFrom(file, rank)] == PIECE_P1 {
 			return true
 		}
 	}
@@ -267,9 +267,9 @@ func NifuFirst(pPosSys *PositionSystem, b BoardLayerT, file Square) bool {
 }
 
 // NifuSecond - 後手で二歩になるか筋調べ
-func NifuSecond(pPosSys *PositionSystem, b BoardLayerT, file Square) bool {
+func NifuSecond(pPosSys *PositionSystem, b PosLayerT, file Square) bool {
 	for rank := Square(1); rank < 9; rank += 1 {
-		if pPosSys.Board[b][SquareFrom(file, rank)] == PIECE_P2 {
+		if pPosSys.PPosition[b].Board[SquareFrom(file, rank)] == PIECE_P2 {
 			return true
 		}
 	}
@@ -278,7 +278,7 @@ func NifuSecond(pPosSys *PositionSystem, b BoardLayerT, file Square) bool {
 }
 
 // GenMoveList - 現局面の指し手のリスト。合法手とは限らないし、全ての合法手を含むとも限らないぜ（＾～＾）
-func GenMoveList(pPosSys *PositionSystem, b BoardLayerT) []Move {
+func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 
 	move_list := []Move{}
 
@@ -315,7 +315,7 @@ func GenMoveList(pPosSys *PositionSystem, b BoardLayerT) []Move {
 				if pPosSys.Homo(b, from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
 					control_list := GenControl(pPosSys, b, from)
 
-					piece := pPosSys.Board[b][from]
+					piece := pPosSys.PPosition[b].Board[from]
 					pieceType := What(piece)
 
 					if pieceType == PIECE_TYPE_K {
@@ -357,7 +357,7 @@ func GenMoveList(pPosSys *PositionSystem, b BoardLayerT) []Move {
 
 		// 自分の駒台もスキャンしよ（＾～＾）
 		for hand_index := hand_start; hand_index < hand_end; hand_index += 1 {
-			if pPosSys.Hands[b][hand_index] > 0 {
+			if pPosSys.PPosition[b].Hands[hand_index] > 0 {
 				hand_sq := Square(hand_index) + SQ_HAND_START
 				control_list := GenControl(pPosSys, b, hand_sq)
 
@@ -389,7 +389,7 @@ func GenMoveList(pPosSys *PositionSystem, b BoardLayerT) []Move {
 				if pPosSys.Homo(b, from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
 					control_list := GenControl(pPosSys, b, from)
 
-					piece := pPosSys.Board[b][from]
+					piece := pPosSys.PPosition[b].Board[from]
 					pieceType := What(piece)
 
 					if pieceType == PIECE_TYPE_K {
@@ -412,7 +412,7 @@ func GenMoveList(pPosSys *PositionSystem, b BoardLayerT) []Move {
 
 		// 自分の駒台もスキャンしよ（＾～＾）
 		for hand_index := hand_start; hand_index < hand_end; hand_index += 1 {
-			if pPosSys.Hands[b][hand_index] > 0 {
+			if pPosSys.PPosition[b].Hands[hand_index] > 0 {
 				hand_sq := Square(hand_index) + SQ_HAND_START
 				control_list := GenControl(pPosSys, b, hand_sq)
 
