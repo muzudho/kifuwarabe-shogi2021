@@ -1,6 +1,7 @@
 package take11
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -33,7 +34,7 @@ func search2(pPos *Position, curDepth int) (Move, int16) {
 
 	// 指し手生成
 	// 探索中に削除される指し手も入ってるかも
-	move_list := GenMoveList(pPos)
+	move_list := GenMoveList(pPos, BOARD_LAYER_MAIN)
 	move_length := len(move_list)
 	//fmt.Printf("%d/%d move_length=%d\n", curDepth, depthEnd, move_length)
 
@@ -48,10 +49,23 @@ func search2(pPos *Position, curDepth int) (Move, int16) {
 
 	// 相手の評価値
 	var opponentWorstVal int16 = MAX_VALUE
+	var younger_sibling_move = RESIGN_MOVE
 
 	// その手を指してみるぜ（＾～＾）
-	for _, move := range move_list {
-		pPos.DoMove(move)
+	for i, move := range move_list {
+		// G.Chat.Debug("move=%s\n", move.ToCode())
+
+		// DoMove と UndoMove を繰り返していると、ずれてくる（＾～＾）
+		if pPos.IsEmptySq(BOARD_LAYER_MAIN, move.GetSource()) {
+			// 強制終了した局面（＾～＾）
+			G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
+			// あの駒、どこにいんの（＾～＾）？
+			G.Chat.Debug(pPos.SprintLocation())
+			panic(fmt.Errorf("Move.Source(%d) has empty square. i=%d/%d. younger_sibling_move=%s",
+				move.GetSource(), i, move_length, younger_sibling_move.ToCode()))
+		}
+
+		pPos.DoMove(BOARD_LAYER_MAIN, move)
 		nodesNum += 1
 
 		// 取った駒は棋譜の１手前に記録されています
@@ -61,6 +75,8 @@ func search2(pPos *Position, curDepth int) (Move, int16) {
 		if curDepth < depthEnd {
 			// 再帰
 			_, opponentVal := search2(pPos, curDepth+1)
+			// 再帰直後（＾～＾）
+			G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
 
 			if opponentVal < opponentWorstVal {
 				// より低い価値が見つかったら更新
@@ -86,7 +102,9 @@ func search2(pPos *Position, curDepth int) (Move, int16) {
 			}
 		}
 
-		pPos.UndoMove()
+		pPos.UndoMove(BOARD_LAYER_MAIN)
+
+		younger_sibling_move = move
 	}
 
 	if curDepth < depthEnd {

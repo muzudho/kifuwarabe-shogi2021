@@ -99,7 +99,7 @@ MainLoop:
 		case "usinewgame":
 		case "position":
 			// position うわっ、大変だ（＾～＾）
-			pPos.ReadPosition(command)
+			pPos.ReadPosition(BOARD_LAYER_MAIN, command)
 		case "go":
 			bestmove := Search(pPos)
 			G.Chat.Print("bestmove %s\n", bestmove.ToCode())
@@ -108,21 +108,21 @@ MainLoop:
 		// 以下、きふわらべ独自拡張コマンド
 		case "pos":
 			// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
-			G.Chat.Debug(pPos.Sprint())
+			G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
 		case "do":
 			// １手指すぜ（＾～＾）
 			// 前の空白を読み飛ばしたところから、指し手文字列の終わりまで読み進めるぜ（＾～＾）
 			i := 3
 			var move, err = ParseMove(command, &i, pPos.GetPhase())
 			if err != nil {
-				fmt.Println(pPos.Sprint())
+				fmt.Println(pPos.Sprint(BOARD_LAYER_MAIN))
 				panic(err)
 			}
 
-			pPos.DoMove(move)
+			pPos.DoMove(BOARD_LAYER_MAIN, move)
 		case "undo":
 			// 棋譜を頼りに１手戻すぜ（＾～＾）
-			pPos.UndoMove()
+			pPos.UndoMove(BOARD_LAYER_MAIN)
 		case "control":
 			length := len(tokens)
 			// fmt.Printf("length=%d", length)
@@ -136,7 +136,7 @@ MainLoop:
 				// 利きのテスト
 				// 現局面の利きを覚え、ムーブ、アンドゥを行って
 				// 元の利きに戻るか確認
-				is_error, message := TestControl(pPos)
+				is_error, message := TestControl(pPos, BOARD_LAYER_MAIN)
 				if is_error {
 					G.Chat.Debug("ControlTest: error=%s\n", message)
 					G.Chat.Debug(pPos.SprintControl(FIRST, CONTROL_LAYER_TEST_ERROR))
@@ -146,29 +146,29 @@ MainLoop:
 			} else if length == 5 && tokens[1] == "diff" {
 				// control diff 11 0 12
 				// 利きボード 11番 から 0番を引いた結果を 12番へ入れる。
-				layer1, err := strconv.Atoi(tokens[2])
+				controlLayer1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				layer2, err := strconv.Atoi(tokens[3])
+				controlLayer2, err := strconv.Atoi(tokens[3])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				layer3, err := strconv.Atoi(tokens[4])
+				controlLayer3, err := strconv.Atoi(tokens[4])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
 
-				pPos.DiffControl(layer1, layer2, layer3)
+				pPos.DiffControl(controlLayer1, controlLayer2, controlLayer3)
 				ok = true
 			} else if length == 3 && tokens[1] == "recalc" {
 				// control recalc 12
 				// 利きの再計算
-				layer1, err := strconv.Atoi(tokens[2])
+				controlLayer1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				pPos.RecalculateControl(layer1)
+				pPos.RecalculateControl(BOARD_LAYER_MAIN, controlLayer1)
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 利きテーブルの表示（＾～＾）
@@ -181,14 +181,14 @@ MainLoop:
 					ok = true
 				}
 			} else if length == 3 && tokens[1] == "sumabs" {
-				layer1, err := strconv.Atoi(tokens[2])
+				controlLayer1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
 				// 利きのテスト
 				// 現局面の利きを覚え、ムーブ、アンドゥを行って
 				// 元の利きに戻るか確認
-				sumList := SumAbsControl(pPos, layer1)
+				sumList := SumAbsControl(pPos, controlLayer1)
 				G.Chat.Debug("ControlTest: SumAbs=%d,%d\n", sumList[0], sumList[1])
 				ok = true
 			}
@@ -207,7 +207,7 @@ MainLoop:
 			G.Chat.Debug(pPos.SprintLocation())
 		case "sfen":
 			// SFEN文字列返せよ（＾～＾）
-			G.Chat.Debug(pPos.SprintSfen())
+			G.Chat.Debug(pPos.SprintSfen(BOARD_LAYER_MAIN))
 		case "record":
 			// 棋譜表示。取った駒を表示するためのもの（＾～＾）
 			G.Chat.Debug(pPos.SprintRecord())
@@ -222,7 +222,7 @@ MainLoop:
 			G.Chat.Debug("Playout start\n")
 
 			for i := 0; i < 100; i += 1 {
-				G.Chat.Debug(pPos.Sprint())
+				G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
 				// あの駒、どこにいんの（＾～＾）？
 				// G.Chat.Debug(pPos.SprintLocation())
 
@@ -235,14 +235,14 @@ MainLoop:
 					break
 				}
 
-				pPos.DoMove(bestmove)
+				pPos.DoMove(BOARD_LAYER_MAIN, bestmove)
 			}
 
 			G.Chat.Debug("Playout finished\n")
 		case "shuffle":
-			ShuffleBoard(pPos)
+			ShuffleBoard(pPos, BOARD_LAYER_MAIN)
 		case "count":
-			ShowAllPiecesCount(pPos)
+			ShowAllPiecesCount(pPos, BOARD_LAYER_MAIN)
 		}
 
 		G.Log.FlushAllLogs()
@@ -256,7 +256,7 @@ MainLoop:
 func moveList(pPos *Position) {
 	G.Chat.Debug("MoveList\n")
 	G.Chat.Debug("--------\n")
-	move_list := GenMoveList(pPos)
+	move_list := GenMoveList(pPos, BOARD_LAYER_MAIN)
 	for i, move := range move_list {
 		G.Chat.Debug("(%d) %s\n", i, move.ToCode())
 	}
@@ -264,8 +264,8 @@ func moveList(pPos *Position) {
 }
 
 // ShowAllPiecesCount - 駒の枚数表示
-func ShowAllPiecesCount(pPos *Position) {
-	countList := CountAllPieces(pPos)
+func ShowAllPiecesCount(pPos *Position, boardLayer int) {
+	countList := CountAllPieces(pPos, boardLayer)
 	G.Chat.Debug("Count\n")
 	G.Chat.Debug("-----\n")
 	G.Chat.Debug("King  :%3d\n", countList[0])
