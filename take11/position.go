@@ -17,9 +17,11 @@ const BOARD_SIZE = 100
 type BoardLayerT int
 
 const (
-	BOARD_LAYER_MAIN = BoardLayerT(0)
-	BOARD_LAYER_COPY = BoardLayerT(1) // テスト用
-	BOARD_LAYER_SIZE = 2
+	BOARD_LAYER_MAIN  = BoardLayerT(0)
+	BOARD_LAYER_COPY  = BoardLayerT(1) // テスト用
+	BOARD_LAYER_DIFF1 = BoardLayerT(2) // テスト用
+	BOARD_LAYER_DIFF2 = BoardLayerT(3) // テスト用
+	BOARD_LAYER_SIZE  = 4
 )
 
 // position sfen の盤のスペース数に使われますN
@@ -312,19 +314,31 @@ var HandPieceMap = [14]Piece{
 	PIECE_R1, PIECE_B1, PIECE_G1, PIECE_S1, PIECE_N1, PIECE_L1, PIECE_P1,
 	PIECE_R2, PIECE_B2, PIECE_G2, PIECE_S2, PIECE_N2, PIECE_L2, PIECE_P2}
 
+// Piece location
+const (
+	PCLOC_K1 = iota
+	PCLOC_K2
+	PCLOC_R1
+	PCLOC_R2
+	PCLOC_B1
+	PCLOC_B2
+	PCLOC_L1
+	PCLOC_L2
+	PCLOC_L3
+	PCLOC_L4
+	PCLOC_START = 0
+	PCLOC_END   = 10 //この数を含まない
+	PCLOC_SIZE  = 10
+)
+
 // Position - 局面
 type Position struct {
 	// Go言語で列挙型めんどくさいんで文字列で（＾～＾）
 	// [19] は １九、 [91] は ９一（＾～＾）反時計回りに９０°回転した将棋盤の状態で入ってるぜ（＾～＾）想像しろだぜ（＾～＾）
 	Board [BOARD_LAYER_SIZE][BOARD_SIZE]Piece
-	// [0]先手 [1]後手
-	kingLocations [BOARD_LAYER_SIZE][2]Square
-	// 飛車の場所。長い利きを消すために必要（＾～＾）
-	RookLocations [BOARD_LAYER_SIZE][2]Square
-	// 角の場所。長い利きを消すために必要（＾～＾）
-	BishopLocations [BOARD_LAYER_SIZE][2]Square
-	// 香の場所。長い利きを消すために必要（＾～＾）
-	LanceLocations [BOARD_LAYER_SIZE][4]Square
+	// 駒の場所
+	// [0]先手玉 [1]後手玉 [2:3]飛 [4:5]角 [6:9]香
+	PieceLocations [BOARD_LAYER_SIZE][PCLOC_SIZE]Square
 	// マスへの利き数、または差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
 	// 利きテーブル [0]先手 [1]後手
 	// [0] 利き
@@ -382,21 +396,36 @@ func NewPosition() *Position {
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+	}, {
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+	}, {
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 	}}
 
 	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
-	pPos.kingLocations = [BOARD_LAYER_SIZE][2]Square{
-		{SQUARE_EMPTY, SQUARE_EMPTY},
-		{SQUARE_EMPTY, SQUARE_EMPTY}}
-	pPos.RookLocations = [BOARD_LAYER_SIZE][2]Square{
-		{SQUARE_EMPTY, SQUARE_EMPTY},
-		{SQUARE_EMPTY, SQUARE_EMPTY}}
-	pPos.BishopLocations = [BOARD_LAYER_SIZE][2]Square{
-		{SQUARE_EMPTY, SQUARE_EMPTY},
-		{SQUARE_EMPTY, SQUARE_EMPTY}}
-	pPos.LanceLocations = [BOARD_LAYER_SIZE][4]Square{
-		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY},
-		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}}
+	pPos.PieceLocations = [BOARD_LAYER_SIZE][PCLOC_SIZE]Square{
+		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}}
 
 	pPos.resetPosition()
 	return pPos
@@ -412,8 +441,8 @@ func (pPos *Position) GetPhase() Phase {
 	return pPos.phase
 }
 
-func (pPos *Position) GetKingLocations(b BoardLayerT) (Square, Square) {
-	return pPos.kingLocations[b][0], pPos.kingLocations[b][1]
+func (pPos *Position) GetPieceLocation(b BoardLayerT, index int) Square {
+	return pPos.PieceLocations[b][index]
 }
 
 // ResetToStartpos - 駒を置いていな状態でリセットします
@@ -432,10 +461,12 @@ func (pPos *Position) clearBoard(b BoardLayerT) {
 	}
 
 	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
-	pPos.kingLocations[b] = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
-	pPos.RookLocations[b] = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
-	pPos.BishopLocations[b] = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
-	pPos.LanceLocations[b] = [4]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
+	pPos.PieceLocations[b] = [PCLOC_SIZE]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
+
+	// 持ち駒の数
+	pPos.Hands[b] = []int{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}
 }
 
 // ResetToStartpos - 駒を置いていな状態でリセットします
@@ -761,7 +792,10 @@ func (pPos *Position) resetPosition() {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}, {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}, {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}}
+
 	// 先手の局面
 	pPos.phase = FIRST
 	// 何手目か
@@ -788,10 +822,12 @@ func (pPos *Position) setToStartpos(b BoardLayerT) {
 		PIECE_EMPTY, PIECE_N2, PIECE_R2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_B1, PIECE_N1,
 		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
 	}
-	pPos.kingLocations[b] = [2]Square{59, 51}
-	pPos.RookLocations[b] = [2]Square{28, 82}
-	pPos.BishopLocations[b] = [2]Square{22, 88}
-	pPos.LanceLocations[b] = [4]Square{11, 19, 91, 99}
+	pPos.PieceLocations[b] = [PCLOC_SIZE]Square{59, 51, 28, 82, 22, 88, 11, 19, 91, 99}
+
+	// 持ち駒の数
+	pPos.Hands[b] = []int{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	}
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -815,8 +851,8 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 		pPos.clearBoard(b)
 		pPos.resetPosition()
 		i = 14
-		var rank = 1
-		var file = 9
+		var rank = Square(1)
+		var file = Square(9)
 
 	BoardLoop:
 		for {
@@ -861,27 +897,30 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 			// 玉と、長い利きの駒は位置を覚えておくぜ（＾～＾）
 			switch command[i-1] {
 			case 'K':
-				pPos.kingLocations[b][0] = Square((file+1)*10 + rank)
+				pPos.PieceLocations[b][PCLOC_K1] = Square((file+1)*10 + rank)
 			case 'k':
-				pPos.kingLocations[b][1] = Square((file+1)*10 + rank)
+				pPos.PieceLocations[b][PCLOC_K2] = Square((file+1)*10 + rank)
 			case 'R', 'r': // 成も兼ねてる（＾～＾）
-				for i, sq := range pPos.RookLocations[b] {
+				for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
+					sq := pPos.PieceLocations[b][i]
 					if sq == SQUARE_EMPTY {
-						pPos.RookLocations[b][i] = Square((file+1)*10 + rank)
+						pPos.PieceLocations[b][i] = SquareFrom(file+1, rank)
 						break
 					}
 				}
 			case 'B', 'b':
-				for i, sq := range pPos.BishopLocations[b] {
+				for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+					sq := pPos.PieceLocations[b][i]
 					if sq == SQUARE_EMPTY {
-						pPos.BishopLocations[b][i] = Square((file+1)*10 + rank)
+						pPos.PieceLocations[b][i] = SquareFrom(file+1, rank)
 						break
 					}
 				}
 			case 'L', 'l':
-				for i, sq := range pPos.LanceLocations[b] {
+				for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+					sq := pPos.PieceLocations[b][i]
 					if sq == SQUARE_EMPTY {
-						pPos.LanceLocations[b][i] = Square((file+1)*10 + rank)
+						pPos.PieceLocations[b][i] = SquareFrom(file+1, rank)
 						break
 					}
 				}
@@ -945,23 +984,26 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 						// 長い利きの駒は位置を覚えておくぜ（＾～＾）
 						switch hand_index {
 						case HAND_R1_IDX, HAND_R2_IDX:
-							for i, sq := range pPos.RookLocations[b] {
+							for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
+								sq := pPos.PieceLocations[b][i]
 								if sq == SQUARE_EMPTY { // 空いているところから埋めていくぜ（＾～＾）
-									pPos.RookLocations[b][i] = Square(hand_index) + SQ_HAND_START
+									pPos.PieceLocations[b][i] = Square(hand_index) + SQ_HAND_START
 									break
 								}
 							}
 						case HAND_B1_IDX, HAND_B2_IDX:
-							for i, sq := range pPos.BishopLocations[b] {
-								if sq == SQUARE_EMPTY {
-									pPos.BishopLocations[b][i] = Square(hand_index) + SQ_HAND_START
+							for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+								sq := pPos.PieceLocations[b][i]
+								if sq == SQUARE_EMPTY { // 空いているところから埋めていくぜ（＾～＾）
+									pPos.PieceLocations[b][i] = Square(hand_index) + SQ_HAND_START
 									break
 								}
 							}
 						case HAND_L1_IDX, HAND_L2_IDX:
-							for i, sq := range pPos.LanceLocations[b] {
-								if sq == SQUARE_EMPTY {
-									pPos.LanceLocations[b][i] = Square(hand_index) + SQ_HAND_START
+							for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+								sq := pPos.PieceLocations[b][i]
+								if sq == SQUARE_EMPTY { // 空いているところから埋めていくぜ（＾～＾）
+									pPos.PieceLocations[b][i] = Square(hand_index) + SQ_HAND_START
 									break
 								}
 							}
@@ -1387,28 +1429,31 @@ func (pPos *Position) DoMove(b BoardLayerT, move Move) {
 		case PIECE_TYPE_K:
 			switch prev_phase {
 			case FIRST:
-				pPos.kingLocations[b][0] = dst_sq_list[j]
+				pPos.PieceLocations[b][PCLOC_K1] = dst_sq_list[j]
 			case SECOND:
-				pPos.kingLocations[b][1] = dst_sq_list[j]
+				pPos.PieceLocations[b][PCLOC_K2] = dst_sq_list[j]
 			default:
 				panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
 			}
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
-			for i, sq := range pPos.RookLocations[b] {
+			for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
+				sq := pPos.PieceLocations[b][i]
 				if sq == src_sq_list[j] {
-					pPos.RookLocations[b][i] = dst_sq_list[j]
+					pPos.PieceLocations[b][i] = dst_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_B, PIECE_TYPE_PB:
-			for i, sq := range pPos.BishopLocations[b] {
+			for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+				sq := pPos.PieceLocations[b][i]
 				if sq == src_sq_list[j] {
-					pPos.BishopLocations[b][i] = dst_sq_list[j]
+					pPos.PieceLocations[b][i] = dst_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
-			for i, sq := range pPos.LanceLocations[b] {
+			for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+				sq := pPos.PieceLocations[b][i]
 				if sq == src_sq_list[j] {
-					pPos.LanceLocations[b][i] = dst_sq_list[j]
+					pPos.PieceLocations[b][i] = dst_sq_list[j]
 				}
 			}
 		}
@@ -1560,28 +1605,31 @@ func (pPos *Position) UndoMove(b BoardLayerT) {
 		case PIECE_TYPE_K:
 			switch pPos.phase { // next_phase
 			case FIRST:
-				pPos.kingLocations[b][0] = src_sq_list[j]
+				pPos.PieceLocations[b][PCLOC_K1] = src_sq_list[j]
 			case SECOND:
-				pPos.kingLocations[b][1] = src_sq_list[j]
+				pPos.PieceLocations[b][PCLOC_K2] = src_sq_list[j]
 			default:
 				panic(fmt.Errorf("Unknown pPos.phase=%d", pPos.phase))
 			}
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
-			for i, sq := range pPos.RookLocations[b] {
+			for i := PCLOC_K1; i < PCLOC_K2+1; i += 1 {
+				sq := pPos.PieceLocations[b][i]
 				if sq == dst_sq_list[j] {
-					pPos.RookLocations[b][i] = src_sq_list[j]
+					pPos.PieceLocations[b][i] = src_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_B, PIECE_TYPE_PB:
-			for i, sq := range pPos.BishopLocations[b] {
+			for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+				sq := pPos.PieceLocations[b][i]
 				if sq == dst_sq_list[j] {
-					pPos.BishopLocations[b][i] = src_sq_list[j]
+					pPos.PieceLocations[b][i] = src_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
-			for i, sq := range pPos.LanceLocations[b] {
+			for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+				sq := pPos.PieceLocations[b][i]
 				if sq == dst_sq_list[j] {
-					pPos.LanceLocations[b][i] = src_sq_list[j]
+					pPos.PieceLocations[b][i] = src_sq_list[j]
 				}
 			}
 		}

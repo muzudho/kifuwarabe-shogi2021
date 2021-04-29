@@ -414,7 +414,6 @@ func (pPos *Position) SprintControl(phase Phase, c ControlLayerT) string {
 
 // SprintLocation - あの駒どこにいんの？を表示
 func (pPos *Position) SprintLocation(b BoardLayerT) string {
-	king1, king2 := pPos.GetKingLocations(b)
 	return "\n" +
 		//
 		" K   k      R          B          L\n" +
@@ -422,11 +421,11 @@ func (pPos *Position) SprintLocation(b BoardLayerT) string {
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		// 持ち駒は３桁になるぜ（＾～＾）
 		fmt.Sprintf("|%3d|%3d|  |%3d|%3d|  |%3d|%3d|  |%3d|%3d|%3d|%3d|\n",
-			king1, king2,
-			pPos.RookLocations[b][0], pPos.RookLocations[b][1],
-			pPos.BishopLocations[b][0], pPos.BishopLocations[b][1],
-			pPos.LanceLocations[b][0], pPos.LanceLocations[b][1],
-			pPos.LanceLocations[b][2], pPos.LanceLocations[b][3]) +
+			pPos.PieceLocations[b][PCLOC_K1], pPos.PieceLocations[b][PCLOC_K2],
+			pPos.PieceLocations[b][PCLOC_R1], pPos.PieceLocations[b][PCLOC_R2],
+			pPos.PieceLocations[b][PCLOC_B1], pPos.PieceLocations[b][PCLOC_B2],
+			pPos.PieceLocations[b][PCLOC_L1], pPos.PieceLocations[b][PCLOC_L2],
+			pPos.PieceLocations[b][PCLOC_L3], pPos.PieceLocations[b][PCLOC_L4]) +
 		//
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		//
@@ -628,21 +627,10 @@ func (pPos *Position) Dump() string {
 			buffer.WriteString(fmt.Sprintf("%d,", pPos.Board[i]))
 		}
 		buffer.WriteString("\n")
-
-		king1, king2 := pPos.GetKingLocations(b)
-		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d,\n", b, king1, king2))
-
-		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:", b))
-		for i := 0; i < 2; i += 1 {
-			buffer.WriteString(fmt.Sprintf("%d,", pPos.BishopLocations[i]))
-		}
-		buffer.WriteString("\n")
-
-		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:", b))
-		for i := 0; i < 2; i += 1 {
-			buffer.WriteString(fmt.Sprintf("%d,", pPos.LanceLocations[i]))
-		}
-		buffer.WriteString("\n")
+		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d\n", b, pPos.PieceLocations[b][PCLOC_K1], pPos.PieceLocations[b][PCLOC_K2]))
+		buffer.WriteString(fmt.Sprintf("RookLocations[%d]:%d,%d\n", b, pPos.PieceLocations[b][PCLOC_R1], pPos.PieceLocations[b][PCLOC_R2]))
+		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:%d,%d\n", b, pPos.PieceLocations[b][PCLOC_B1], pPos.PieceLocations[b][PCLOC_B2]))
+		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:%d,%d,%d,%d\n", b, pPos.PieceLocations[b][PCLOC_L1], pPos.PieceLocations[b][PCLOC_L2], pPos.PieceLocations[b][PCLOC_L3], pPos.PieceLocations[b][PCLOC_L4]))
 	}
 
 	for phase := 0; phase < 2; phase += 1 {
