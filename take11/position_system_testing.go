@@ -8,7 +8,7 @@ import (
 )
 
 // TestControl
-func TestControl(pPosSys *PositionSystem, b PosLayerT) (bool, string) {
+func TestControl(pPosSys *PositionSystem, pPos *Position) (bool, string) {
 	pPosSys.ClearControlLayer(CONTROL_LAYER_TEST_COPY)
 	pPosSys.ClearControlLayer(CONTROL_LAYER_TEST_ERROR)
 
@@ -21,15 +21,15 @@ func TestControl(pPosSys *PositionSystem, b PosLayerT) (bool, string) {
 
 	// 指し手生成
 	// 探索中に削除される指し手も入ってるかも
-	move_list := GenMoveList(pPosSys, b)
+	move_list := GenMoveList(pPosSys, pPos)
 	move_total := len(move_list)
 
 	for move_seq, move := range move_list {
 		// その手を指してみるぜ（＾～＾）
-		pPosSys.DoMove(b, move)
+		pPosSys.DoMove(pPos, move)
 
 		// すぐ戻すぜ（＾～＾）
-		pPosSys.UndoMove(b)
+		pPosSys.UndoMove(pPos)
 
 		// 元に戻っていればOK（＾～＾）
 		is_error := checkControl(pPosSys, move_seq, move_total, move)
@@ -81,10 +81,10 @@ func SumAbsControl(pPosSys *PositionSystem, layer1 int) [2]int {
 // ShuffleBoard - 盤上の駒、持ち駒をシャッフルします
 // ゲーム中にはできない動きをするので、利きの計算は無視します。
 // 最後に利きは再計算します
-func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
+func ShuffleBoard(pPosSys *PositionSystem, pPos *Position) {
 
 	// 駒の数を数えます
-	countList1 := CountAllPieces(pPosSys, b)
+	countList1 := CountAllPieces(pPos)
 
 	// 盤と駒台との移動
 	// 適当な回数
@@ -98,7 +98,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 				// 10マスに1マスは駒台へ
 				change := Square(rand.Intn(10))
 				if change == 0 {
-					piece := pPosSys.PPosition[b].Board[sq]
+					piece := pPos.Board[sq]
 					if piece != PIECE_EMPTY {
 						phase := Who(piece)
 						pieceType := What(piece)
@@ -108,25 +108,25 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 						case FIRST:
 							switch pieceType {
 							case PIECE_TYPE_R, PIECE_TYPE_PR:
-								pPosSys.PPosition[b].Hands[HAND_R1_IDX] += 1
+								pPos.Hands[HAND_R1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_B, PIECE_TYPE_PB:
-								pPosSys.PPosition[b].Hands[HAND_B1_IDX] += 1
+								pPos.Hands[HAND_B1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_G:
-								pPosSys.PPosition[b].Hands[HAND_G1_IDX] += 1
+								pPos.Hands[HAND_G1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_S, PIECE_TYPE_PS:
-								pPosSys.PPosition[b].Hands[HAND_S1_IDX] += 1
+								pPos.Hands[HAND_S1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_N, PIECE_TYPE_PN:
-								pPosSys.PPosition[b].Hands[HAND_N1_IDX] += 1
+								pPos.Hands[HAND_N1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_L, PIECE_TYPE_PL:
-								pPosSys.PPosition[b].Hands[HAND_L1_IDX] += 1
+								pPos.Hands[HAND_L1_IDX] += 1
 								ok = true
 							case PIECE_TYPE_P, PIECE_TYPE_PP:
-								pPosSys.PPosition[b].Hands[HAND_P1_IDX] += 1
+								pPos.Hands[HAND_P1_IDX] += 1
 								ok = true
 							default:
 								// Ignored
@@ -134,25 +134,25 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 						case SECOND:
 							switch pieceType {
 							case PIECE_TYPE_R, PIECE_TYPE_PR:
-								pPosSys.PPosition[b].Hands[HAND_R2_IDX] += 1
+								pPos.Hands[HAND_R2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_B, PIECE_TYPE_PB:
-								pPosSys.PPosition[b].Hands[HAND_B2_IDX] += 1
+								pPos.Hands[HAND_B2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_G:
-								pPosSys.PPosition[b].Hands[HAND_G2_IDX] += 1
+								pPos.Hands[HAND_G2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_S, PIECE_TYPE_PS:
-								pPosSys.PPosition[b].Hands[HAND_S2_IDX] += 1
+								pPos.Hands[HAND_S2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_N, PIECE_TYPE_PN:
-								pPosSys.PPosition[b].Hands[HAND_N2_IDX] += 1
+								pPos.Hands[HAND_N2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_L, PIECE_TYPE_PL:
-								pPosSys.PPosition[b].Hands[HAND_L2_IDX] += 1
+								pPos.Hands[HAND_L2_IDX] += 1
 								ok = true
 							case PIECE_TYPE_P, PIECE_TYPE_PP:
-								pPosSys.PPosition[b].Hands[HAND_P2_IDX] += 1
+								pPos.Hands[HAND_P2_IDX] += 1
 								ok = true
 							default:
 								// Ignored
@@ -162,7 +162,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 						}
 
 						if ok {
-							pPosSys.PPosition[b].Board[sq] = PIECE_EMPTY
+							pPos.Board[sq] = PIECE_EMPTY
 						}
 					}
 
@@ -171,7 +171,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 		}
 
 		// 駒の数を数えます
-		countList2 := CountAllPieces(pPosSys, b)
+		countList2 := CountAllPieces(pPos)
 		countError := CountErrorCountLists(countList1, countList2)
 		if countError != 0 {
 			panic(fmt.Errorf("Shuffle: (1) countError=%d", countError))
@@ -179,19 +179,19 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 
 		// 駒台から盤の方向
 		for hand_index := HAND_IDX_START; hand_index < HAND_IDX_END; hand_index += 1 {
-			num := pPosSys.PPosition[b].Hands[hand_index]
+			num := pPos.Hands[hand_index]
 			if num > 0 {
 				sq := Square(rand.Intn(100))
 				// うまく空マスなら移動成功
-				if OnBoard(sq) && pPosSys.PPosition[b].IsEmptySq(sq) {
-					pPosSys.PPosition[b].Board[sq] = HandPieceMap[hand_index]
-					pPosSys.PPosition[b].Hands[hand_index] -= 1
+				if OnBoard(sq) && pPos.IsEmptySq(sq) {
+					pPos.Board[sq] = HandPieceMap[hand_index]
+					pPos.Hands[hand_index] -= 1
 				}
 			}
 		}
 
 		// 駒の数を数えます
-		countList2 = CountAllPieces(pPosSys, b)
+		countList2 = CountAllPieces(pPos)
 		countError = CountErrorCountLists(countList1, countList2)
 		if countError != 0 {
 			panic(fmt.Errorf("Shuffle: (2) countError=%d", countError))
@@ -203,22 +203,22 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 	for i := 0; i < 81*80; i += 1 {
 		sq1 := Square(rand.Intn(100))
 		sq2 := Square(rand.Intn(100))
-		if OnBoard(sq1) && OnBoard(sq2) && !pPosSys.PPosition[b].IsEmptySq(sq1) {
-			piece := pPosSys.PPosition[b].Board[sq1]
+		if OnBoard(sq1) && OnBoard(sq2) && !pPos.IsEmptySq(sq1) {
+			piece := pPos.Board[sq1]
 			// 位置スワップ
-			pPosSys.PPosition[b].Board[sq1] = pPosSys.PPosition[b].Board[sq2]
-			pPosSys.PPosition[b].Board[sq2] = piece
+			pPos.Board[sq1] = pPos.Board[sq2]
+			pPos.Board[sq2] = piece
 
 			// 成／不成 変更
 			promote := Square(rand.Intn(10))
 			if promote == 0 {
-				pPosSys.PPosition[b].Board[sq2] = Promote(pPosSys.PPosition[b].Board[sq2])
+				pPos.Board[sq2] = Promote(pPos.Board[sq2])
 			} else if promote == 1 {
-				pPosSys.PPosition[b].Board[sq2] = Demote(pPosSys.PPosition[b].Board[sq2])
+				pPos.Board[sq2] = Demote(pPos.Board[sq2])
 			}
 
 			// 駒の先後変更（玉除く）
-			piece = pPosSys.PPosition[b].Board[sq2]
+			piece = pPos.Board[sq2]
 			switch What(piece) {
 			case PIECE_TYPE_K, PIECE_TYPE_EMPTY:
 				// Ignored
@@ -231,12 +231,12 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 					phase = FlipPhase(phase)
 				}
 
-				pPosSys.PPosition[b].Board[sq2] = PieceFromPhPt(phase, pieceType)
+				pPos.Board[sq2] = PieceFromPhPt(phase, pieceType)
 			}
 		}
 
 		// 駒の数を数えます
-		countList2 := CountAllPieces(pPosSys, b)
+		countList2 := CountAllPieces(pPos)
 		countError := CountErrorCountLists(countList1, countList2)
 		if countError != 0 {
 			panic(fmt.Errorf("Shuffle: (3) countError=%d", countError))
@@ -256,7 +256,11 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 	pPosSys.OffsetMovesIndex = 0
 
 	// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
-	G.Chat.Debug(pPosSys.Sprint(b))
+	G.Chat.Debug(pPos.Sprint(
+		pPosSys.phase,
+		pPosSys.StartMovesNum,
+		pPosSys.OffsetMovesIndex,
+		pPosSys.createMovesText()))
 
 	if false {
 		var countList [8]int
@@ -269,9 +273,9 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 				for file := Square(9); file > 0; file -= 1 {
 					sq := SquareFrom(file, rank)
 
-					fmt.Printf("%s,", pPosSys.PPosition[b].Board[sq].ToCode())
+					fmt.Printf("%s,", pPos.Board[sq].ToCode())
 
-					piece := What(pPosSys.PPosition[b].Board[sq])
+					piece := What(pPos.Board[sq])
 					switch piece {
 					case PIECE_TYPE_K:
 						countList[0] += 1
@@ -297,15 +301,15 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 			}
 
 			// 駒台
-			countList[1] += pPosSys.PPosition[b].Hands[0] + pPosSys.PPosition[b].Hands[7]
-			countList[2] += pPosSys.PPosition[b].Hands[1] + pPosSys.PPosition[b].Hands[8]
-			countList[3] += pPosSys.PPosition[b].Hands[2] + pPosSys.PPosition[b].Hands[9]
-			countList[4] += pPosSys.PPosition[b].Hands[3] + pPosSys.PPosition[b].Hands[10]
-			countList[5] += pPosSys.PPosition[b].Hands[4] + pPosSys.PPosition[b].Hands[11]
-			countList[6] += pPosSys.PPosition[b].Hands[5] + pPosSys.PPosition[b].Hands[12]
-			countList[7] += pPosSys.PPosition[b].Hands[6] + pPosSys.PPosition[b].Hands[13]
+			countList[1] += pPos.Hands[0] + pPos.Hands[7]
+			countList[2] += pPos.Hands[1] + pPos.Hands[8]
+			countList[3] += pPos.Hands[2] + pPos.Hands[9]
+			countList[4] += pPos.Hands[3] + pPos.Hands[10]
+			countList[5] += pPos.Hands[4] + pPos.Hands[11]
+			countList[6] += pPos.Hands[5] + pPos.Hands[12]
+			countList[7] += pPos.Hands[6] + pPos.Hands[13]
 		} else {
-			countList = CountAllPieces(pPosSys, b)
+			countList = CountAllPieces(pPos)
 		}
 
 		G.Chat.Debug("#Count\n")
@@ -321,24 +325,28 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 		G.Chat.Debug("#----------\n")
 		G.Chat.Debug("#Total :%3d\n", countList[0]+countList[1]+countList[2]+countList[3]+countList[4]+countList[5]+countList[6]+countList[7])
 	} else {
-		ShowAllPiecesCount(pPosSys, b)
+		ShowAllPiecesCount(pPos)
 	}
 
 	// position sfen 文字列を取得
-	command := pPosSys.SprintSfen(b)
+	command := pPosSys.SprintSfen(pPos)
 	G.Chat.Debug("#command=%s", command)
 
 	// 利きの再計算もやってくれる
-	pPosSys.ReadPosition(b, command)
+	pPosSys.ReadPosition(pPos, command)
 
 	// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
-	G.Chat.Debug(pPosSys.Sprint(b))
-	ShowAllPiecesCount(pPosSys, b)
-	command2 := pPosSys.SprintSfen(b)
+	G.Chat.Debug(pPos.Sprint(
+		pPosSys.phase,
+		pPosSys.StartMovesNum,
+		pPosSys.OffsetMovesIndex,
+		pPosSys.createMovesText()))
+	ShowAllPiecesCount(pPos)
+	command2 := pPosSys.SprintSfen(pPos)
 	G.Chat.Debug("#command2=%s", command2)
 
 	// 駒の数を数えます
-	countList2 := CountAllPieces(pPosSys, b)
+	countList2 := CountAllPieces(pPos)
 	countError := CountErrorCountLists(countList1, countList2)
 	if countError != 0 {
 		panic(fmt.Errorf("Shuffle: (4) countError=%d", countError))
@@ -346,7 +354,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 }
 
 // CountAllPieces - 駒の数を確認するぜ（＾～＾）
-func CountAllPieces(pPosSys *PositionSystem, b PosLayerT) [8]int {
+func CountAllPieces(pPos *Position) [8]int {
 
 	countList := [8]int{}
 
@@ -355,7 +363,7 @@ func CountAllPieces(pPosSys *PositionSystem, b PosLayerT) [8]int {
 		for file := Square(9); file > 0; file -= 1 {
 			sq := SquareFrom(file, rank)
 
-			piece := What(pPosSys.PPosition[b].Board[sq])
+			piece := What(pPos.Board[sq])
 			switch piece {
 			case PIECE_TYPE_K:
 				countList[0] += 1
@@ -380,13 +388,13 @@ func CountAllPieces(pPosSys *PositionSystem, b PosLayerT) [8]int {
 	}
 
 	// 駒台
-	countList[1] += pPosSys.PPosition[b].Hands[0] + pPosSys.PPosition[b].Hands[7]
-	countList[2] += pPosSys.PPosition[b].Hands[1] + pPosSys.PPosition[b].Hands[8]
-	countList[3] += pPosSys.PPosition[b].Hands[2] + pPosSys.PPosition[b].Hands[9]
-	countList[4] += pPosSys.PPosition[b].Hands[3] + pPosSys.PPosition[b].Hands[10]
-	countList[5] += pPosSys.PPosition[b].Hands[4] + pPosSys.PPosition[b].Hands[11]
-	countList[6] += pPosSys.PPosition[b].Hands[5] + pPosSys.PPosition[b].Hands[12]
-	countList[7] += pPosSys.PPosition[b].Hands[6] + pPosSys.PPosition[b].Hands[13]
+	countList[1] += pPos.Hands[0] + pPos.Hands[7]
+	countList[2] += pPos.Hands[1] + pPos.Hands[8]
+	countList[3] += pPos.Hands[2] + pPos.Hands[9]
+	countList[4] += pPos.Hands[3] + pPos.Hands[10]
+	countList[5] += pPos.Hands[4] + pPos.Hands[11]
+	countList[6] += pPos.Hands[5] + pPos.Hands[12]
+	countList[7] += pPos.Hands[6] + pPos.Hands[13]
 
 	return countList
 }

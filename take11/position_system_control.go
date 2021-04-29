@@ -60,50 +60,50 @@ func GetControlLayerName(c ControlLayerT) string {
 }
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlRook(b PosLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
+func (pPosSys *PositionSystem) AddControlRook(pPos *Position, c ControlLayerT, sign int8, excludeFrom Square) {
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
-		from := pPosSys.PPosition[b].PieceLocations[i]
+		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
-			!pPosSys.PPosition[b].IsEmptySq(from) && // 飛落ちも考えて 空マスは除外
+			!pPos.IsEmptySq(from) && // 飛落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
-			pPosSys.AddControlDiff(b, c, from, sign)
+			pPosSys.AddControlDiff(pPos, c, from, sign)
 		}
 	}
 }
 
 // AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlBishop(b PosLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
+func (pPosSys *PositionSystem) AddControlBishop(pPos *Position, c ControlLayerT, sign int8, excludeFrom Square) {
 	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
-		from := pPosSys.PPosition[b].PieceLocations[i]
+		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
-			!pPosSys.PPosition[b].IsEmptySq(from) && // 角落ちも考えて 空マスは除外
+			!pPos.IsEmptySq(from) && // 角落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
-			pPosSys.AddControlDiff(b, c, from, sign)
+			pPosSys.AddControlDiff(pPos, c, from, sign)
 		}
 	}
 }
 
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlLance(b PosLayerT, c ControlLayerT, sign int8, excludeFrom Square) {
+func (pPosSys *PositionSystem) AddControlLance(pPos *Position, c ControlLayerT, sign int8, excludeFrom Square) {
 	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
-		from := pPosSys.PPosition[b].PieceLocations[i]
+		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
-			!pPosSys.PPosition[b].IsEmptySq(from) && // 香落ちも考えて 空マスは除外
+			!pPos.IsEmptySq(from) && // 香落ちも考えて 空マスは除外
 			from != excludeFrom && // 除外マスは除外
-			PIECE_TYPE_PL != What(pPosSys.PPosition[b].Board[from]) { // 杏は除外
-			pPosSys.AddControlDiff(b, c, from, sign)
+			PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
+			pPosSys.AddControlDiff(pPos, c, from, sign)
 		}
 	}
 }
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pPosSys *PositionSystem) AddControlDiff(b PosLayerT, c ControlLayerT, from Square, sign int8) {
+func (pPosSys *PositionSystem) AddControlDiff(pPos *Position, c ControlLayerT, from Square, sign int8) {
 	if from > 99 {
 		// 持ち駒は無視します
 		return
 	}
 
-	piece := pPosSys.PPosition[b].Board[from]
+	piece := pPos.Board[from]
 	if piece == PIECE_EMPTY {
 		panic(fmt.Errorf("LogicalError: Piece from empty square. It has no control. from=%d", from))
 	}
@@ -111,7 +111,7 @@ func (pPosSys *PositionSystem) AddControlDiff(b PosLayerT, c ControlLayerT, from
 	ph := int(Who(piece)) - 1
 	// fmt.Printf("Debug: ph=%d\n", ph)
 
-	sq_list := GenControl(pPosSys, b, from)
+	sq_list := GenControl(pPos, from)
 
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: to=%d\n", to)
@@ -151,15 +151,15 @@ func (pPosSys *PositionSystem) MergeControlDiff() {
 }
 
 // RecalculateControl - 利きの再計算
-func (pPosSys *PositionSystem) RecalculateControl(b PosLayerT, c1 ControlLayerT) {
+func (pPosSys *PositionSystem) RecalculateControl(pPos *Position, c1 ControlLayerT) {
 
 	pPosSys.ClearControlLayer(c1)
 
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
-		if File(from) != 0 && Rank(from) != 0 && !pPosSys.PPosition[b].IsEmptySq(from) {
-			piece := pPosSys.PPosition[b].Board[from]
+		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
+			piece := pPos.Board[from]
 			phase := Who(piece)
-			sq_list := GenControl(pPosSys, b, from)
+			sq_list := GenControl(pPos, from)
 
 			for _, to := range sq_list {
 				pPosSys.ControlBoards[phase-1][c1][to] += 1

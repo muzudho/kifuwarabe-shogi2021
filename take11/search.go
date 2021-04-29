@@ -34,7 +34,7 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 
 	// 指し手生成
 	// 探索中に削除される指し手も入ってるかも
-	move_list := GenMoveList(pPosSys, POS_LAYER_MAIN)
+	move_list := GenMoveList(pPosSys, pPosSys.PPosition[POS_LAYER_MAIN])
 	move_length := len(move_list)
 	//fmt.Printf("%d/%d move_length=%d\n", curDepth, depthEnd, move_length)
 
@@ -63,14 +63,18 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 		// DoMove と UndoMove を繰り返していると、ずれてくる（＾～＾）
 		if pPosSys.PPosition[POS_LAYER_MAIN].IsEmptySq(move.GetSource()) {
 			// 強制終了した局面（＾～＾）
-			G.Chat.Debug(pPosSys.Sprint(POS_LAYER_MAIN))
+			G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].Sprint(
+				pPosSys.phase,
+				pPosSys.StartMovesNum,
+				pPosSys.OffsetMovesIndex,
+				pPosSys.createMovesText()))
 			// あの駒、どこにいんの（＾～＾）？
-			G.Chat.Debug(pPosSys.SprintLocation(POS_LAYER_MAIN))
+			G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].SprintLocation())
 			panic(fmt.Errorf("Move.Source(%d) has empty square. i=%d/%d. younger_sibling_move=%s",
 				move.GetSource(), i, move_length, younger_sibling_move.ToCode()))
 		}
 
-		pPosSys.DoMove(POS_LAYER_MAIN, move)
+		pPosSys.DoMove(pPosSys.PPosition[POS_LAYER_MAIN], move)
 		nodesNum += 1
 
 		// 取った駒は棋譜の１手前に記録されています
@@ -107,7 +111,7 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 			}
 		}
 
-		pPosSys.UndoMove(POS_LAYER_MAIN)
+		pPosSys.UndoMove(pPosSys.PPosition[POS_LAYER_MAIN])
 
 		/*
 			// 盤と、コピー盤を比較します

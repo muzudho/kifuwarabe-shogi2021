@@ -5,157 +5,6 @@ import (
 	"fmt"
 )
 
-// Print - 局面出力（＾ｑ＾）
-func (pPosSys *PositionSystem) Sprint(b PosLayerT) string {
-	var phase_str string
-	switch pPosSys.GetPhase() {
-	case FIRST:
-		phase_str = "First"
-	case SECOND:
-		phase_str = "Second"
-	default:
-		phase_str = "?"
-	}
-
-	// 0段目
-	zeroRanks := [10]string{"  9", "  8", "  7", "  6", "  5", "  4", "  3", "  2", "  1", "   "}
-	// 0筋目
-	zeroFiles := [9]string{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " i "}
-
-	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
-	if !pPosSys.PPosition[b].IsEmptySq(90) {
-		zeroRanks[0] = pPosSys.PPosition[b].Board[90].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(80) {
-		zeroRanks[1] = pPosSys.PPosition[b].Board[80].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(70) {
-		zeroRanks[2] = pPosSys.PPosition[b].Board[70].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(60) {
-		zeroRanks[3] = pPosSys.PPosition[b].Board[60].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(50) {
-		zeroRanks[4] = pPosSys.PPosition[b].Board[50].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(40) {
-		zeroRanks[5] = pPosSys.PPosition[b].Board[40].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(30) {
-		zeroRanks[6] = pPosSys.PPosition[b].Board[30].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(20) {
-		zeroRanks[7] = pPosSys.PPosition[b].Board[20].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(10) {
-		zeroRanks[8] = pPosSys.PPosition[b].Board[10].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(0) {
-		zeroRanks[9] = pPosSys.PPosition[b].Board[0].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(1) {
-		zeroFiles[0] = pPosSys.PPosition[b].Board[1].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(2) {
-		zeroFiles[1] = pPosSys.PPosition[b].Board[2].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(3) {
-		zeroFiles[2] = pPosSys.PPosition[b].Board[3].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(4) {
-		zeroFiles[3] = pPosSys.PPosition[b].Board[4].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(5) {
-		zeroFiles[4] = pPosSys.PPosition[b].Board[5].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(6) {
-		zeroFiles[5] = pPosSys.PPosition[b].Board[6].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(7) {
-		zeroFiles[6] = pPosSys.PPosition[b].Board[7].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(8) {
-		zeroFiles[7] = pPosSys.PPosition[b].Board[8].ToCode()
-	}
-	if !pPosSys.PPosition[b].IsEmptySq(9) {
-		zeroFiles[8] = pPosSys.PPosition[b].Board[9].ToCode()
-	}
-
-	var s1 = "\n" +
-		//
-		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPosSys.StartMovesNum, (pPosSys.StartMovesNum+pPosSys.OffsetMovesIndex), phase_str) +
-		//
-		"\n" +
-		//
-		"  r  b  g  s  n  l  p\n" +
-		"+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPosSys.PPosition[b].Hands[7], pPosSys.PPosition[b].Hands[8], pPosSys.PPosition[b].Hands[9], pPosSys.PPosition[b].Hands[10], pPosSys.PPosition[b].Hands[11], pPosSys.PPosition[b].Hands[12], pPosSys.PPosition[b].Hands[13]) +
-		//
-		"+--+--+--+--+--+--+--+\n" +
-		//
-		"\n" +
-		//
-		fmt.Sprintf("%3s%3s%3s%3s%3s%3s%3s%3s%3s%3s\n", zeroRanks[0], zeroRanks[1], zeroRanks[2], zeroRanks[3], zeroRanks[4], zeroRanks[5], zeroRanks[6], zeroRanks[7], zeroRanks[8], zeroRanks[9]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[91].ToCode(), pPosSys.PPosition[b].Board[81].ToCode(), pPosSys.PPosition[b].Board[71].ToCode(), pPosSys.PPosition[b].Board[61].ToCode(), pPosSys.PPosition[b].Board[51].ToCode(), pPosSys.PPosition[b].Board[41].ToCode(), pPosSys.PPosition[b].Board[31].ToCode(), pPosSys.PPosition[b].Board[21].ToCode(), pPosSys.PPosition[b].Board[11].ToCode(), zeroFiles[0]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[92].ToCode(), pPosSys.PPosition[b].Board[82].ToCode(), pPosSys.PPosition[b].Board[72].ToCode(), pPosSys.PPosition[b].Board[62].ToCode(), pPosSys.PPosition[b].Board[52].ToCode(), pPosSys.PPosition[b].Board[42].ToCode(), pPosSys.PPosition[b].Board[32].ToCode(), pPosSys.PPosition[b].Board[22].ToCode(), pPosSys.PPosition[b].Board[12].ToCode(), zeroFiles[1]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[93].ToCode(), pPosSys.PPosition[b].Board[83].ToCode(), pPosSys.PPosition[b].Board[73].ToCode(), pPosSys.PPosition[b].Board[63].ToCode(), pPosSys.PPosition[b].Board[53].ToCode(), pPosSys.PPosition[b].Board[43].ToCode(), pPosSys.PPosition[b].Board[33].ToCode(), pPosSys.PPosition[b].Board[23].ToCode(), pPosSys.PPosition[b].Board[13].ToCode(), zeroFiles[2]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[94].ToCode(), pPosSys.PPosition[b].Board[84].ToCode(), pPosSys.PPosition[b].Board[74].ToCode(), pPosSys.PPosition[b].Board[64].ToCode(), pPosSys.PPosition[b].Board[54].ToCode(), pPosSys.PPosition[b].Board[44].ToCode(), pPosSys.PPosition[b].Board[34].ToCode(), pPosSys.PPosition[b].Board[24].ToCode(), pPosSys.PPosition[b].Board[14].ToCode(), zeroFiles[3]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[95].ToCode(), pPosSys.PPosition[b].Board[85].ToCode(), pPosSys.PPosition[b].Board[75].ToCode(), pPosSys.PPosition[b].Board[65].ToCode(), pPosSys.PPosition[b].Board[55].ToCode(), pPosSys.PPosition[b].Board[45].ToCode(), pPosSys.PPosition[b].Board[35].ToCode(), pPosSys.PPosition[b].Board[25].ToCode(), pPosSys.PPosition[b].Board[15].ToCode(), zeroFiles[4]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[96].ToCode(), pPosSys.PPosition[b].Board[86].ToCode(), pPosSys.PPosition[b].Board[76].ToCode(), pPosSys.PPosition[b].Board[66].ToCode(), pPosSys.PPosition[b].Board[56].ToCode(), pPosSys.PPosition[b].Board[46].ToCode(), pPosSys.PPosition[b].Board[36].ToCode(), pPosSys.PPosition[b].Board[26].ToCode(), pPosSys.PPosition[b].Board[16].ToCode(), zeroFiles[5]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[97].ToCode(), pPosSys.PPosition[b].Board[87].ToCode(), pPosSys.PPosition[b].Board[77].ToCode(), pPosSys.PPosition[b].Board[67].ToCode(), pPosSys.PPosition[b].Board[57].ToCode(), pPosSys.PPosition[b].Board[47].ToCode(), pPosSys.PPosition[b].Board[37].ToCode(), pPosSys.PPosition[b].Board[27].ToCode(), pPosSys.PPosition[b].Board[17].ToCode(), zeroFiles[6]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[98].ToCode(), pPosSys.PPosition[b].Board[88].ToCode(), pPosSys.PPosition[b].Board[78].ToCode(), pPosSys.PPosition[b].Board[68].ToCode(), pPosSys.PPosition[b].Board[58].ToCode(), pPosSys.PPosition[b].Board[48].ToCode(), pPosSys.PPosition[b].Board[38].ToCode(), pPosSys.PPosition[b].Board[28].ToCode(), pPosSys.PPosition[b].Board[18].ToCode(), zeroFiles[7]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.PPosition[b].Board[99].ToCode(), pPosSys.PPosition[b].Board[89].ToCode(), pPosSys.PPosition[b].Board[79].ToCode(), pPosSys.PPosition[b].Board[69].ToCode(), pPosSys.PPosition[b].Board[59].ToCode(), pPosSys.PPosition[b].Board[49].ToCode(), pPosSys.PPosition[b].Board[39].ToCode(), pPosSys.PPosition[b].Board[29].ToCode(), pPosSys.PPosition[b].Board[19].ToCode(), zeroFiles[8]) +
-		//
-		"+--+--+--+--+--+--+--+--+--+\n" +
-		//
-		"\n" +
-		//
-		"        R  B  G  S  N  L  P\n" +
-		"      +--+--+--+--+--+--+--+\n" +
-		//
-		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPosSys.PPosition[b].Hands[0], pPosSys.PPosition[b].Hands[1], pPosSys.PPosition[b].Hands[2], pPosSys.PPosition[b].Hands[3], pPosSys.PPosition[b].Hands[4], pPosSys.PPosition[b].Hands[5], pPosSys.PPosition[b].Hands[6]) +
-		//
-		"      +--+--+--+--+--+--+--+\n" +
-		//
-		"\n" +
-		//
-		"moves"
-
-	moves_text := pPosSys.createMovesText()
-
-	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
-	//return s1 + *(*string)(unsafe.Pointer(&moves_text)) + "\n"
-	return s1 + string(moves_text) + "\n"
-}
-
 // Print - ２局面の比較用画面出力（＾ｑ＾）
 func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	var phase_str string
@@ -412,28 +261,8 @@ func (pPosSys *PositionSystem) SprintControl(phase Phase, c ControlLayerT) strin
 		"\n"
 }
 
-// SprintLocation - あの駒どこにいんの？を表示
-func (pPosSys *PositionSystem) SprintLocation(b PosLayerT) string {
-	return "\n" +
-		//
-		" K   k      R          B          L\n" +
-		//
-		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
-		// 持ち駒は３桁になるぜ（＾～＾）
-		fmt.Sprintf("|%3d|%3d|  |%3d|%3d|  |%3d|%3d|  |%3d|%3d|%3d|%3d|\n",
-			pPosSys.PPosition[b].PieceLocations[PCLOC_K1], pPosSys.PPosition[b].PieceLocations[PCLOC_K2],
-			pPosSys.PPosition[b].PieceLocations[PCLOC_R1], pPosSys.PPosition[b].PieceLocations[PCLOC_R2],
-			pPosSys.PPosition[b].PieceLocations[PCLOC_B1], pPosSys.PPosition[b].PieceLocations[PCLOC_B2],
-			pPosSys.PPosition[b].PieceLocations[PCLOC_L1], pPosSys.PPosition[b].PieceLocations[PCLOC_L2],
-			pPosSys.PPosition[b].PieceLocations[PCLOC_L3], pPosSys.PPosition[b].PieceLocations[PCLOC_L4]) +
-		//
-		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
-		//
-		"\n"
-}
-
 // SprintSfen - SFEN文字列返せよ（＾～＾）
-func (pPosSys *PositionSystem) SprintSfen(b PosLayerT) string {
+func (pPosSys *PositionSystem) SprintSfen(pPos *Position) string {
 	// 9x9=81 + 8slash = 89 文字 なんだが成り駒で増えるし めんどくさ（＾～＾）多めに取っとくか（＾～＾）
 	// 成り駒２文字なんで、byte型だとめんどくさ（＾～＾）
 	buf := make([]byte, 0, 200)
@@ -441,7 +270,7 @@ func (pPosSys *PositionSystem) SprintSfen(b PosLayerT) string {
 	spaces := 0
 	for rank := Square(1); rank < 10; rank += 1 {
 		for file := Square(9); file > 0; file -= 1 {
-			piece := pPosSys.PPosition[b].Board[SquareFrom(file, rank)]
+			piece := pPos.Board[SquareFrom(file, rank)]
 
 			if piece != PIECE_EMPTY {
 				if spaces > 0 {
@@ -490,98 +319,98 @@ func (pPosSys *PositionSystem) SprintSfen(b PosLayerT) string {
 
 	// 持ち駒
 	hands := ""
-	num := pPosSys.PPosition[b].Hands[0]
+	num := pPos.Hands[0]
 	if num == 1 {
 		hands += "R"
 	} else if num > 1 {
 		hands += fmt.Sprintf("R%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[1]
+	num = pPos.Hands[1]
 	if num == 1 {
 		hands += "B"
 	} else if num > 1 {
 		hands += fmt.Sprintf("B%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[2]
+	num = pPos.Hands[2]
 	if num == 1 {
 		hands += "G"
 	} else if num > 1 {
 		hands += fmt.Sprintf("G%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[3]
+	num = pPos.Hands[3]
 	if num == 1 {
 		hands += "S"
 	} else if num > 1 {
 		hands += fmt.Sprintf("S%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[4]
+	num = pPos.Hands[4]
 	if num == 1 {
 		hands += "N"
 	} else if num > 1 {
 		hands += fmt.Sprintf("N%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[5]
+	num = pPos.Hands[5]
 	if num == 1 {
 		hands += "L"
 	} else if num > 1 {
 		hands += fmt.Sprintf("L%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[6]
+	num = pPos.Hands[6]
 	if num == 1 {
 		hands += "P"
 	} else if num > 1 {
 		hands += fmt.Sprintf("P%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[7]
+	num = pPos.Hands[7]
 	if num == 1 {
 		hands += "r"
 	} else if num > 1 {
 		hands += fmt.Sprintf("r%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[8]
+	num = pPos.Hands[8]
 	if num == 1 {
 		hands += "b"
 	} else if num > 1 {
 		hands += fmt.Sprintf("b%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[9]
+	num = pPos.Hands[9]
 	if num == 1 {
 		hands += "g"
 	} else if num > 1 {
 		hands += fmt.Sprintf("g%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[10]
+	num = pPos.Hands[10]
 	if num == 1 {
 		hands += "s"
 	} else if num > 1 {
 		hands += fmt.Sprintf("s%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[11]
+	num = pPos.Hands[11]
 	if num == 1 {
 		hands += "n"
 	} else if num > 1 {
 		hands += fmt.Sprintf("n%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[12]
+	num = pPos.Hands[12]
 	if num == 1 {
 		hands += "l"
 	} else if num > 1 {
 		hands += fmt.Sprintf("l%d", num)
 	}
 
-	num = pPosSys.PPosition[b].Hands[13]
+	num = pPos.Hands[13]
 	if num == 1 {
 		hands += "p"
 	} else if num > 1 {
@@ -622,15 +451,16 @@ func (pPosSys *PositionSystem) Dump() string {
 	var buffer bytes.Buffer
 
 	for b := PosLayerT(0); b < 2; b += 1 {
+		pPos := pPosSys.PPosition[b]
 		buffer.WriteString(fmt.Sprintf("Board[%d]:", b))
 		for i := 0; i < BOARD_SIZE; i += 1 {
 			buffer.WriteString(fmt.Sprintf("%d,", pPosSys.PPosition[i].Board))
 		}
 		buffer.WriteString("\n")
-		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d\n", b, pPosSys.PPosition[b].PieceLocations[PCLOC_K1], pPosSys.PPosition[b].PieceLocations[PCLOC_K2]))
-		buffer.WriteString(fmt.Sprintf("RookLocations[%d]:%d,%d\n", b, pPosSys.PPosition[b].PieceLocations[PCLOC_R1], pPosSys.PPosition[b].PieceLocations[PCLOC_R2]))
-		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:%d,%d\n", b, pPosSys.PPosition[b].PieceLocations[PCLOC_B1], pPosSys.PPosition[b].PieceLocations[PCLOC_B2]))
-		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:%d,%d,%d,%d\n", b, pPosSys.PPosition[b].PieceLocations[PCLOC_L1], pPosSys.PPosition[b].PieceLocations[PCLOC_L2], pPosSys.PPosition[b].PieceLocations[PCLOC_L3], pPosSys.PPosition[b].PieceLocations[PCLOC_L4]))
+		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d\n", b, pPos.PieceLocations[PCLOC_K1], pPos.PieceLocations[PCLOC_K2]))
+		buffer.WriteString(fmt.Sprintf("RookLocations[%d]:%d,%d\n", b, pPos.PieceLocations[PCLOC_R1], pPos.PieceLocations[PCLOC_R2]))
+		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:%d,%d\n", b, pPos.PieceLocations[PCLOC_B1], pPos.PieceLocations[PCLOC_B2]))
+		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:%d,%d,%d,%d\n", b, pPos.PieceLocations[PCLOC_L1], pPos.PieceLocations[PCLOC_L2], pPos.PieceLocations[PCLOC_L3], pPos.PieceLocations[PCLOC_L4]))
 	}
 
 	for phase := 0; phase < 2; phase += 1 {

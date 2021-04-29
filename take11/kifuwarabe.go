@@ -99,7 +99,7 @@ MainLoop:
 		case "usinewgame":
 		case "position":
 			// position うわっ、大変だ（＾～＾）
-			pPosSys.ReadPosition(POS_LAYER_MAIN, command)
+			pPosSys.ReadPosition(pPosSys.PPosition[POS_LAYER_MAIN], command)
 		case "go":
 			bestmove := Search(pPosSys)
 			G.Chat.Print("bestmove %s\n", bestmove.ToCode())
@@ -111,7 +111,12 @@ MainLoop:
 			ok := false
 			if length == 1 {
 				// 局面表示しないと、データが合ってんのか分からないからな（＾～＾）
-				G.Chat.Debug(pPosSys.Sprint(POS_LAYER_MAIN))
+				G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].Sprint(
+					pPosSys.phase,
+					pPosSys.StartMovesNum,
+					pPosSys.OffsetMovesIndex,
+					pPosSys.createMovesText()))
+				ok = true
 				ok = true
 			} else if length == 2 {
 				// 盤番号
@@ -119,7 +124,11 @@ MainLoop:
 				if err != nil {
 					G.Chat.Debug("Error: %s", err)
 				} else {
-					G.Chat.Debug(pPosSys.Sprint(PosLayerT(b1)))
+					G.Chat.Debug(pPosSys.PPosition[b1].Sprint(
+						pPosSys.phase,
+						pPosSys.StartMovesNum,
+						pPosSys.OffsetMovesIndex,
+						pPosSys.createMovesText()))
 					ok = true
 				}
 			}
@@ -136,14 +145,18 @@ MainLoop:
 			i := 3
 			var move, err = ParseMove(command, &i, pPosSys.GetPhase())
 			if err != nil {
-				fmt.Println(pPosSys.Sprint(POS_LAYER_MAIN))
+				G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].Sprint(
+					pPosSys.phase,
+					pPosSys.StartMovesNum,
+					pPosSys.OffsetMovesIndex,
+					pPosSys.createMovesText()))
 				panic(err)
 			}
 
-			pPosSys.DoMove(POS_LAYER_MAIN, move)
+			pPosSys.DoMove(pPosSys.PPosition[POS_LAYER_MAIN], move)
 		case "undo":
 			// 棋譜を頼りに１手戻すぜ（＾～＾）
-			pPosSys.UndoMove(POS_LAYER_MAIN)
+			pPosSys.UndoMove(pPosSys.PPosition[POS_LAYER_MAIN])
 		case "control":
 			length := len(tokens)
 			// fmt.Printf("length=%d", length)
@@ -157,7 +170,7 @@ MainLoop:
 				// 利きのテスト
 				// 現局面の利きを覚え、ムーブ、アンドゥを行って
 				// 元の利きに戻るか確認
-				is_error, message := TestControl(pPosSys, POS_LAYER_MAIN)
+				is_error, message := TestControl(pPosSys, pPosSys.PPosition[POS_LAYER_MAIN])
 				if is_error {
 					G.Chat.Debug("ControlTest: error=%s\n", message)
 					G.Chat.Debug(pPosSys.SprintControl(FIRST, CONTROL_LAYER_TEST_ERROR))
@@ -189,7 +202,7 @@ MainLoop:
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				pPosSys.RecalculateControl(POS_LAYER_MAIN, ControlLayerT(c1))
+				pPosSys.RecalculateControl(pPosSys.PPosition[POS_LAYER_MAIN], ControlLayerT(c1))
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 利きテーブルの表示（＾～＾）
@@ -234,7 +247,7 @@ MainLoop:
 				}
 
 				// あの駒、どこにいんの（＾～＾）？
-				G.Chat.Debug(pPosSys.SprintLocation(PosLayerT(b1)))
+				G.Chat.Debug(pPosSys.PPosition[PosLayerT(b1)].SprintLocation())
 				ok = true
 			}
 
@@ -245,7 +258,7 @@ MainLoop:
 			}
 		case "sfen":
 			// SFEN文字列返せよ（＾～＾）
-			G.Chat.Debug(pPosSys.SprintSfen(POS_LAYER_MAIN))
+			G.Chat.Debug(pPosSys.SprintSfen(pPosSys.PPosition[POS_LAYER_MAIN]))
 		case "record":
 			// 棋譜表示。取った駒を表示するためのもの（＾～＾）
 			G.Chat.Debug(pPosSys.SprintRecord())
@@ -260,7 +273,11 @@ MainLoop:
 			G.Chat.Debug("Playout start\n")
 
 			for i := 0; i < 100; i += 1 {
-				G.Chat.Debug(pPosSys.Sprint(POS_LAYER_MAIN))
+				G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].Sprint(
+					pPosSys.phase,
+					pPosSys.StartMovesNum,
+					pPosSys.OffsetMovesIndex,
+					pPosSys.createMovesText()))
 				// あの駒、どこにいんの（＾～＾）？
 				// G.Chat.Debug(pPosSys.SprintLocation())
 
@@ -273,14 +290,14 @@ MainLoop:
 					break
 				}
 
-				pPosSys.DoMove(POS_LAYER_MAIN, bestmove)
+				pPosSys.DoMove(pPosSys.PPosition[POS_LAYER_MAIN], bestmove)
 			}
 
 			G.Chat.Debug("Playout finished\n")
 		case "shuffle":
-			ShuffleBoard(pPosSys, POS_LAYER_MAIN)
+			ShuffleBoard(pPosSys, pPosSys.PPosition[POS_LAYER_MAIN])
 		case "count":
-			ShowAllPiecesCount(pPosSys, POS_LAYER_MAIN)
+			ShowAllPiecesCount(pPosSys.PPosition[POS_LAYER_MAIN])
 		case "board":
 			length := len(tokens)
 			ok := false
@@ -392,7 +409,7 @@ MainLoop:
 func moveList(pPosSys *PositionSystem) {
 	G.Chat.Debug("MoveList\n")
 	G.Chat.Debug("--------\n")
-	move_list := GenMoveList(pPosSys, POS_LAYER_MAIN)
+	move_list := GenMoveList(pPosSys, pPosSys.PPosition[POS_LAYER_MAIN])
 	for i, move := range move_list {
 		G.Chat.Debug("(%d) %s\n", i, move.ToCode())
 	}
@@ -400,8 +417,8 @@ func moveList(pPosSys *PositionSystem) {
 }
 
 // ShowAllPiecesCount - 駒の枚数表示
-func ShowAllPiecesCount(pPosSys *PositionSystem, b PosLayerT) {
-	countList := CountAllPieces(pPosSys, b)
+func ShowAllPiecesCount(pPos *Position) {
+	countList := CountAllPieces(pPos)
 	G.Chat.Debug("Count\n")
 	G.Chat.Debug("-----\n")
 	G.Chat.Debug("King  :%3d\n", countList[0])
