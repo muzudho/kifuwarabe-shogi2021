@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/muzudho/kifuwarabe-shogi2021/take10"
+	"github.com/muzudho/kifuwarabe-shogi2021/take11"
 )
 
 // main - 最初に実行されます
@@ -23,5 +23,6 @@ func main() {
 	// take7.MainLoop()
 	// take8.MainLoop()
 	// take9.MainLoop()
-	take10.MainLoop()
+	// take10.MainLoop()
+	take11.MainLoop()
 }
