@@ -81,7 +81,7 @@ func MainLoop() {
 
 	G.Log.FlushAllLogs()
 
-	var pPosSys = NewPosition()
+	var pPosSys = NewPositionSystem()
 
 MainLoop:
 	for scanner.Scan() {
@@ -316,7 +316,7 @@ MainLoop:
 				copyBoard(pPosSys.PPosition[b1], pPosSys.PPosition[b2])
 				ok = true
 			} else if length == 2 && tokens[1] == "diff" {
-				diffBoard(pPosSys, PosLayerT(0), PosLayerT(1), PosLayerT(2), PosLayerT(3))
+				diffBoard(pPosSys.PPosition[0], pPosSys.PPosition[1], pPosSys.PPosition[2], pPosSys.PPosition[3])
 				ok = true
 			}
 
@@ -376,7 +376,7 @@ MainLoop:
 					G.Chat.Debug("Error: %s", err)
 				}
 
-				errorNum := errorBoard(pPosSys, PosLayerT(b0), PosLayerT(b1), PosLayerT(b2), PosLayerT(b3))
+				errorNum := errorBoard(pPosSys.PPosition[b0], pPosSys.PPosition[b1], pPosSys.PPosition[b2], pPosSys.PPosition[b3])
 				if errorNum == 0 {
 					G.Chat.Debug("ok\n")
 				} else {

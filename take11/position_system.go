@@ -366,10 +366,10 @@ type PositionSystem struct {
 	CapturedList [MOVES_SIZE]Piece
 }
 
-func NewPosition() *PositionSystem {
+func NewPositionSystem() *PositionSystem {
 	var pPosSys = new(PositionSystem)
 
-	pPosSys.PPosition = [POS_LAYER_SIZE]*Position{NewPosition1(), NewPosition1(), NewPosition1(), NewPosition1()}
+	pPosSys.PPosition = [POS_LAYER_SIZE]*Position{NewPosition(), NewPosition(), NewPosition(), NewPosition()}
 
 	pPosSys.resetPosition()
 	return pPosSys

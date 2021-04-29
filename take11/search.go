@@ -56,7 +56,8 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 		// G.Chat.Debug("move=%s\n", move.ToCode())
 
 		// 盤をコピーしておきます
-		copyBoard(pPosSys.PPosition[0], pPosSys.PPosition[1])
+		pPosCopy := NewPosition()
+		copyBoard(pPosSys.PPosition[0], pPosCopy)
 
 		// DoMove と UndoMove を繰り返していると、ずれてくる（＾～＾）
 		if pPosSys.PPosition[POS_LAYER_MAIN].IsEmptySq(move.GetSource()) {
@@ -111,20 +112,18 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 
 		pPosSys.UndoMove(pPosSys.PPosition[POS_LAYER_MAIN])
 
-		/*
-			// 盤と、コピー盤を比較します
-			diffBoard(pPosSys, 0, 1, 2, 3)
-			// 異なる箇所を数えます
-			errorNum := errorBoard(pPosSys, 0, 1, 2, 3)
-			if errorNum != 0 {
-				// 違いのあった局面（＾～＾）
-				G.Chat.Debug(pPosSys.SprintDiff(0, 1))
-				// あの駒、どこにいんの（＾～＾）？
-				G.Chat.Debug(pPosSys.SprintLocation(0))
-				G.Chat.Debug(pPosSys.SprintLocation(1))
-				panic(fmt.Errorf("Error: count=%d younger_sibling_move=%s move=%s", errorNum, younger_sibling_move.ToCode(), move.ToCode()))
-			}
-		*/
+		// 盤と、コピー盤を比較します
+		diffBoard(pPosSys.PPosition[0], pPosCopy, pPosSys.PPosition[2], pPosSys.PPosition[3])
+		// 異なる箇所を数えます
+		errorNum := errorBoard(pPosSys.PPosition[0], pPosCopy, pPosSys.PPosition[2], pPosSys.PPosition[3])
+		if errorNum != 0 {
+			// 違いのあった局面（＾～＾）
+			G.Chat.Debug(pPosSys.SprintDiff(0, 1))
+			// あの駒、どこにいんの（＾～＾）？
+			G.Chat.Debug(pPosSys.PPosition[0].SprintLocation())
+			G.Chat.Debug(pPosCopy.SprintLocation())
+			panic(fmt.Errorf("Error: count=%d younger_sibling_move=%s move=%s", errorNum, younger_sibling_move.ToCode(), move.ToCode()))
+		}
 
 		younger_sibling_move = move
 	}

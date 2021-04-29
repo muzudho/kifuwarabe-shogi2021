@@ -421,71 +421,71 @@ func copyBoard(pPos0 *Position, pPos1 *Position) {
 }
 
 // copyBoard - 盤[0] を 盤[1] で異なるマスを 盤[2] 盤[3] にセットします
-func diffBoard(pPosSys *PositionSystem, b0 PosLayerT, b1 PosLayerT, b2 PosLayerT, b3 PosLayerT) {
+func diffBoard(pPos0 *Position, pPos1 *Position, pPos2 *Position, pPos3 *Position) {
 	// 盤上
 	for sq := 0; sq < 100; sq += 1 {
-		if pPosSys.PPosition[b1].Board[sq] == pPosSys.PPosition[b0].Board[sq] {
+		if pPos1.Board[sq] == pPos0.Board[sq] {
 			// 等しければ空マス
-			pPosSys.PPosition[b2].Board[sq] = PIECE_EMPTY
-			pPosSys.PPosition[b3].Board[sq] = PIECE_EMPTY
+			pPos2.Board[sq] = PIECE_EMPTY
+			pPos3.Board[sq] = PIECE_EMPTY
 
 		} else {
 			// 異なったら
-			pPosSys.PPosition[b2].Board[sq] = pPosSys.PPosition[b0].Board[sq]
-			pPosSys.PPosition[b3].Board[sq] = pPosSys.PPosition[b1].Board[sq]
+			pPos2.Board[sq] = pPos0.Board[sq]
+			pPos3.Board[sq] = pPos1.Board[sq]
 		}
 	}
 
 	// 駒台
 	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPosSys.PPosition[b0].Hands[i] == pPosSys.PPosition[b1].Hands[i] {
+		if pPos0.Hands[i] == pPos1.Hands[i] {
 			// 等しければゼロ
-			pPosSys.PPosition[b2].Hands[i] = 0
-			pPosSys.PPosition[b3].Hands[i] = 0
+			pPos2.Hands[i] = 0
+			pPos3.Hands[i] = 0
 		} else {
 			// 異なればその数
-			pPosSys.PPosition[b2].Hands[i] = pPosSys.PPosition[b0].Hands[i]
-			pPosSys.PPosition[b3].Hands[i] = pPosSys.PPosition[b1].Hands[i]
+			pPos2.Hands[i] = pPos0.Hands[i]
+			pPos3.Hands[i] = pPos1.Hands[i]
 		}
 	}
 
 	// 位置
 	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		if pPosSys.PPosition[b0].PieceLocations[i] == pPosSys.PPosition[b1].PieceLocations[i] {
+		if pPos0.PieceLocations[i] == pPos1.PieceLocations[i] {
 			// 等しければゼロ
-			pPosSys.PPosition[b2].PieceLocations[i] = 0
-			pPosSys.PPosition[b3].PieceLocations[i] = 0
+			pPos2.PieceLocations[i] = 0
+			pPos3.PieceLocations[i] = 0
 		} else {
 			// 異なればその数
-			pPosSys.PPosition[b2].PieceLocations[i] = pPosSys.PPosition[b0].PieceLocations[i]
-			pPosSys.PPosition[b3].PieceLocations[i] = pPosSys.PPosition[b1].PieceLocations[i]
+			pPos2.PieceLocations[i] = pPos0.PieceLocations[i]
+			pPos3.PieceLocations[i] = pPos1.PieceLocations[i]
 		}
 	}
 }
 
 // ２つのボードの違いを数えるぜ（＾～＾）
-func errorBoard(pPosSys *PositionSystem, b0 PosLayerT, b1 PosLayerT, b2 PosLayerT, b3 PosLayerT) int {
-	diffBoard(pPosSys, b0, b1, b2, b3)
+func errorBoard(pPos0 *Position, pPos1 *Position, pPos2 *Position, pPos3 *Position) int {
+	diffBoard(pPos0, pPos1, pPos2, pPos3)
 
 	errorNum := 0
 
 	// 盤上
 	for sq := 0; sq < 100; sq += 1 {
-		if pPosSys.PPosition[b2].Board[sq] != pPosSys.PPosition[b3].Board[sq] {
+		if pPos2.Board[sq] != pPos3.Board[sq] {
 			errorNum += 1
 		}
 	}
 
 	// 駒台
 	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPosSys.PPosition[b2].Hands[i] != pPosSys.PPosition[b3].Hands[i] {
+		if pPos2.Hands[i] != pPos3.Hands[i] {
 			errorNum += 1
 		}
 	}
 
 	// 位置
 	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		if pPosSys.PPosition[b2].PieceLocations[i] != pPosSys.PPosition[b3].PieceLocations[i] {
+		if pPos2.PieceLocations[i] != pPos3.PieceLocations[i] {
 			errorNum += 1
 		}
 	}

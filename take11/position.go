@@ -13,7 +13,7 @@ type Position struct {
 	Hands [14]int
 }
 
-func NewPosition1() *Position {
+func NewPosition() *Position {
 	var pPos = new(Position)
 
 	pPos.Board = [BOARD_SIZE]Piece{
