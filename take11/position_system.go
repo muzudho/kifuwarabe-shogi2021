@@ -1487,7 +1487,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 取った駒
 	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
-	// fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
+	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
 
 	// 取った駒に関係するのは行き先だけ（＾～＾）
 	mov_dst_sq := move.GetDestination()
@@ -1548,6 +1548,8 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 		default:
 			fmt.Printf("Error: Unknown captured=[%d]", captured)
 		}
+
+		fmt.Printf("Debug: hand_sq=%d\n", hand_sq)
 
 		if hand_sq != SQUARE_EMPTY {
 			pPos.Hands[hand_sq-SQ_HAND_START] -= 1

@@ -55,6 +55,8 @@ location 0
 
 ## Test3
 
+break文抜け修正（＾～＾）
+
 ```shell
 position startpos moves 7g7f 3c3d
 pos
@@ -64,4 +66,42 @@ pos
 location 0
 undo
 location 0
+```
+
+## Test4
+
+```shell
+# position startpos moves 1g1f 4a3b 1f1e 6a5b 2g2f 2c2d 3g3f 5a4b 3f3e 4c4d 4g4f 5b4c 5g5f 7c7d 5f5e 7d7e 6g6f 9c9d 6f6e 9d9e 8g8f 8c8d 2h4h 5c5d 1e1d 1c1d
+position startpos moves 1g1f 4a3b 1f1e 6a5b 2g2f 2c2d 3g3f 5a4b 3f3e 4c4d 4g4f 5b4c 5g5f 7c7d 5f5e 7d7e 6g6f 9c9d 6f6e 9d9e 8g8f 8c8d 2h4h 5c5d 1e1d 1c1d 1i1d
+
+pos
+
+location 0
+
+do 1a1d
+
+pos
+
+location 0
+
+# 強制終了（＾～＾）
+# go
+
+undo
+# pawnが減ってない？
+pos
+location 0
+
+# 後手香車で、先手香車を取ると不具合（＾～＾）？
+# 探索をやっていると、位置が変わることがあるようだ（＾～＾）？
+#
+#  K   k      R          B          L
+# +---+---+  +---+---+  +---+---+  +---+---+---+---+
+# | 59| 42|  | 48| 82|  | 22| 88|  | 14| 11| 91| 99|
+# +---+---+  +---+---+  +---+---+  +---+---+---+---+
+#
+#  K   k      R          B          L
+# +---+---+  +---+---+  +---+---+  +---+---+---+---+
+# | 59| 42|  | 48| 82|  | 22| 88|  | 11| 14| 91| 99|
+# +---+---+  +---+---+  +---+---+  +---+---+---+---+
 ```
