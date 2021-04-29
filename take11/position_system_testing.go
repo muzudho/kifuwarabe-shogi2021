@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sort"
 )
 
 // TestControl
@@ -484,8 +485,54 @@ func errorBoard(pPos0 *Position, pPos1 *Position, pPos2 *Position, pPos3 *Positi
 	}
 
 	// 位置
-	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		if pPos2.PieceLocations[i] != pPos3.PieceLocations[i] {
+	if pPos2.PieceLocations[PCLOC_K1] != pPos3.PieceLocations[PCLOC_K1] {
+		errorNum += 1
+	}
+	if pPos2.PieceLocations[PCLOC_K2] != pPos3.PieceLocations[PCLOC_K2] {
+		errorNum += 1
+	}
+
+	// 位置（不安定注意）
+	rook2 := []int{}
+	rook3 := []int{}
+	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
+		rook2 = append(rook2, int(pPos2.PieceLocations[i]))
+		rook3 = append(rook3, int(pPos2.PieceLocations[i]))
+	}
+	sort.Ints(rook2)
+	sort.Ints(rook3)
+	for i := 0; i < len(rook2); i += 1 {
+		if rook2[i] != rook3[i] {
+			errorNum += 1
+		}
+	}
+
+	// 位置（不安定注意）
+	bishop2 := []int{}
+	bishop3 := []int{}
+	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+		bishop2 = append(bishop2, int(pPos2.PieceLocations[i]))
+		bishop3 = append(bishop3, int(pPos2.PieceLocations[i]))
+	}
+	sort.Ints(bishop2)
+	sort.Ints(bishop3)
+	for i := 0; i < len(bishop2); i += 1 {
+		if bishop2[i] != bishop3[i] {
+			errorNum += 1
+		}
+	}
+
+	// 位置（不安定注意）
+	lance2 := []int{}
+	lance3 := []int{}
+	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+		lance2 = append(lance2, int(pPos2.PieceLocations[i]))
+		lance3 = append(lance3, int(pPos2.PieceLocations[i]))
+	}
+	sort.Ints(lance2)
+	sort.Ints(lance3)
+	for i := 0; i < len(lance2); i += 1 {
+		if lance2[i] != lance3[i] {
 			errorNum += 1
 		}
 	}
