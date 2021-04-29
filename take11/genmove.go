@@ -290,10 +290,10 @@ func GenMoveList(pPos *Position, b BoardLayerT) []Move {
 	var hand_end int
 	// var opponentKingSq Square
 	if friend == FIRST {
-		friendKingSq, _ = pPos.GetKingLocations()
+		friendKingSq, _ = pPos.GetKingLocations(b)
 		hand_start = HAND_IDX_START
 	} else if friend == SECOND {
-		_, friendKingSq = pPos.GetKingLocations()
+		_, friendKingSq = pPos.GetKingLocations(b)
 		hand_start = HAND_IDX_START + HAND_TYPE_SIZE
 	} else {
 		panic(fmt.Errorf("Unknown phase=%d", friend))

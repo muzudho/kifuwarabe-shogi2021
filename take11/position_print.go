@@ -413,8 +413,8 @@ func (pPos *Position) SprintControl(phase Phase, c ControlLayerT) string {
 }
 
 // SprintLocation - あの駒どこにいんの？を表示
-func (pPos *Position) SprintLocation() string {
-	king1, king2 := pPos.GetKingLocations()
+func (pPos *Position) SprintLocation(b BoardLayerT) string {
+	king1, king2 := pPos.GetKingLocations(b)
 	return "\n" +
 		//
 		" K   k      R          B          L\n" +
@@ -423,10 +423,10 @@ func (pPos *Position) SprintLocation() string {
 		// 持ち駒は３桁になるぜ（＾～＾）
 		fmt.Sprintf("|%3d|%3d|  |%3d|%3d|  |%3d|%3d|  |%3d|%3d|%3d|%3d|\n",
 			king1, king2,
-			pPos.RookLocations[0], pPos.RookLocations[1],
-			pPos.BishopLocations[0], pPos.BishopLocations[1],
-			pPos.LanceLocations[0], pPos.LanceLocations[1],
-			pPos.LanceLocations[2], pPos.LanceLocations[3]) +
+			pPos.RookLocations[b][0], pPos.RookLocations[b][1],
+			pPos.BishopLocations[b][0], pPos.BishopLocations[b][1],
+			pPos.LanceLocations[b][0], pPos.LanceLocations[b][1],
+			pPos.LanceLocations[b][2], pPos.LanceLocations[b][3]) +
 		//
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		//
@@ -622,26 +622,28 @@ func (pPos *Position) Dump() string {
 	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
 	var buffer bytes.Buffer
 
-	buffer.WriteString("Board:")
-	for i := 0; i < BOARD_SIZE; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.Board[i]))
-	}
-	buffer.WriteString("\n")
+	for b := BoardLayerT(0); b < 2; b += 1 {
+		buffer.WriteString(fmt.Sprintf("Board[%d]:", b))
+		for i := 0; i < BOARD_SIZE; i += 1 {
+			buffer.WriteString(fmt.Sprintf("%d,", pPos.Board[i]))
+		}
+		buffer.WriteString("\n")
 
-	king1, king2 := pPos.GetKingLocations()
-	buffer.WriteString(fmt.Sprintf("KingLocations:%d,%d,\n", king1, king2))
+		king1, king2 := pPos.GetKingLocations(b)
+		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d,\n", b, king1, king2))
 
-	buffer.WriteString("BishopLocations:")
-	for i := 0; i < 2; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.BishopLocations[i]))
-	}
-	buffer.WriteString("\n")
+		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:", b))
+		for i := 0; i < 2; i += 1 {
+			buffer.WriteString(fmt.Sprintf("%d,", pPos.BishopLocations[i]))
+		}
+		buffer.WriteString("\n")
 
-	buffer.WriteString("LanceLocations:")
-	for i := 0; i < 2; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.LanceLocations[i]))
+		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:", b))
+		for i := 0; i < 2; i += 1 {
+			buffer.WriteString(fmt.Sprintf("%d,", pPos.LanceLocations[i]))
+		}
+		buffer.WriteString("\n")
 	}
-	buffer.WriteString("\n")
 
 	for phase := 0; phase < 2; phase += 1 {
 		// 利きボード

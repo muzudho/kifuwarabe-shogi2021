@@ -63,6 +63,9 @@ const (
 	SECOND = Phase(2)
 )
 
+// [0], [1]
+const PHASE_ARRAY_SIZE = 2
+
 // 先後付きの駒
 type Piece uint8
 
@@ -315,13 +318,13 @@ type Position struct {
 	// [19] は １九、 [91] は ９一（＾～＾）反時計回りに９０°回転した将棋盤の状態で入ってるぜ（＾～＾）想像しろだぜ（＾～＾）
 	Board [BOARD_LAYER_SIZE][BOARD_SIZE]Piece
 	// [0]先手 [1]後手
-	kingLocations [2]Square
+	kingLocations [BOARD_LAYER_SIZE][2]Square
 	// 飛車の場所。長い利きを消すために必要（＾～＾）
-	RookLocations [2]Square
+	RookLocations [BOARD_LAYER_SIZE][2]Square
 	// 角の場所。長い利きを消すために必要（＾～＾）
-	BishopLocations [2]Square
+	BishopLocations [BOARD_LAYER_SIZE][2]Square
 	// 香の場所。長い利きを消すために必要（＾～＾）
-	LanceLocations [4]Square
+	LanceLocations [BOARD_LAYER_SIZE][4]Square
 	// マスへの利き数、または差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
 	// 利きテーブル [0]先手 [1]後手
 	// [0] 利き
@@ -355,28 +358,8 @@ type Position struct {
 }
 
 func NewPosition() *Position {
-	var ins = new(Position)
-	ins.resetToZero()
-	return ins
-}
+	var pPos = new(Position)
 
-// FlipPhase - フェーズをひっくり返すぜ（＾～＾）
-func (pPos *Position) FlipPhase() {
-	pPos.phase = FlipPhase(pPos.phase)
-}
-
-// GetPhase - フェーズ
-func (pPos *Position) GetPhase() Phase {
-	return pPos.phase
-}
-
-func (pPos *Position) GetKingLocations() (Square, Square) {
-	return pPos.kingLocations[0], pPos.kingLocations[1]
-}
-
-// ResetToStartpos - 駒を置いていな状態でリセットします
-func (pPos *Position) resetToZero() {
-	// 筋、段のラベルだけ入れとくぜ（＾～＾）
 	pPos.Board = [BOARD_LAYER_SIZE][BOARD_SIZE]Piece{{
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
@@ -400,7 +383,64 @@ func (pPos *Position) resetToZero() {
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 	}}
-	pPos.ControlBoards = [2][CONTROL_LAYER_ALL_SIZE][BOARD_SIZE]int8{{
+
+	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
+	pPos.kingLocations = [BOARD_LAYER_SIZE][2]Square{
+		{SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY}}
+	pPos.RookLocations = [BOARD_LAYER_SIZE][2]Square{
+		{SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY}}
+	pPos.BishopLocations = [BOARD_LAYER_SIZE][2]Square{
+		{SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY}}
+	pPos.LanceLocations = [BOARD_LAYER_SIZE][4]Square{
+		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY},
+		{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}}
+
+	pPos.resetPosition()
+	return pPos
+}
+
+// FlipPhase - フェーズをひっくり返すぜ（＾～＾）
+func (pPos *Position) FlipPhase() {
+	pPos.phase = FlipPhase(pPos.phase)
+}
+
+// GetPhase - フェーズ
+func (pPos *Position) GetPhase() Phase {
+	return pPos.phase
+}
+
+func (pPos *Position) GetKingLocations(b BoardLayerT) (Square, Square) {
+	return pPos.kingLocations[b][0], pPos.kingLocations[b][1]
+}
+
+// ResetToStartpos - 駒を置いていな状態でリセットします
+func (pPos *Position) clearBoard(b BoardLayerT) {
+	pPos.Board[b] = [BOARD_SIZE]Piece{
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+	}
+
+	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
+	pPos.kingLocations[b] = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
+	pPos.RookLocations[b] = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
+	pPos.BishopLocations[b] = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
+	pPos.LanceLocations[b] = [4]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
+}
+
+// ResetToStartpos - 駒を置いていな状態でリセットします
+func (pPos *Position) resetPosition() {
+	pPos.ControlBoards = [PHASE_ARRAY_SIZE][CONTROL_LAYER_ALL_SIZE][BOARD_SIZE]int8{{
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -715,11 +755,6 @@ func (pPos *Position) resetToZero() {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		},
 	}}
-	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
-	pPos.kingLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
-	pPos.RookLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
-	pPos.BishopLocations = [2]Square{SQUARE_EMPTY, SQUARE_EMPTY}
-	pPos.LanceLocations = [4]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
 
 	// 持ち駒の数
 	pPos.Hands = [BOARD_LAYER_SIZE][]int{{
@@ -739,9 +774,9 @@ func (pPos *Position) resetToZero() {
 }
 
 // setToStartpos - 初期局面にします。利きの計算はまだ行っていません。
-func (pPos *Position) setToStartpos() {
+func (pPos *Position) setToStartpos(b BoardLayerT) {
 	// 初期局面にします
-	pPos.Board = [BOARD_LAYER_SIZE][BOARD_SIZE]Piece{{
+	pPos.Board[b] = [BOARD_SIZE]Piece{
 		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
 		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
 		PIECE_EMPTY, PIECE_N2, PIECE_B2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_R1, PIECE_N1,
@@ -752,22 +787,11 @@ func (pPos *Position) setToStartpos() {
 		PIECE_EMPTY, PIECE_S2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_S1,
 		PIECE_EMPTY, PIECE_N2, PIECE_R2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_B1, PIECE_N1,
 		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
-	}, {
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
-		PIECE_EMPTY, PIECE_N2, PIECE_B2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_R1, PIECE_N1,
-		PIECE_EMPTY, PIECE_S2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_S1,
-		PIECE_EMPTY, PIECE_G2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_G1,
-		PIECE_EMPTY, PIECE_K2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_K1,
-		PIECE_EMPTY, PIECE_G2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_G1,
-		PIECE_EMPTY, PIECE_S2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_S1,
-		PIECE_EMPTY, PIECE_N2, PIECE_R2, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_B1, PIECE_N1,
-		PIECE_EMPTY, PIECE_L2, PIECE_EMPTY, PIECE_P2, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_P1, PIECE_EMPTY, PIECE_L1,
-	}}
-	pPos.kingLocations = [2]Square{59, 51}
-	pPos.RookLocations = [2]Square{28, 82}
-	pPos.BishopLocations = [2]Square{22, 88}
-	pPos.LanceLocations = [4]Square{11, 19, 91, 99}
+	}
+	pPos.kingLocations[b] = [2]Square{59, 51}
+	pPos.RookLocations[b] = [2]Square{28, 82}
+	pPos.BishopLocations[b] = [2]Square{22, 88}
+	pPos.LanceLocations[b] = [4]Square{11, 19, 91, 99}
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
@@ -776,8 +800,9 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 	var i int
 	if strings.HasPrefix(command, "position startpos") {
 		// 平手初期局面をセット（＾～＾）
-		pPos.resetToZero()
-		pPos.setToStartpos()
+		pPos.clearBoard(b)
+		pPos.resetPosition()
+		pPos.setToStartpos(b)
 		i = 17
 
 		if i < len && command[i] == ' ' {
@@ -787,7 +812,8 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 
 	} else if strings.HasPrefix(command, "position sfen ") {
 		// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
-		pPos.resetToZero()
+		pPos.clearBoard(b)
+		pPos.resetPosition()
 		i = 14
 		var rank = 1
 		var file = 9
@@ -835,27 +861,27 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 			// 玉と、長い利きの駒は位置を覚えておくぜ（＾～＾）
 			switch command[i-1] {
 			case 'K':
-				pPos.kingLocations[0] = Square((file+1)*10 + rank)
+				pPos.kingLocations[b][0] = Square((file+1)*10 + rank)
 			case 'k':
-				pPos.kingLocations[1] = Square((file+1)*10 + rank)
+				pPos.kingLocations[b][1] = Square((file+1)*10 + rank)
 			case 'R', 'r': // 成も兼ねてる（＾～＾）
-				for i, sq := range pPos.RookLocations {
+				for i, sq := range pPos.RookLocations[b] {
 					if sq == SQUARE_EMPTY {
-						pPos.RookLocations[i] = Square((file+1)*10 + rank)
+						pPos.RookLocations[b][i] = Square((file+1)*10 + rank)
 						break
 					}
 				}
 			case 'B', 'b':
-				for i, sq := range pPos.BishopLocations {
+				for i, sq := range pPos.BishopLocations[b] {
 					if sq == SQUARE_EMPTY {
-						pPos.BishopLocations[i] = Square((file+1)*10 + rank)
+						pPos.BishopLocations[b][i] = Square((file+1)*10 + rank)
 						break
 					}
 				}
 			case 'L', 'l':
-				for i, sq := range pPos.LanceLocations {
+				for i, sq := range pPos.LanceLocations[b] {
 					if sq == SQUARE_EMPTY {
-						pPos.LanceLocations[i] = Square((file+1)*10 + rank)
+						pPos.LanceLocations[b][i] = Square((file+1)*10 + rank)
 						break
 					}
 				}
@@ -919,23 +945,23 @@ func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 						// 長い利きの駒は位置を覚えておくぜ（＾～＾）
 						switch hand_index {
 						case HAND_R1_IDX, HAND_R2_IDX:
-							for i, sq := range pPos.RookLocations {
+							for i, sq := range pPos.RookLocations[b] {
 								if sq == SQUARE_EMPTY { // 空いているところから埋めていくぜ（＾～＾）
-									pPos.RookLocations[i] = Square(hand_index) + SQ_HAND_START
+									pPos.RookLocations[b][i] = Square(hand_index) + SQ_HAND_START
 									break
 								}
 							}
 						case HAND_B1_IDX, HAND_B2_IDX:
-							for i, sq := range pPos.BishopLocations {
+							for i, sq := range pPos.BishopLocations[b] {
 								if sq == SQUARE_EMPTY {
-									pPos.BishopLocations[i] = Square(hand_index) + SQ_HAND_START
+									pPos.BishopLocations[b][i] = Square(hand_index) + SQ_HAND_START
 									break
 								}
 							}
 						case HAND_L1_IDX, HAND_L2_IDX:
-							for i, sq := range pPos.LanceLocations {
+							for i, sq := range pPos.LanceLocations[b] {
 								if sq == SQUARE_EMPTY {
-									pPos.LanceLocations[i] = Square(hand_index) + SQ_HAND_START
+									pPos.LanceLocations[b][i] = Square(hand_index) + SQ_HAND_START
 									break
 								}
 							}
@@ -1361,28 +1387,28 @@ func (pPos *Position) DoMove(b BoardLayerT, move Move) {
 		case PIECE_TYPE_K:
 			switch prev_phase {
 			case FIRST:
-				pPos.kingLocations[0] = dst_sq_list[j]
+				pPos.kingLocations[b][0] = dst_sq_list[j]
 			case SECOND:
-				pPos.kingLocations[1] = dst_sq_list[j]
+				pPos.kingLocations[b][1] = dst_sq_list[j]
 			default:
 				panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
 			}
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
-			for i, sq := range pPos.RookLocations {
+			for i, sq := range pPos.RookLocations[b] {
 				if sq == src_sq_list[j] {
-					pPos.RookLocations[i] = dst_sq_list[j]
+					pPos.RookLocations[b][i] = dst_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_B, PIECE_TYPE_PB:
-			for i, sq := range pPos.BishopLocations {
+			for i, sq := range pPos.BishopLocations[b] {
 				if sq == src_sq_list[j] {
-					pPos.BishopLocations[i] = dst_sq_list[j]
+					pPos.BishopLocations[b][i] = dst_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
-			for i, sq := range pPos.LanceLocations {
+			for i, sq := range pPos.LanceLocations[b] {
 				if sq == src_sq_list[j] {
-					pPos.LanceLocations[i] = dst_sq_list[j]
+					pPos.LanceLocations[b][i] = dst_sq_list[j]
 				}
 			}
 		}
@@ -1534,28 +1560,28 @@ func (pPos *Position) UndoMove(b BoardLayerT) {
 		case PIECE_TYPE_K:
 			switch pPos.phase { // next_phase
 			case FIRST:
-				pPos.kingLocations[0] = src_sq_list[j]
+				pPos.kingLocations[b][0] = src_sq_list[j]
 			case SECOND:
-				pPos.kingLocations[1] = src_sq_list[j]
+				pPos.kingLocations[b][1] = src_sq_list[j]
 			default:
 				panic(fmt.Errorf("Unknown pPos.phase=%d", pPos.phase))
 			}
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
-			for i, sq := range pPos.RookLocations {
+			for i, sq := range pPos.RookLocations[b] {
 				if sq == dst_sq_list[j] {
-					pPos.RookLocations[i] = src_sq_list[j]
+					pPos.RookLocations[b][i] = src_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_B, PIECE_TYPE_PB:
-			for i, sq := range pPos.BishopLocations {
+			for i, sq := range pPos.BishopLocations[b] {
 				if sq == dst_sq_list[j] {
-					pPos.BishopLocations[i] = src_sq_list[j]
+					pPos.BishopLocations[b][i] = src_sq_list[j]
 				}
 			}
 		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
-			for i, sq := range pPos.LanceLocations {
+			for i, sq := range pPos.LanceLocations[b] {
 				if sq == dst_sq_list[j] {
-					pPos.LanceLocations[i] = src_sq_list[j]
+					pPos.LanceLocations[b][i] = src_sq_list[j]
 				}
 			}
 		}

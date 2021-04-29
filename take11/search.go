@@ -60,7 +60,7 @@ func search2(pPos *Position, curDepth int) (Move, int16) {
 			// 強制終了した局面（＾～＾）
 			G.Chat.Debug(pPos.Sprint(BOARD_LAYER_MAIN))
 			// あの駒、どこにいんの（＾～＾）？
-			G.Chat.Debug(pPos.SprintLocation())
+			G.Chat.Debug(pPos.SprintLocation(BOARD_LAYER_MAIN))
 			panic(fmt.Errorf("Move.Source(%d) has empty square. i=%d/%d. younger_sibling_move=%s",
 				move.GetSource(), i, move_length, younger_sibling_move.ToCode()))
 		}
