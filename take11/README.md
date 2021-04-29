@@ -41,7 +41,7 @@ location 1
 
 ## Test2
 
-```
+```shell
 # 後手馬で先手飛を取って、アンドゥするテスト（＾～＾）
 position sfen 4k4/9/9/9/9/9/2+b6/3R5/4K4 w - 1
 pos
@@ -50,5 +50,18 @@ pos
 location 0
 undo
 pos
+location 0
+```
+
+## Test3
+
+```shell
+position startpos moves 7g7f 3c3d
+pos
+location 0
+do 8h2b
+pos
+location 0
+undo
 location 0
 ```

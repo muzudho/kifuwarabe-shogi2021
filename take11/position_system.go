@@ -1377,6 +1377,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	// 取った駒
 	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
+	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
 
 	mov_dst_sq := move.GetDestination()
 	mov_src_sq := move.GetSource()
