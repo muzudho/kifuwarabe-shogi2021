@@ -93,7 +93,7 @@ func (pPos *Position) Sprint(phase Phase, startMovesNum int, offsetMovesIndex in
 		//
 		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands1[8], pPos.Hands1[9], pPos.Hands1[10], pPos.Hands1[11], pPos.Hands1[12], pPos.Hands1[13], pPos.Hands1[14], pPos.Hands1[15]) +
 		//
-		"+--+--+--+--+--+--+--+\n" +
+		"+--+--+--+--+--+--+--+--+\n" +
 		//
 		"\n" +
 		//
