@@ -280,6 +280,8 @@ MainLoop:
 			}
 		case "posdiff":
 			G.Chat.Debug(pPos.SprintDiff(BOARD_LAYER_MAIN, BOARD_LAYER_COPY))
+		default:
+			fmt.Printf("Unknown command=%s\n", command)
 		}
 
 		G.Log.FlushAllLogs()
