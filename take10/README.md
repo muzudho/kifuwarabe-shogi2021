@@ -31,7 +31,7 @@ MoveList
 position startpos moves 7i6h 4a3b 2h3h 6a5b 3h4h 3a4b 3i3h 7a7b 2g2f 3c3d 6h7i 4b3c 8g8f 5a4b 6i5h 3d3e 7i6h 8c8d 5i6i 7b8c 9i9h 9c9d 9g9f 5c5d 8h7i 8c7d 4i3i 7d7e 2f2e 7e8f 7g7f 8f8g 6h7g 8g9h+ 4g4f L*8e 5g5f 8e8i+ 7g8f 8i7i 6i7i N*8e 8f8e 8d8e N*4g 8e8f 4g3e 8f8g+ 3e2c 8g7h
 go
 
-# 違法手。香車持ってないのに打った（＾～＾）先後間違えてる（＾～＾）？
+# 違法手。香車持ってないのに打った（＾～＾）先後間違えてる（＾～＾）？ -> 先後のどちらの駒も打つようになってたので修正（＾～＾）
 position startpos moves 7g7f 8b4b 3i4h 9a9b 5i6h 6c6d 8h5e 6a7b 5e6d 9c9d 6d5c+ 8a9c 5c4b 3a4b R*9a B*8d 9a9b+ 8d5g 4h5g
 go btime 70000 wtime 69000 binc 2000 winc 2000
 info depth 0 nodes 118 score cp 0 currmove L*3b pv L*3b

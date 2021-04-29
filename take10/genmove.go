@@ -286,15 +286,21 @@ func GenMoveList(pPos *Position) []Move {
 	friend := pPos.GetPhase()
 	opponent := FlipPhase(pPos.GetPhase())
 	var friendKingSq Square
+	var hand_start int
+	var hand_end int
 	// var opponentKingSq Square
 	if friend == FIRST {
 		friendKingSq, _ = pPos.GetKingLocations()
+		hand_start = HAND_IDX_START
 	} else if friend == SECOND {
 		_, friendKingSq = pPos.GetKingLocations()
+		hand_start = HAND_IDX_START + HAND_TYPE_SIZE
 	} else {
 		panic(fmt.Errorf("Unknown phase=%d", friend))
 	}
+	hand_end = hand_start + HAND_TYPE_SIZE
 
+	// 相手の利きテーブルの自玉のマスに利きがあるか
 	if pPos.ControlBoards[opponent-1][CONTROL_LAYER_SUM][friendKingSq] > 0 {
 		// 王手されています
 		// fmt.Printf("Debug: Checked friendKingSq=%d opponentKingSq=%d friend=%d opponent=%d\n", friendKingSq, opponentKingSq, friend, opponent)
@@ -349,7 +355,28 @@ func GenMoveList(pPos *Position) []Move {
 			}
 		}
 
-		// TODO 打もやりたい（＾～＾）
+		// 自分の駒台もスキャンしよ（＾～＾）
+		for hand_index := hand_start; hand_index < hand_end; hand_index += 1 {
+			if pPos.Hands[hand_index] > 0 {
+				hand_sq := Square(hand_index) + SQ_HAND_START
+				control_list := GenControl(pPos, hand_sq)
+
+				for _, to := range control_list {
+					if pPos.IsEmptySq(to) { // 駒の上には打てません
+						move := NewMoveValue2(hand_sq, to)
+						pPos.DoMove(move)
+
+						if pPos.ControlBoards[opponent-1][CONTROL_LAYER_SUM][friendKingSq] == 0 {
+							// 王手が解除されてるから採用（＾～＾）
+							move_list = append(move_list, move)
+						}
+
+						pPos.UndoMove()
+
+					}
+				}
+			}
+		}
 
 	} else {
 		// 王手されていないぜ（＾～＾）
@@ -383,8 +410,8 @@ func GenMoveList(pPos *Position) []Move {
 			}
 		}
 
-		// 駒台もスキャンしよ（＾～＾）
-		for hand_index := HAND_IDX_START; hand_index < HAND_IDX_END; hand_index += 1 {
+		// 自分の駒台もスキャンしよ（＾～＾）
+		for hand_index := hand_start; hand_index < hand_end; hand_index += 1 {
 			if pPos.Hands[hand_index] > 0 {
 				hand_sq := Square(hand_index) + SQ_HAND_START
 				control_list := GenControl(pPos, hand_sq)
