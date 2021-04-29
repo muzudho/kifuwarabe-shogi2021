@@ -1595,9 +1595,11 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	case PIECE_TYPE_K:
 		switch pPosSys.phase { // next_phase
 		case FIRST:
-			pPos.PieceLocations[PCLOC_K1] = mov_dst_sq
-		case SECOND:
+			// 後手の玉
 			pPos.PieceLocations[PCLOC_K2] = mov_dst_sq
+		case SECOND:
+			// 先手の玉
+			pPos.PieceLocations[PCLOC_K1] = mov_dst_sq
 		default:
 			panic(fmt.Errorf("Unknown pPosSys.phase=%d", pPosSys.phase))
 		}

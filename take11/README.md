@@ -133,3 +133,12 @@ undo
 pos
 location 0
 ```
+
+## Test6
+
+```shell
+position startpos moves 5i5h 4a3b 8g8f 6a5b 2g2f 5a4b 6g6f 3c3d 5h4h 2b6f
+
+# 強制終了（＾～＾） 後手玉の位置が、先手玉の位置になってる（＾～＾）
+go
+```
