@@ -278,6 +278,8 @@ MainLoop:
 				G.Chat.Debug("------\n")
 				G.Chat.Debug("board copy\n")
 			}
+		case "posdiff":
+			G.Chat.Debug(pPos.SprintDiff(BOARD_LAYER_MAIN, BOARD_LAYER_COPY))
 		}
 
 		G.Log.FlushAllLogs()

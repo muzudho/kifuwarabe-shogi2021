@@ -156,6 +156,178 @@ func (pPos *Position) Sprint(b BoardLayerT) string {
 	return s1 + string(moves_text) + "\n"
 }
 
+// Print - ２局面の比較用画面出力（＾ｑ＾）
+func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
+	var phase_str string
+	switch pPos.GetPhase() {
+	case FIRST:
+		phase_str = "First"
+	case SECOND:
+		phase_str = "Second"
+	default:
+		phase_str = "?"
+	}
+
+	// 0段目
+	zeroRanks := [10]string{"    9", "    8", "    7", "    6", "    5", "    4", "    3", "    2", "    1", "     "}
+	// 0筋目
+	zeroFiles := [9]string{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " i "}
+
+	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
+	for file := 9; file > -1; file -= 1 {
+		if !pPos.IsEmptySq(b1, Square(file*10)) || !pPos.IsEmptySq(b2, Square(file*10)) {
+			zeroRanks[10-file] = fmt.Sprintf("%2s%2s", pPos.Board[b1][file*10].ToCode(), pPos.Board[b2][file*10].ToCode())
+		}
+	}
+
+	// 0筋目
+	for rank := Square(1); rank < 10; rank += 1 {
+		if !pPos.IsEmptySq(b1, rank) || !pPos.IsEmptySq(b2, rank) {
+			zeroFiles[rank-1] = fmt.Sprintf("%2s%2s", pPos.Board[b1][rank].ToCode(), pPos.Board[b2][rank].ToCode())
+		}
+	}
+
+	lines := []string{}
+	lines = append(lines, "\n")
+	lines = append(lines, fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPos.StartMovesNum, (pPos.StartMovesNum+pPos.OffsetMovesIndex), phase_str))
+	lines = append(lines, "\n")
+	lines = append(lines, "    r    b    g    s    n    l    p\n")
+	lines = append(lines, "+----+----+----+----+----+----+----+\n")
+
+	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
+	var buf bytes.Buffer
+	for i := 0; i < 7; i++ {
+		buf.WriteString(fmt.Sprintf("|%2d%2d", pPos.Hands[b1][i+7], pPos.Hands[b2][i+7]))
+	}
+	buf.WriteString("|\n")
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	for i := 0; i < 10; i += 1 {
+		buf.WriteString(zeroRanks[i])
+	}
+	buf.WriteString("\n")
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank := 1
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 2
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 3
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 4
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 5
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 6
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 7
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 8
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	rank = 9
+	for file := 9; file > 0; file-- {
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+	}
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
+	lines = append(lines, "\n")
+	lines = append(lines, "          R    B    G    S    N    L    P\n")
+	lines = append(lines, "      +----+----+----+----+----+----+----+\n")
+
+	buf.Reset()
+	buf.WriteString("      ")
+	for i := 0; i < 7; i++ {
+		buf.WriteString(fmt.Sprintf("|%2d%2d", pPos.Hands[b1][i], pPos.Hands[b2][i]))
+	}
+	buf.WriteString("|\n")
+	lines = append(lines, buf.String())
+
+	lines = append(lines, "      +----+----+----+----+----+----+----+\n")
+	lines = append(lines, "\n")
+	lines = append(lines, "moves")
+
+	lines = append(lines, pPos.createMovesText())
+	lines = append(lines, "\n")
+
+	buf.Reset()
+	for _, line := range lines {
+		buf.WriteString(line)
+	}
+	return buf.String()
+}
+
 // CreateMovesList - " 7g7f 3c3d" みたいな部分を返します。最初は半角スペースです
 func (pPos *Position) createMovesText() string {
 	moves_text := make([]byte, 0, MOVES_SIZE*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
