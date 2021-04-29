@@ -13,9 +13,12 @@ const MOVES_SIZE = 512
 // 00～99
 const BOARD_SIZE = 100
 
+// 盤レイヤー・インデックス型
+type BoardLayerT int
+
 const (
-	BOARD_LAYER_MAIN = iota
-	BOARD_LAYER_COPY // テスト用
+	BOARD_LAYER_MAIN = BoardLayerT(0)
+	BOARD_LAYER_COPY = BoardLayerT(1) // テスト用
 	BOARD_LAYER_SIZE = 2
 )
 
@@ -768,7 +771,7 @@ func (pPos *Position) setToStartpos() {
 }
 
 // ReadPosition - 局面を読み取ります。マルチバイト文字は含まれていないぜ（＾ｑ＾）
-func (pPos *Position) ReadPosition(boardLayer int, command string) {
+func (pPos *Position) ReadPosition(b BoardLayerT, command string) {
 	var len = len(command)
 	var i int
 	if strings.HasPrefix(command, "position startpos") {
@@ -794,13 +797,13 @@ func (pPos *Position) ReadPosition(boardLayer int, command string) {
 			promoted := false
 			switch pc := command[i]; pc {
 			case 'K', 'R', 'B', 'G', 'S', 'N', 'L', 'P', 'k', 'r', 'b', 'g', 's', 'n', 'l', 'p':
-				pPos.Board[boardLayer][file*10+rank] = PieceFrom(string(pc))
+				pPos.Board[b][file*10+rank] = PieceFrom(string(pc))
 				file -= 1
 				i += 1
 			case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 				var spaces, _ = strconv.Atoi(string(pc))
 				for sp := 0; sp < spaces; sp += 1 {
-					pPos.Board[boardLayer][file*10+rank] = PIECE_EMPTY
+					pPos.Board[b][file*10+rank] = PIECE_EMPTY
 					file -= 1
 				}
 				i += 1
@@ -821,7 +824,7 @@ func (pPos *Position) ReadPosition(boardLayer int, command string) {
 			if promoted {
 				switch pc2 := command[i]; pc2 {
 				case 'R', 'B', 'S', 'N', 'L', 'P', 'r', 'b', 's', 'n', 'l', 'p':
-					pPos.Board[boardLayer][file*10+rank] = PieceFrom("+" + string(pc2))
+					pPos.Board[b][file*10+rank] = PieceFrom("+" + string(pc2))
 					file -= 1
 					i += 1
 				default:
@@ -910,7 +913,7 @@ func (pPos *Position) ReadPosition(boardLayer int, command string) {
 							number = 1
 						}
 
-						pPos.Hands[boardLayer][hand_index] = number
+						pPos.Hands[b][hand_index] = number
 						number = 0
 
 						// 長い利きの駒は位置を覚えておくぜ（＾～＾）
@@ -1037,7 +1040,7 @@ func (pPos *Position) ReadPosition(boardLayer int, command string) {
 			var move, err = ParseMove(command, &i, pPos.GetPhase())
 			if err != nil {
 				fmt.Println(err)
-				fmt.Println(pPos.Sprint(boardLayer))
+				fmt.Println(pPos.Sprint(b))
 				panic(err)
 			}
 			pPos.Moves[pPos.OffsetMovesIndex] = move
@@ -1053,10 +1056,10 @@ func (pPos *Position) ReadPosition(boardLayer int, command string) {
 	//fmt.Printf("Debug: 開始局面の利きを計算（＾～＾）\n")
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			if !pPos.IsEmptySq(boardLayer, sq) {
+			if !pPos.IsEmptySq(b, sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
 				// あとですぐクリアーするので、どのレイヤー使ってても関係ないんで、仮で PUTレイヤーを使っているぜ（＾～＾）
-				pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_PUT, sq, 1)
+				pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_PUT, sq, 1)
 			}
 		}
 	}
@@ -1069,7 +1072,7 @@ func (pPos *Position) ReadPosition(boardLayer int, command string) {
 	pPos.OffsetMovesIndex = 0
 	pPos.phase = start_phase
 	for i = 0; i < moves_size; i += 1 {
-		pPos.DoMove(boardLayer, pPos.Moves[i])
+		pPos.DoMove(b, pPos.Moves[i])
 	}
 }
 
@@ -1191,7 +1194,7 @@ func ParseMove(command string, i *int, phase Phase) (Move, error) {
 }
 
 // DoMove - 一手指すぜ（＾～＾）
-func (pPos *Position) DoMove(boardLayer int, move Move) {
+func (pPos *Position) DoMove(b BoardLayerT, move Move) {
 
 	// fmt.Printf("Debug: move src=%d dst=%d pro=%t\n", move.GetSource(), move.GetDestination(), move.GetPromotion())
 
@@ -1201,7 +1204,7 @@ func (pPos *Position) DoMove(boardLayer int, move Move) {
 	cap_piece_type := PIECE_TYPE_EMPTY
 
 	mov_src_sq := move.GetSource()
-	if pPos.IsEmptySq(boardLayer, mov_src_sq) {
+	if pPos.IsEmptySq(b, mov_src_sq) {
 		// 人間の打鍵ミスか（＾～＾）
 		fmt.Printf("Error: %d square is empty\n", mov_src_sq)
 	}
@@ -1213,9 +1216,9 @@ func (pPos *Position) DoMove(boardLayer int, move Move) {
 	pPos.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
-	pPos.AddControlRook(boardLayer, CONTROL_LAYER_DIFF_ROOK_OFF, -1, mov_src_sq)
-	pPos.AddControlBishop(boardLayer, CONTROL_LAYER_DIFF_BISHOP_OFF, -1, mov_src_sq)
-	pPos.AddControlLance(boardLayer, CONTROL_LAYER_DIFF_LANCE_OFF, -1, mov_src_sq)
+	pPos.AddControlRook(b, CONTROL_LAYER_DIFF_ROOK_OFF, -1, mov_src_sq)
+	pPos.AddControlBishop(b, CONTROL_LAYER_DIFF_BISHOP_OFF, -1, mov_src_sq)
+	pPos.AddControlLance(b, CONTROL_LAYER_DIFF_LANCE_OFF, -1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	sq_drop := mov_src_sq
@@ -1258,43 +1261,43 @@ func (pPos *Position) DoMove(boardLayer int, move Move) {
 		// 打なら
 
 		// 持ち駒の数を減らします
-		pPos.Hands[boardLayer][sq_drop-SQ_HAND_START] -= 1
+		pPos.Hands[b][sq_drop-SQ_HAND_START] -= 1
 
 		// 行き先に駒を置きます
-		pPos.Board[boardLayer][mov_dst_sq] = piece
-		pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
+		pPos.Board[b][mov_dst_sq] = piece
+		pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
 
 		// 移動先に駒があれば、その駒の利きを除外します。
-		captured := pPos.Board[boardLayer][mov_dst_sq]
+		captured := pPos.Board[b][mov_dst_sq]
 		if captured != PIECE_EMPTY {
 			pieceType := What(captured)
 			switch pieceType {
 			case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
 				// Ignored: 長い利きの駒は 既に除外しているので無視します
 			default:
-				pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, -1)
+				pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, -1)
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
 
 		// 元位置の駒の利きを除去
-		pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, -1)
+		pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, -1)
 
 		// 行き先の駒の上書き
 		if move.GetPromotion() {
 			// 駒を成りに変換します
-			pPos.Board[boardLayer][mov_dst_sq] = Promote(pPos.Board[boardLayer][mov_src_sq])
+			pPos.Board[b][mov_dst_sq] = Promote(pPos.Board[b][mov_src_sq])
 		} else {
-			pPos.Board[boardLayer][mov_dst_sq] = pPos.Board[boardLayer][mov_src_sq]
+			pPos.Board[b][mov_dst_sq] = pPos.Board[b][mov_src_sq]
 		}
-		mov_piece_type = What(pPos.Board[boardLayer][mov_dst_sq])
+		mov_piece_type = What(pPos.Board[b][mov_dst_sq])
 		// 元位置の駒を削除してから、移動先の駒の利きを追加
-		pPos.Board[boardLayer][mov_src_sq] = PIECE_EMPTY
-		pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
+		pPos.Board[b][mov_src_sq] = PIECE_EMPTY
+		pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1336,7 +1339,7 @@ func (pPos *Position) DoMove(boardLayer int, move Move) {
 
 		if cap_dst_sq != SQUARE_EMPTY {
 			pPos.CapturedList[pPos.OffsetMovesIndex] = captured
-			pPos.Hands[boardLayer][cap_dst_sq-SQ_HAND_START] += 1
+			pPos.Hands[b][cap_dst_sq-SQ_HAND_START] += 1
 		} else {
 			// 取った駒は無かった（＾～＾）
 			pPos.CapturedList[pPos.OffsetMovesIndex] = PIECE_EMPTY
@@ -1386,15 +1389,15 @@ func (pPos *Position) DoMove(boardLayer int, move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
-	pPos.AddControlLance(boardLayer, CONTROL_LAYER_DIFF_LANCE_ON, 1, mov_dst_sq)
-	pPos.AddControlBishop(boardLayer, CONTROL_LAYER_DIFF_BISHOP_ON, 1, mov_dst_sq)
-	pPos.AddControlRook(boardLayer, CONTROL_LAYER_DIFF_ROOK_ON, 1, mov_dst_sq)
+	pPos.AddControlLance(b, CONTROL_LAYER_DIFF_LANCE_ON, 1, mov_dst_sq)
+	pPos.AddControlBishop(b, CONTROL_LAYER_DIFF_BISHOP_ON, 1, mov_dst_sq)
+	pPos.AddControlRook(b, CONTROL_LAYER_DIFF_ROOK_ON, 1, mov_dst_sq)
 
 	pPos.MergeControlDiff()
 }
 
 // UndoMove - 棋譜を頼りに１手戻すぜ（＾～＾）
-func (pPos *Position) UndoMove(boardLayer int) {
+func (pPos *Position) UndoMove(b BoardLayerT) {
 
 	// G.StderrChat.Trace(pPos.Sprint())
 
@@ -1426,9 +1429,9 @@ func (pPos *Position) UndoMove(boardLayer int) {
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPos.AddControlRook(boardLayer, CONTROL_LAYER_DIFF_ROOK_ON, -1, mov_dst_sq)
-	pPos.AddControlBishop(boardLayer, CONTROL_LAYER_DIFF_BISHOP_ON, -1, mov_dst_sq)
-	pPos.AddControlLance(boardLayer, CONTROL_LAYER_DIFF_LANCE_ON, -1, mov_dst_sq)
+	pPos.AddControlRook(b, CONTROL_LAYER_DIFF_ROOK_ON, -1, mov_dst_sq)
+	pPos.AddControlBishop(b, CONTROL_LAYER_DIFF_BISHOP_ON, -1, mov_dst_sq)
+	pPos.AddControlLance(b, CONTROL_LAYER_DIFF_LANCE_ON, -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1436,26 +1439,26 @@ func (pPos *Position) UndoMove(boardLayer int) {
 		// 打なら
 		drop := mov_src_sq
 		// 行き先から駒を除去します
-		mov_piece_type = What(pPos.Board[boardLayer][mov_dst_sq])
-		pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
-		pPos.Board[boardLayer][mov_dst_sq] = PIECE_EMPTY
+		mov_piece_type = What(pPos.Board[b][mov_dst_sq])
+		pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
+		pPos.Board[b][mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
-		pPos.Hands[boardLayer][drop-SQ_HAND_START] += 1
+		pPos.Hands[b][drop-SQ_HAND_START] += 1
 		cap_dst_sq = 0
 	default:
 		// 打でないなら
 
 		// 行き先に進んでいた自駒の利きの除去
-		mov_piece_type = What(pPos.Board[boardLayer][mov_dst_sq])
-		pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
+		mov_piece_type = What(pPos.Board[b][mov_dst_sq])
+		pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
 
 		// 自駒を移動元へ戻します
 		if move.GetPromotion() {
 			// 成りを元に戻します
-			pPos.Board[boardLayer][mov_src_sq] = Demote(pPos.Board[boardLayer][mov_dst_sq])
+			pPos.Board[b][mov_src_sq] = Demote(pPos.Board[b][mov_dst_sq])
 		} else {
-			pPos.Board[boardLayer][mov_src_sq] = pPos.Board[boardLayer][mov_dst_sq]
+			pPos.Board[b][mov_src_sq] = pPos.Board[b][mov_dst_sq]
 		}
 
 		// あれば、取った駒は駒台から下ろします
@@ -1499,11 +1502,11 @@ func (pPos *Position) UndoMove(boardLayer int) {
 
 		if cap_src_sq != SQUARE_EMPTY {
 			cap_dst_sq = cap_src_sq
-			pPos.Hands[boardLayer][cap_src_sq-SQ_HAND_START] -= 1
+			pPos.Hands[b][cap_src_sq-SQ_HAND_START] -= 1
 
 			// 取っていた駒を行き先に戻します
 			cap_piece_type = What(captured)
-			pPos.Board[boardLayer][mov_dst_sq] = captured
+			pPos.Board[b][mov_dst_sq] = captured
 
 			// pieceType := What(captured)
 			// switch pieceType {
@@ -1512,14 +1515,14 @@ func (pPos *Position) UndoMove(boardLayer int) {
 			// default:
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
-			pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
+			pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
 			// }
 		} else {
-			pPos.Board[boardLayer][mov_dst_sq] = PIECE_EMPTY
+			pPos.Board[b][mov_dst_sq] = PIECE_EMPTY
 		}
 
 		// 元の場所に戻した自駒の利きを復元します
-		pPos.AddControlDiff(boardLayer, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
+		pPos.AddControlDiff(b, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
@@ -1560,32 +1563,32 @@ func (pPos *Position) UndoMove(boardLayer int) {
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPos.AddControlLance(boardLayer, CONTROL_LAYER_DIFF_LANCE_OFF, 1, mov_src_sq)
-	pPos.AddControlBishop(boardLayer, CONTROL_LAYER_DIFF_BISHOP_OFF, 1, mov_src_sq)
-	pPos.AddControlRook(boardLayer, CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
+	pPos.AddControlLance(b, CONTROL_LAYER_DIFF_LANCE_OFF, 1, mov_src_sq)
+	pPos.AddControlBishop(b, CONTROL_LAYER_DIFF_BISHOP_OFF, 1, mov_src_sq)
+	pPos.AddControlRook(b, CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
 
 	pPos.MergeControlDiff()
 }
 
 // Homo - 移動元と移動先の駒を持つプレイヤーが等しければ真。移動先が空なら偽
 // 持ち駒は指定してはいけません。
-func (pPos *Position) Homo(boardLayer int, from Square, to Square) bool {
+func (pPos *Position) Homo(b BoardLayerT, from Square, to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
-	return Who(pPos.Board[boardLayer][from]) == Who(pPos.Board[boardLayer][to])
+	return Who(pPos.Board[b][from]) == Who(pPos.Board[b][to])
 }
 
 // Hetero - 移動元と移動先の駒を持つプレイヤーが異なれば真。移動先が空マスでも真
 // 持ち駒は指定してはいけません。
 // Homo の逆だぜ（＾～＾）片方ありゃいいんだけど（＾～＾）
-func (pPos *Position) Hetero(boardLayer int, from Square, to Square) bool {
+func (pPos *Position) Hetero(b BoardLayerT, from Square, to Square) bool {
 	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
-	return Who(pPos.Board[boardLayer][from]) != Who(pPos.Board[boardLayer][to])
+	return Who(pPos.Board[b][from]) != Who(pPos.Board[b][to])
 }
 
 // IsEmptySq - 空きマスなら真。持ち駒は偽
-func (pPos *Position) IsEmptySq(boardLayer int, sq Square) bool {
+func (pPos *Position) IsEmptySq(b BoardLayerT, sq Square) bool {
 	if sq > 99 {
 		return false
 	}
-	return pPos.Board[boardLayer][sq] == PIECE_EMPTY
+	return pPos.Board[b][sq] == PIECE_EMPTY
 }

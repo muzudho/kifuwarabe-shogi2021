@@ -6,7 +6,7 @@ import (
 )
 
 // Print - 局面出力（＾ｑ＾）
-func (pPos *Position) Sprint(boardLayer int) string {
+func (pPos *Position) Sprint(b BoardLayerT) string {
 	var phase_str string
 	switch pPos.GetPhase() {
 	case FIRST:
@@ -23,62 +23,62 @@ func (pPos *Position) Sprint(boardLayer int) string {
 	zeroFiles := [9]string{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " i "}
 
 	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
-	if !pPos.IsEmptySq(boardLayer, 90) {
-		zeroRanks[0] = pPos.Board[boardLayer][90].ToCode()
+	if !pPos.IsEmptySq(b, 90) {
+		zeroRanks[0] = pPos.Board[b][90].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 80) {
-		zeroRanks[1] = pPos.Board[boardLayer][80].ToCode()
+	if !pPos.IsEmptySq(b, 80) {
+		zeroRanks[1] = pPos.Board[b][80].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 70) {
-		zeroRanks[2] = pPos.Board[boardLayer][70].ToCode()
+	if !pPos.IsEmptySq(b, 70) {
+		zeroRanks[2] = pPos.Board[b][70].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 60) {
-		zeroRanks[3] = pPos.Board[boardLayer][60].ToCode()
+	if !pPos.IsEmptySq(b, 60) {
+		zeroRanks[3] = pPos.Board[b][60].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 50) {
-		zeroRanks[4] = pPos.Board[boardLayer][50].ToCode()
+	if !pPos.IsEmptySq(b, 50) {
+		zeroRanks[4] = pPos.Board[b][50].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 40) {
-		zeroRanks[5] = pPos.Board[boardLayer][40].ToCode()
+	if !pPos.IsEmptySq(b, 40) {
+		zeroRanks[5] = pPos.Board[b][40].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 30) {
-		zeroRanks[6] = pPos.Board[boardLayer][30].ToCode()
+	if !pPos.IsEmptySq(b, 30) {
+		zeroRanks[6] = pPos.Board[b][30].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 20) {
-		zeroRanks[7] = pPos.Board[boardLayer][20].ToCode()
+	if !pPos.IsEmptySq(b, 20) {
+		zeroRanks[7] = pPos.Board[b][20].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 10) {
-		zeroRanks[8] = pPos.Board[boardLayer][10].ToCode()
+	if !pPos.IsEmptySq(b, 10) {
+		zeroRanks[8] = pPos.Board[b][10].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 0) {
-		zeroRanks[9] = pPos.Board[boardLayer][0].ToCode()
+	if !pPos.IsEmptySq(b, 0) {
+		zeroRanks[9] = pPos.Board[b][0].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 1) {
-		zeroFiles[0] = pPos.Board[boardLayer][1].ToCode()
+	if !pPos.IsEmptySq(b, 1) {
+		zeroFiles[0] = pPos.Board[b][1].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 2) {
-		zeroFiles[1] = pPos.Board[boardLayer][2].ToCode()
+	if !pPos.IsEmptySq(b, 2) {
+		zeroFiles[1] = pPos.Board[b][2].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 3) {
-		zeroFiles[2] = pPos.Board[boardLayer][3].ToCode()
+	if !pPos.IsEmptySq(b, 3) {
+		zeroFiles[2] = pPos.Board[b][3].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 4) {
-		zeroFiles[3] = pPos.Board[boardLayer][4].ToCode()
+	if !pPos.IsEmptySq(b, 4) {
+		zeroFiles[3] = pPos.Board[b][4].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 5) {
-		zeroFiles[4] = pPos.Board[boardLayer][5].ToCode()
+	if !pPos.IsEmptySq(b, 5) {
+		zeroFiles[4] = pPos.Board[b][5].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 6) {
-		zeroFiles[5] = pPos.Board[boardLayer][6].ToCode()
+	if !pPos.IsEmptySq(b, 6) {
+		zeroFiles[5] = pPos.Board[b][6].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 7) {
-		zeroFiles[6] = pPos.Board[boardLayer][7].ToCode()
+	if !pPos.IsEmptySq(b, 7) {
+		zeroFiles[6] = pPos.Board[b][7].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 8) {
-		zeroFiles[7] = pPos.Board[boardLayer][8].ToCode()
+	if !pPos.IsEmptySq(b, 8) {
+		zeroFiles[7] = pPos.Board[b][8].ToCode()
 	}
-	if !pPos.IsEmptySq(boardLayer, 9) {
-		zeroFiles[8] = pPos.Board[boardLayer][9].ToCode()
+	if !pPos.IsEmptySq(b, 9) {
+		zeroFiles[8] = pPos.Board[b][9].ToCode()
 	}
 
 	var s1 = "\n" +
@@ -90,7 +90,7 @@ func (pPos *Position) Sprint(boardLayer int) string {
 		"  r  b  g  s  n  l  p\n" +
 		"+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[boardLayer][7], pPos.Hands[boardLayer][8], pPos.Hands[boardLayer][9], pPos.Hands[boardLayer][10], pPos.Hands[boardLayer][11], pPos.Hands[boardLayer][12], pPos.Hands[boardLayer][13]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[b][7], pPos.Hands[b][8], pPos.Hands[b][9], pPos.Hands[b][10], pPos.Hands[b][11], pPos.Hands[b][12], pPos.Hands[b][13]) +
 		//
 		"+--+--+--+--+--+--+--+\n" +
 		//
@@ -100,39 +100,39 @@ func (pPos *Position) Sprint(boardLayer int) string {
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][91].ToCode(), pPos.Board[boardLayer][81].ToCode(), pPos.Board[boardLayer][71].ToCode(), pPos.Board[boardLayer][61].ToCode(), pPos.Board[boardLayer][51].ToCode(), pPos.Board[boardLayer][41].ToCode(), pPos.Board[boardLayer][31].ToCode(), pPos.Board[boardLayer][21].ToCode(), pPos.Board[boardLayer][11].ToCode(), zeroFiles[0]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][91].ToCode(), pPos.Board[b][81].ToCode(), pPos.Board[b][71].ToCode(), pPos.Board[b][61].ToCode(), pPos.Board[b][51].ToCode(), pPos.Board[b][41].ToCode(), pPos.Board[b][31].ToCode(), pPos.Board[b][21].ToCode(), pPos.Board[b][11].ToCode(), zeroFiles[0]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][92].ToCode(), pPos.Board[boardLayer][82].ToCode(), pPos.Board[boardLayer][72].ToCode(), pPos.Board[boardLayer][62].ToCode(), pPos.Board[boardLayer][52].ToCode(), pPos.Board[boardLayer][42].ToCode(), pPos.Board[boardLayer][32].ToCode(), pPos.Board[boardLayer][22].ToCode(), pPos.Board[boardLayer][12].ToCode(), zeroFiles[1]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][92].ToCode(), pPos.Board[b][82].ToCode(), pPos.Board[b][72].ToCode(), pPos.Board[b][62].ToCode(), pPos.Board[b][52].ToCode(), pPos.Board[b][42].ToCode(), pPos.Board[b][32].ToCode(), pPos.Board[b][22].ToCode(), pPos.Board[b][12].ToCode(), zeroFiles[1]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][93].ToCode(), pPos.Board[boardLayer][83].ToCode(), pPos.Board[boardLayer][73].ToCode(), pPos.Board[boardLayer][63].ToCode(), pPos.Board[boardLayer][53].ToCode(), pPos.Board[boardLayer][43].ToCode(), pPos.Board[boardLayer][33].ToCode(), pPos.Board[boardLayer][23].ToCode(), pPos.Board[boardLayer][13].ToCode(), zeroFiles[2]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][93].ToCode(), pPos.Board[b][83].ToCode(), pPos.Board[b][73].ToCode(), pPos.Board[b][63].ToCode(), pPos.Board[b][53].ToCode(), pPos.Board[b][43].ToCode(), pPos.Board[b][33].ToCode(), pPos.Board[b][23].ToCode(), pPos.Board[b][13].ToCode(), zeroFiles[2]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][94].ToCode(), pPos.Board[boardLayer][84].ToCode(), pPos.Board[boardLayer][74].ToCode(), pPos.Board[boardLayer][64].ToCode(), pPos.Board[boardLayer][54].ToCode(), pPos.Board[boardLayer][44].ToCode(), pPos.Board[boardLayer][34].ToCode(), pPos.Board[boardLayer][24].ToCode(), pPos.Board[boardLayer][14].ToCode(), zeroFiles[3]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][94].ToCode(), pPos.Board[b][84].ToCode(), pPos.Board[b][74].ToCode(), pPos.Board[b][64].ToCode(), pPos.Board[b][54].ToCode(), pPos.Board[b][44].ToCode(), pPos.Board[b][34].ToCode(), pPos.Board[b][24].ToCode(), pPos.Board[b][14].ToCode(), zeroFiles[3]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][95].ToCode(), pPos.Board[boardLayer][85].ToCode(), pPos.Board[boardLayer][75].ToCode(), pPos.Board[boardLayer][65].ToCode(), pPos.Board[boardLayer][55].ToCode(), pPos.Board[boardLayer][45].ToCode(), pPos.Board[boardLayer][35].ToCode(), pPos.Board[boardLayer][25].ToCode(), pPos.Board[boardLayer][15].ToCode(), zeroFiles[4]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][95].ToCode(), pPos.Board[b][85].ToCode(), pPos.Board[b][75].ToCode(), pPos.Board[b][65].ToCode(), pPos.Board[b][55].ToCode(), pPos.Board[b][45].ToCode(), pPos.Board[b][35].ToCode(), pPos.Board[b][25].ToCode(), pPos.Board[b][15].ToCode(), zeroFiles[4]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][96].ToCode(), pPos.Board[boardLayer][86].ToCode(), pPos.Board[boardLayer][76].ToCode(), pPos.Board[boardLayer][66].ToCode(), pPos.Board[boardLayer][56].ToCode(), pPos.Board[boardLayer][46].ToCode(), pPos.Board[boardLayer][36].ToCode(), pPos.Board[boardLayer][26].ToCode(), pPos.Board[boardLayer][16].ToCode(), zeroFiles[5]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][96].ToCode(), pPos.Board[b][86].ToCode(), pPos.Board[b][76].ToCode(), pPos.Board[b][66].ToCode(), pPos.Board[b][56].ToCode(), pPos.Board[b][46].ToCode(), pPos.Board[b][36].ToCode(), pPos.Board[b][26].ToCode(), pPos.Board[b][16].ToCode(), zeroFiles[5]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][97].ToCode(), pPos.Board[boardLayer][87].ToCode(), pPos.Board[boardLayer][77].ToCode(), pPos.Board[boardLayer][67].ToCode(), pPos.Board[boardLayer][57].ToCode(), pPos.Board[boardLayer][47].ToCode(), pPos.Board[boardLayer][37].ToCode(), pPos.Board[boardLayer][27].ToCode(), pPos.Board[boardLayer][17].ToCode(), zeroFiles[6]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][97].ToCode(), pPos.Board[b][87].ToCode(), pPos.Board[b][77].ToCode(), pPos.Board[b][67].ToCode(), pPos.Board[b][57].ToCode(), pPos.Board[b][47].ToCode(), pPos.Board[b][37].ToCode(), pPos.Board[b][27].ToCode(), pPos.Board[b][17].ToCode(), zeroFiles[6]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][98].ToCode(), pPos.Board[boardLayer][88].ToCode(), pPos.Board[boardLayer][78].ToCode(), pPos.Board[boardLayer][68].ToCode(), pPos.Board[boardLayer][58].ToCode(), pPos.Board[boardLayer][48].ToCode(), pPos.Board[boardLayer][38].ToCode(), pPos.Board[boardLayer][28].ToCode(), pPos.Board[boardLayer][18].ToCode(), zeroFiles[7]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][98].ToCode(), pPos.Board[b][88].ToCode(), pPos.Board[b][78].ToCode(), pPos.Board[b][68].ToCode(), pPos.Board[b][58].ToCode(), pPos.Board[b][48].ToCode(), pPos.Board[b][38].ToCode(), pPos.Board[b][28].ToCode(), pPos.Board[b][18].ToCode(), zeroFiles[7]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[boardLayer][99].ToCode(), pPos.Board[boardLayer][89].ToCode(), pPos.Board[boardLayer][79].ToCode(), pPos.Board[boardLayer][69].ToCode(), pPos.Board[boardLayer][59].ToCode(), pPos.Board[boardLayer][49].ToCode(), pPos.Board[boardLayer][39].ToCode(), pPos.Board[boardLayer][29].ToCode(), pPos.Board[boardLayer][19].ToCode(), zeroFiles[8]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][99].ToCode(), pPos.Board[b][89].ToCode(), pPos.Board[b][79].ToCode(), pPos.Board[b][69].ToCode(), pPos.Board[b][59].ToCode(), pPos.Board[b][49].ToCode(), pPos.Board[b][39].ToCode(), pPos.Board[b][29].ToCode(), pPos.Board[b][19].ToCode(), zeroFiles[8]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
@@ -141,7 +141,7 @@ func (pPos *Position) Sprint(boardLayer int) string {
 		"        R  B  G  S  N  L  P\n" +
 		"      +--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[boardLayer][0], pPos.Hands[boardLayer][1], pPos.Hands[boardLayer][2], pPos.Hands[boardLayer][3], pPos.Hands[boardLayer][4], pPos.Hands[boardLayer][5], pPos.Hands[boardLayer][6]) +
+		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[b][0], pPos.Hands[b][1], pPos.Hands[b][2], pPos.Hands[b][3], pPos.Hands[b][4], pPos.Hands[b][5], pPos.Hands[b][6]) +
 		//
 		"      +--+--+--+--+--+--+--+\n" +
 		//
@@ -262,7 +262,7 @@ func (pPos *Position) SprintLocation() string {
 }
 
 // SprintSfen - SFEN文字列返せよ（＾～＾）
-func (pPos *Position) SprintSfen(boardLayer int) string {
+func (pPos *Position) SprintSfen(b BoardLayerT) string {
 	// 9x9=81 + 8slash = 89 文字 なんだが成り駒で増えるし めんどくさ（＾～＾）多めに取っとくか（＾～＾）
 	// 成り駒２文字なんで、byte型だとめんどくさ（＾～＾）
 	buf := make([]byte, 0, 200)
@@ -270,7 +270,7 @@ func (pPos *Position) SprintSfen(boardLayer int) string {
 	spaces := 0
 	for rank := Square(1); rank < 10; rank += 1 {
 		for file := Square(9); file > 0; file -= 1 {
-			piece := pPos.Board[boardLayer][SquareFrom(file, rank)]
+			piece := pPos.Board[b][SquareFrom(file, rank)]
 
 			if piece != PIECE_EMPTY {
 				if spaces > 0 {
@@ -319,98 +319,98 @@ func (pPos *Position) SprintSfen(boardLayer int) string {
 
 	// 持ち駒
 	hands := ""
-	num := pPos.Hands[boardLayer][0]
+	num := pPos.Hands[b][0]
 	if num == 1 {
 		hands += "R"
 	} else if num > 1 {
 		hands += fmt.Sprintf("R%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][1]
+	num = pPos.Hands[b][1]
 	if num == 1 {
 		hands += "B"
 	} else if num > 1 {
 		hands += fmt.Sprintf("B%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][2]
+	num = pPos.Hands[b][2]
 	if num == 1 {
 		hands += "G"
 	} else if num > 1 {
 		hands += fmt.Sprintf("G%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][3]
+	num = pPos.Hands[b][3]
 	if num == 1 {
 		hands += "S"
 	} else if num > 1 {
 		hands += fmt.Sprintf("S%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][4]
+	num = pPos.Hands[b][4]
 	if num == 1 {
 		hands += "N"
 	} else if num > 1 {
 		hands += fmt.Sprintf("N%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][5]
+	num = pPos.Hands[b][5]
 	if num == 1 {
 		hands += "L"
 	} else if num > 1 {
 		hands += fmt.Sprintf("L%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][6]
+	num = pPos.Hands[b][6]
 	if num == 1 {
 		hands += "P"
 	} else if num > 1 {
 		hands += fmt.Sprintf("P%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][7]
+	num = pPos.Hands[b][7]
 	if num == 1 {
 		hands += "r"
 	} else if num > 1 {
 		hands += fmt.Sprintf("r%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][8]
+	num = pPos.Hands[b][8]
 	if num == 1 {
 		hands += "b"
 	} else if num > 1 {
 		hands += fmt.Sprintf("b%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][9]
+	num = pPos.Hands[b][9]
 	if num == 1 {
 		hands += "g"
 	} else if num > 1 {
 		hands += fmt.Sprintf("g%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][10]
+	num = pPos.Hands[b][10]
 	if num == 1 {
 		hands += "s"
 	} else if num > 1 {
 		hands += fmt.Sprintf("s%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][11]
+	num = pPos.Hands[b][11]
 	if num == 1 {
 		hands += "n"
 	} else if num > 1 {
 		hands += fmt.Sprintf("n%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][12]
+	num = pPos.Hands[b][12]
 	if num == 1 {
 		hands += "l"
 	} else if num > 1 {
 		hands += fmt.Sprintf("l%d", num)
 	}
 
-	num = pPos.Hands[boardLayer][13]
+	num = pPos.Hands[b][13]
 	if num == 1 {
 		hands += "p"
 	} else if num > 1 {

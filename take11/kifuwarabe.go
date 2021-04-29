@@ -264,8 +264,8 @@ func moveList(pPos *Position) {
 }
 
 // ShowAllPiecesCount - 駒の枚数表示
-func ShowAllPiecesCount(pPos *Position, boardLayer int) {
-	countList := CountAllPieces(pPos, boardLayer)
+func ShowAllPiecesCount(pPos *Position, b BoardLayerT) {
+	countList := CountAllPieces(pPos, b)
 	G.Chat.Debug("Count\n")
 	G.Chat.Debug("-----\n")
 	G.Chat.Debug("King  :%3d\n", countList[0])
