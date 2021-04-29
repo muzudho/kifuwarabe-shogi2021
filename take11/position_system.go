@@ -1367,7 +1367,6 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	// １手指すと１～２の駒が動くことに着目してくれだぜ（＾～＾）
 	// 動かしている駒と、取った駒だぜ（＾～＾）
 	mov_piece_type := PIECE_TYPE_EMPTY
-	cap_piece_type := PIECE_TYPE_EMPTY
 
 	// 先に 手目 を１つ戻すぜ（＾～＾）UndoMoveでフェーズもひっくり返すぜ（＾～＾）
 	pPosSys.OffsetMovesIndex -= 1
@@ -1375,14 +1374,8 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	// next_phase := pPosSys.GetPhase()
 	pPosSys.FlipPhase()
 
-	// 取った駒
-	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
-	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
-
 	mov_dst_sq := move.GetDestination()
 	mov_src_sq := move.GetSource()
-	var cap_dst_sq = SQUARE_EMPTY
-	var cap_src_sq = SQUARE_EMPTY
 
 	// 利きの差分テーブルをクリアー（＾～＾）
 	pPosSys.ClearControlDiff()
@@ -1405,7 +1398,6 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 		// 駒台に駒を戻します
 		pPos.Hands[drop-SQ_HAND_START] += 1
-		cap_dst_sq = SQUARE_EMPTY
 	default:
 		// 打でないなら
 
@@ -1421,105 +1413,179 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			pPos.Board[mov_src_sq] = pPos.Board[mov_dst_sq]
 		}
 
-		// 取った相手の駒があれば、自分の駒台から下ろします
-		switch captured {
-		case PIECE_EMPTY: // Ignored
-		case PIECE_K1: // Second player win
-			// Lost first king
-		case PIECE_R1, PIECE_PR1:
-			cap_dst_sq = SQ_R2
-		case PIECE_B1, PIECE_PB1:
-			cap_dst_sq = SQ_B2
-		case PIECE_G1:
-			cap_dst_sq = SQ_G2
-		case PIECE_S1, PIECE_PS1:
-			cap_dst_sq = SQ_S2
-		case PIECE_N1, PIECE_PN1:
-			cap_dst_sq = SQ_N2
-		case PIECE_L1, PIECE_PL1:
-			cap_dst_sq = SQ_L2
-		case PIECE_P1, PIECE_PP1:
-			cap_dst_sq = SQ_P2
-		case PIECE_K2: // First player win
-			// Lost second king
-		case PIECE_R2, PIECE_PR2:
-			cap_dst_sq = SQ_R1
-		case PIECE_B2, PIECE_PB2:
-			cap_dst_sq = SQ_B1
-		case PIECE_G2:
-			cap_dst_sq = SQ_G1
-		case PIECE_S2, PIECE_PS2:
-			cap_dst_sq = SQ_S1
-		case PIECE_N2, PIECE_PN2:
-			cap_dst_sq = SQ_N1
-		case PIECE_L2, PIECE_PL2:
-			cap_dst_sq = SQ_L1
-		case PIECE_P2, PIECE_PP2:
-			cap_dst_sq = SQ_P1
-		default:
-			fmt.Printf("Error: Unknown captured=[%d]", captured)
-		}
-
-		if cap_dst_sq != SQUARE_EMPTY {
-			cap_src_sq = mov_dst_sq
-			pPos.Hands[cap_dst_sq-SQ_HAND_START] -= 1
-
-			// 取っていた駒を行き先に戻します
-			cap_piece_type = What(captured)
-			pPos.Board[cap_src_sq] = captured
-
-			// pieceType := What(captured)
-			// switch pieceType {
-			// case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
-			// 	// Ignored: 長い利きの駒は あとで追加するので、ここでは無視します
-			// default:
-			// 取った駒は盤上になかったので、ここで利きを復元させます
-			// 行き先にある取られていた駒の利きの復元
-			pPosSys.AddControlDiff(pPos, CONTROL_LAYER_DIFF_CAPTURED, cap_src_sq, 1)
-			// }
-		} else {
-			pPos.Board[mov_dst_sq] = PIECE_EMPTY
-		}
+		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 元の場所に戻した自駒の利きを復元します
 		pPosSys.AddControlDiff(pPos, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
-	piece_type_list := []PieceType{mov_piece_type, cap_piece_type}
-	dst_sq_list := []Square{mov_dst_sq, cap_dst_sq}
-	src_sq_list := []Square{mov_src_sq, cap_src_sq}
-	for j, moving_piece_type := range piece_type_list {
-		switch moving_piece_type {
-		case PIECE_TYPE_K:
-			switch pPosSys.phase { // next_phase
-			case FIRST:
-				pPos.PieceLocations[PCLOC_K1] = src_sq_list[j]
-			case SECOND:
-				pPos.PieceLocations[PCLOC_K2] = src_sq_list[j]
-			default:
-				panic(fmt.Errorf("Unknown pPosSys.phase=%d", pPosSys.phase))
+	switch mov_piece_type {
+	case PIECE_TYPE_K:
+		switch pPosSys.phase { // next_phase
+		case FIRST:
+			pPos.PieceLocations[PCLOC_K1] = mov_src_sq
+		case SECOND:
+			pPos.PieceLocations[PCLOC_K2] = mov_src_sq
+		default:
+			panic(fmt.Errorf("Unknown pPosSys.phase=%d", pPosSys.phase))
+		}
+	case PIECE_TYPE_R, PIECE_TYPE_PR:
+		for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
+			sq := pPos.PieceLocations[i]
+			if sq == mov_dst_sq {
+				pPos.PieceLocations[i] = mov_src_sq
 			}
-		case PIECE_TYPE_R, PIECE_TYPE_PR:
-			for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
-				sq := pPos.PieceLocations[i]
-				if sq == dst_sq_list[j] {
-					pPos.PieceLocations[i] = src_sq_list[j]
-				}
+		}
+	case PIECE_TYPE_B, PIECE_TYPE_PB:
+		for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+			sq := pPos.PieceLocations[i]
+			if sq == mov_dst_sq {
+				pPos.PieceLocations[i] = mov_src_sq
 			}
-		case PIECE_TYPE_B, PIECE_TYPE_PB:
-			for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
-				sq := pPos.PieceLocations[i]
-				if sq == dst_sq_list[j] {
-					pPos.PieceLocations[i] = src_sq_list[j]
-				}
+		}
+	case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
+		for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+			sq := pPos.PieceLocations[i]
+			if sq == mov_dst_sq {
+				pPos.PieceLocations[i] = mov_src_sq
 			}
-		case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
-			for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
-				sq := pPos.PieceLocations[i]
-				if sq == dst_sq_list[j] {
-					pPos.PieceLocations[i] = src_sq_list[j]
-				}
+		}
+	}
+
+	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
+	// アンドゥなので逆さになっているぜ（＾～＾）
+	pPosSys.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_OFF, 1, mov_src_sq)
+	pPosSys.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_OFF, 1, mov_src_sq)
+	pPosSys.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
+
+	pPosSys.MergeControlDiff()
+
+	// 取った駒を戻すぜ（＾～＾）
+	pPosSys.undoCapture(pPos)
+}
+
+// undoCapture - 取った駒を戻すぜ（＾～＾）
+func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
+	// G.StderrChat.Trace(pPosSys.Sprint())
+
+	if pPosSys.OffsetMovesIndex < 1 {
+		return
+	}
+
+	// 取った駒だぜ（＾～＾）
+	cap_piece_type := PIECE_TYPE_EMPTY
+
+	// 手目もフェーズもすでに１つ戻っているとするぜ（＾～＾）
+	move := pPosSys.Moves[pPosSys.OffsetMovesIndex]
+
+	// 取った駒
+	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
+	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
+
+	// 取った駒に関係するのは行き先だけ（＾～＾）
+	mov_dst_sq := move.GetDestination()
+	mov_src_sq := move.GetSource()
+	var hand_sq = SQUARE_EMPTY
+
+	// 利きの差分テーブルをクリアー（＾～＾）
+	pPosSys.ClearControlDiff()
+
+	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
+	// アンドゥなので逆さになっているぜ（＾～＾）
+	pPosSys.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_ON, -1, mov_dst_sq)
+	pPosSys.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_ON, -1, mov_dst_sq)
+	pPosSys.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_ON, -1, mov_dst_sq)
+
+	// 打かどうかで分けます
+	switch mov_src_sq {
+	case SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_N1, SQ_L1, SQ_P1, SQ_R2, SQ_B2, SQ_G2, SQ_S2, SQ_N2, SQ_L2, SQ_P2:
+		// 打で取れる駒はないぜ（＾～＾）
+	default:
+		// 打でないなら
+
+		// 取った相手の駒があれば、自分の駒台から下ろします
+		switch captured {
+		case PIECE_EMPTY: // Ignored
+		case PIECE_K1: // Second player win
+			// Lost first king
+		case PIECE_R1, PIECE_PR1:
+			hand_sq = SQ_R2
+		case PIECE_B1, PIECE_PB1:
+			hand_sq = SQ_B2
+		case PIECE_G1:
+			hand_sq = SQ_G2
+		case PIECE_S1, PIECE_PS1:
+			hand_sq = SQ_S2
+		case PIECE_N1, PIECE_PN1:
+			hand_sq = SQ_N2
+		case PIECE_L1, PIECE_PL1:
+			hand_sq = SQ_L2
+		case PIECE_P1, PIECE_PP1:
+			hand_sq = SQ_P2
+		case PIECE_K2: // First player win
+			// Lost second king
+		case PIECE_R2, PIECE_PR2:
+			hand_sq = SQ_R1
+		case PIECE_B2, PIECE_PB2:
+			hand_sq = SQ_B1
+		case PIECE_G2:
+			hand_sq = SQ_G1
+		case PIECE_S2, PIECE_PS2:
+			hand_sq = SQ_S1
+		case PIECE_N2, PIECE_PN2:
+			hand_sq = SQ_N1
+		case PIECE_L2, PIECE_PL2:
+			hand_sq = SQ_L1
+		case PIECE_P2, PIECE_PP2:
+			hand_sq = SQ_P1
+		default:
+			fmt.Printf("Error: Unknown captured=[%d]", captured)
+		}
+
+		if hand_sq != SQUARE_EMPTY {
+			pPos.Hands[hand_sq-SQ_HAND_START] -= 1
+
+			// 取っていた駒を行き先に戻します
+			cap_piece_type = What(captured)
+			pPos.Board[mov_dst_sq] = captured
+
+			// 取った駒は盤上になかったので、ここで利きを復元させます
+			// 行き先にある取られていた駒の利きの復元
+			pPosSys.AddControlDiff(pPos, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
+		}
+	}
+
+	// 玉と、長い利きの駒が動いたときは、位置情報更新
+	switch cap_piece_type {
+	case PIECE_TYPE_K:
+		switch pPosSys.phase { // next_phase
+		case FIRST:
+			pPos.PieceLocations[PCLOC_K1] = mov_dst_sq
+		case SECOND:
+			pPos.PieceLocations[PCLOC_K2] = mov_dst_sq
+		default:
+			panic(fmt.Errorf("Unknown pPosSys.phase=%d", pPosSys.phase))
+		}
+	case PIECE_TYPE_R, PIECE_TYPE_PR:
+		for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
+			sq := pPos.PieceLocations[i]
+			if sq == hand_sq {
+				pPos.PieceLocations[i] = mov_dst_sq
+			}
+		}
+	case PIECE_TYPE_B, PIECE_TYPE_PB:
+		for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
+			sq := pPos.PieceLocations[i]
+			if sq == hand_sq {
+				pPos.PieceLocations[i] = mov_dst_sq
+			}
+		}
+	case PIECE_TYPE_L, PIECE_TYPE_PL: // 成香も一応、位置を覚えておかないと存在しない香を監視してしまうぜ（＾～＾）
+		for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
+			sq := pPos.PieceLocations[i]
+			if sq == hand_sq {
+				pPos.PieceLocations[i] = mov_dst_sq
 			}
 		}
 	}
