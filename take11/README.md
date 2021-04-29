@@ -38,3 +38,17 @@ error board 0 1 2 3
 location 0
 location 1
 ```
+
+## Test2
+
+```
+# 後手馬で先手飛を取って、アンドゥするテスト（＾～＾）
+position sfen 4k4/9/9/9/9/9/2+b6/3R5/4K4 w - 1
+pos
+do 7g6h
+pos
+location 0
+undo
+pos
+location 0
+```

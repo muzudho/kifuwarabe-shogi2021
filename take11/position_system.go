@@ -1420,7 +1420,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			pPos.Board[mov_src_sq] = pPos.Board[mov_dst_sq]
 		}
 
-		// あれば、取った駒は駒台から下ろします
+		// 取った相手の駒があれば、自分の駒台から下ろします
 		switch captured {
 		case PIECE_EMPTY: // Ignored
 		case PIECE_K1: // Second player win
