@@ -399,3 +399,88 @@ func CountErrorCountLists(countList1 [8]int, countList2 [8]int) int {
 	}
 	return sum
 }
+
+// copyBoard - 盤[b0] を 盤[b1] にコピーします
+func copyBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT) {
+	for sq := 0; sq < 100; sq += 1 {
+		pPos.Board[b1][sq] = pPos.Board[b0][sq]
+	}
+
+	pPos.Hands[b1] = pPos.Hands[b0]
+	for i := PCLOC_START; i < PCLOC_END; i += 1 {
+		pPos.PieceLocations[b1][i] = pPos.PieceLocations[b0][i]
+	}
+}
+
+// copyBoard - 盤[0] を 盤[1] で異なるマスを 盤[2] 盤[3] にセットします
+func diffBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) {
+	// 盤上
+	for sq := 0; sq < 100; sq += 1 {
+		if pPos.Board[b1][sq] == pPos.Board[b0][sq] {
+			// 等しければ空マス
+			pPos.Board[b2][sq] = PIECE_EMPTY
+			pPos.Board[b3][sq] = PIECE_EMPTY
+
+		} else {
+			// 異なったら
+			pPos.Board[b2][sq] = pPos.Board[b0][sq]
+			pPos.Board[b3][sq] = pPos.Board[b1][sq]
+		}
+	}
+
+	// 駒台
+	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
+		if pPos.Hands[b0][i] == pPos.Hands[b1][i] {
+			// 等しければゼロ
+			pPos.Hands[b2][i] = 0
+			pPos.Hands[b3][i] = 0
+		} else {
+			// 異なればその数
+			pPos.Hands[b2][i] = pPos.Hands[b0][i]
+			pPos.Hands[b3][i] = pPos.Hands[b1][i]
+		}
+	}
+
+	// 位置
+	for i := PCLOC_START; i < PCLOC_END; i += 1 {
+		if pPos.PieceLocations[b0][i] == pPos.PieceLocations[b1][i] {
+			// 等しければゼロ
+			pPos.PieceLocations[b2][i] = 0
+			pPos.PieceLocations[b3][i] = 0
+		} else {
+			// 異なればその数
+			pPos.PieceLocations[b2][i] = pPos.PieceLocations[b0][i]
+			pPos.PieceLocations[b3][i] = pPos.PieceLocations[b1][i]
+		}
+	}
+}
+
+// ２つのボードの違いを数えるぜ（＾～＾）
+func errorBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) int {
+	diffBoard(pPos, b0, b1, b2, b3)
+
+	errorNum := 0
+
+	// 盤上
+	for sq := 0; sq < 100; sq += 1 {
+		if pPos.Board[b2][sq] != pPos.Board[b3][sq] {
+			errorNum += 1
+		}
+	}
+
+	// 駒台
+	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
+		if pPos.Hands[b2][i] != pPos.Hands[b3][i] {
+			errorNum += 1
+		}
+	}
+
+	// 位置
+	for i := PCLOC_START; i < PCLOC_END; i += 1 {
+		if pPos.PieceLocations[b2][i] != pPos.PieceLocations[b3][i] {
+			errorNum += 1
+		}
+	}
+
+	return errorNum
+}

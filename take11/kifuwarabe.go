@@ -224,8 +224,25 @@ MainLoop:
 				G.Chat.Debug("control sumabs {number}\n")
 			}
 		case "location":
-			// あの駒、どこにいんの（＾～＾）？
-			G.Chat.Debug(pPos.SprintLocation(BOARD_LAYER_MAIN))
+			length := len(tokens)
+			ok := false
+			if length == 2 {
+				// 盤番号
+				b1, err := strconv.Atoi(tokens[1])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				// あの駒、どこにいんの（＾～＾）？
+				G.Chat.Debug(pPos.SprintLocation(BoardLayerT(b1)))
+				ok = true
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("location {boardLayerIndex}\n")
+			}
 		case "sfen":
 			// SFEN文字列返せよ（＾～＾）
 			G.Chat.Debug(pPos.SprintSfen(BOARD_LAYER_MAIN))
@@ -267,8 +284,19 @@ MainLoop:
 		case "board":
 			length := len(tokens)
 			ok := false
-			if length == 2 && tokens[1] == "copy" {
-				copyBoard(pPos)
+			if length == 4 && tokens[1] == "copy" {
+				// 盤番号
+				b1, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b2, err := strconv.Atoi(tokens[3])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				copyBoard(pPos, BoardLayerT(b1), BoardLayerT(b2))
 				ok = true
 			} else if length == 2 && tokens[1] == "diff" {
 				diffBoard(pPos, BoardLayerT(0), BoardLayerT(1), BoardLayerT(2), BoardLayerT(3))
@@ -278,7 +306,7 @@ MainLoop:
 			if !ok {
 				G.Chat.Debug("Format\n")
 				G.Chat.Debug("------\n")
-				G.Chat.Debug("board copy\n")
+				G.Chat.Debug("board copy {boardLayerIndex} {boardLayerIndex}\n")
 			}
 		case "posdiff":
 			length := len(tokens)
@@ -386,89 +414,4 @@ func ShowAllPiecesCount(pPos *Position, b BoardLayerT) {
 	G.Chat.Debug("Pawn  :%3d\n", countList[7])
 	G.Chat.Debug("----------\n")
 	G.Chat.Debug("Total :%3d\n", countList[0]+countList[1]+countList[2]+countList[3]+countList[4]+countList[5]+countList[6]+countList[7])
-}
-
-// copyBoard - 盤[0] を 盤[1] にコピーします
-func copyBoard(pPos *Position) {
-	for sq := 0; sq < 100; sq += 1 {
-		pPos.Board[1][sq] = pPos.Board[0][sq]
-	}
-
-	pPos.Hands[1] = pPos.Hands[0]
-	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		pPos.PieceLocations[1][i] = pPos.PieceLocations[0][i]
-	}
-}
-
-// copyBoard - 盤[0] を 盤[1] で異なるマスを 盤[2] 盤[3] にセットします
-func diffBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) {
-	// 盤上
-	for sq := 0; sq < 100; sq += 1 {
-		if pPos.Board[b1][sq] == pPos.Board[b0][sq] {
-			// 等しければ空マス
-			pPos.Board[b2][sq] = PIECE_EMPTY
-			pPos.Board[b3][sq] = PIECE_EMPTY
-
-		} else {
-			// 異なったら
-			pPos.Board[b2][sq] = pPos.Board[b0][sq]
-			pPos.Board[b3][sq] = pPos.Board[b1][sq]
-		}
-	}
-
-	// 駒台
-	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPos.Hands[b0][i] == pPos.Hands[b1][i] {
-			// 等しければゼロ
-			pPos.Hands[b2][i] = 0
-			pPos.Hands[b3][i] = 0
-		} else {
-			// 異なればその数
-			pPos.Hands[b2][i] = pPos.Hands[b0][i]
-			pPos.Hands[b3][i] = pPos.Hands[b1][i]
-		}
-	}
-
-	// 位置
-	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		if pPos.PieceLocations[b0][i] == pPos.PieceLocations[b1][i] {
-			// 等しければゼロ
-			pPos.PieceLocations[b2][i] = 0
-			pPos.PieceLocations[b3][i] = 0
-		} else {
-			// 異なればその数
-			pPos.PieceLocations[b2][i] = pPos.PieceLocations[b0][i]
-			pPos.PieceLocations[b3][i] = pPos.PieceLocations[b1][i]
-		}
-	}
-}
-
-// ２つのボードの違いを数えるぜ（＾～＾）
-func errorBoard(pPos *Position, b0 BoardLayerT, b1 BoardLayerT, b2 BoardLayerT, b3 BoardLayerT) int {
-	diffBoard(pPos, b0, b1, b2, b3)
-
-	errorNum := 0
-
-	// 盤上
-	for sq := 0; sq < 100; sq += 1 {
-		if pPos.Board[b2][sq] != pPos.Board[b3][sq] {
-			errorNum += 1
-		}
-	}
-
-	// 駒台
-	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPos.Hands[b2][i] != pPos.Hands[b3][i] {
-			errorNum += 1
-		}
-	}
-
-	// 位置
-	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		if pPos.PieceLocations[b2][i] == pPos.PieceLocations[b3][i] {
-			errorNum += 1
-		}
-	}
-
-	return errorNum
 }
