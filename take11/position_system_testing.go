@@ -409,14 +409,14 @@ func CountErrorCountLists(countList1 [8]int, countList2 [8]int) int {
 }
 
 // copyBoard - 盤[b0] を 盤[b1] にコピーします
-func copyBoard(pPosSys *PositionSystem, b0 PosLayerT, b1 PosLayerT) {
+func copyBoard(pPos0 *Position, pPos1 *Position) {
 	for sq := 0; sq < 100; sq += 1 {
-		pPosSys.PPosition[b1].Board[sq] = pPosSys.PPosition[b0].Board[sq]
+		pPos1.Board[sq] = pPos0.Board[sq]
 	}
 
-	pPosSys.PPosition[b1].Hands = pPosSys.PPosition[b0].Hands
+	pPos1.Hands = pPos0.Hands
 	for i := PCLOC_START; i < PCLOC_END; i += 1 {
-		pPosSys.PPosition[b1].PieceLocations[i] = pPosSys.PPosition[b0].PieceLocations[i]
+		pPos1.PieceLocations[i] = pPos0.PieceLocations[i]
 	}
 }
 

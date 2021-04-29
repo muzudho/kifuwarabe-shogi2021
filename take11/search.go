@@ -55,10 +55,8 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 	for i, move := range move_list {
 		// G.Chat.Debug("move=%s\n", move.ToCode())
 
-		/*
-			// 盤をコピーしておきます
-			copyBoard(pPosSys, 0, 1)
-		*/
+		// 盤をコピーしておきます
+		copyBoard(pPosSys.PPosition[0], pPosSys.PPosition[1])
 
 		// DoMove と UndoMove を繰り返していると、ずれてくる（＾～＾）
 		if pPosSys.PPosition[POS_LAYER_MAIN].IsEmptySq(move.GetSource()) {

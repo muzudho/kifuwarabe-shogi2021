@@ -313,7 +313,7 @@ MainLoop:
 					G.Chat.Debug("Error: %s", err)
 				}
 
-				copyBoard(pPosSys, PosLayerT(b1), PosLayerT(b2))
+				copyBoard(pPosSys.PPosition[b1], pPosSys.PPosition[b2])
 				ok = true
 			} else if length == 2 && tokens[1] == "diff" {
 				diffBoard(pPosSys, PosLayerT(0), PosLayerT(1), PosLayerT(2), PosLayerT(3))
