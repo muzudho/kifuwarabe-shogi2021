@@ -6,9 +6,9 @@ import (
 )
 
 // Print - 局面出力（＾ｑ＾）
-func (pPos *Position) Sprint(b BoardLayerT) string {
+func (pPosSys *PositionSystem) Sprint(b BoardLayerT) string {
 	var phase_str string
-	switch pPos.GetPhase() {
+	switch pPosSys.GetPhase() {
 	case FIRST:
 		phase_str = "First"
 	case SECOND:
@@ -23,74 +23,74 @@ func (pPos *Position) Sprint(b BoardLayerT) string {
 	zeroFiles := [9]string{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " i "}
 
 	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
-	if !pPos.IsEmptySq(b, 90) {
-		zeroRanks[0] = pPos.Board[b][90].ToCode()
+	if !pPosSys.IsEmptySq(b, 90) {
+		zeroRanks[0] = pPosSys.Board[b][90].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 80) {
-		zeroRanks[1] = pPos.Board[b][80].ToCode()
+	if !pPosSys.IsEmptySq(b, 80) {
+		zeroRanks[1] = pPosSys.Board[b][80].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 70) {
-		zeroRanks[2] = pPos.Board[b][70].ToCode()
+	if !pPosSys.IsEmptySq(b, 70) {
+		zeroRanks[2] = pPosSys.Board[b][70].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 60) {
-		zeroRanks[3] = pPos.Board[b][60].ToCode()
+	if !pPosSys.IsEmptySq(b, 60) {
+		zeroRanks[3] = pPosSys.Board[b][60].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 50) {
-		zeroRanks[4] = pPos.Board[b][50].ToCode()
+	if !pPosSys.IsEmptySq(b, 50) {
+		zeroRanks[4] = pPosSys.Board[b][50].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 40) {
-		zeroRanks[5] = pPos.Board[b][40].ToCode()
+	if !pPosSys.IsEmptySq(b, 40) {
+		zeroRanks[5] = pPosSys.Board[b][40].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 30) {
-		zeroRanks[6] = pPos.Board[b][30].ToCode()
+	if !pPosSys.IsEmptySq(b, 30) {
+		zeroRanks[6] = pPosSys.Board[b][30].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 20) {
-		zeroRanks[7] = pPos.Board[b][20].ToCode()
+	if !pPosSys.IsEmptySq(b, 20) {
+		zeroRanks[7] = pPosSys.Board[b][20].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 10) {
-		zeroRanks[8] = pPos.Board[b][10].ToCode()
+	if !pPosSys.IsEmptySq(b, 10) {
+		zeroRanks[8] = pPosSys.Board[b][10].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 0) {
-		zeroRanks[9] = pPos.Board[b][0].ToCode()
+	if !pPosSys.IsEmptySq(b, 0) {
+		zeroRanks[9] = pPosSys.Board[b][0].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 1) {
-		zeroFiles[0] = pPos.Board[b][1].ToCode()
+	if !pPosSys.IsEmptySq(b, 1) {
+		zeroFiles[0] = pPosSys.Board[b][1].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 2) {
-		zeroFiles[1] = pPos.Board[b][2].ToCode()
+	if !pPosSys.IsEmptySq(b, 2) {
+		zeroFiles[1] = pPosSys.Board[b][2].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 3) {
-		zeroFiles[2] = pPos.Board[b][3].ToCode()
+	if !pPosSys.IsEmptySq(b, 3) {
+		zeroFiles[2] = pPosSys.Board[b][3].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 4) {
-		zeroFiles[3] = pPos.Board[b][4].ToCode()
+	if !pPosSys.IsEmptySq(b, 4) {
+		zeroFiles[3] = pPosSys.Board[b][4].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 5) {
-		zeroFiles[4] = pPos.Board[b][5].ToCode()
+	if !pPosSys.IsEmptySq(b, 5) {
+		zeroFiles[4] = pPosSys.Board[b][5].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 6) {
-		zeroFiles[5] = pPos.Board[b][6].ToCode()
+	if !pPosSys.IsEmptySq(b, 6) {
+		zeroFiles[5] = pPosSys.Board[b][6].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 7) {
-		zeroFiles[6] = pPos.Board[b][7].ToCode()
+	if !pPosSys.IsEmptySq(b, 7) {
+		zeroFiles[6] = pPosSys.Board[b][7].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 8) {
-		zeroFiles[7] = pPos.Board[b][8].ToCode()
+	if !pPosSys.IsEmptySq(b, 8) {
+		zeroFiles[7] = pPosSys.Board[b][8].ToCode()
 	}
-	if !pPos.IsEmptySq(b, 9) {
-		zeroFiles[8] = pPos.Board[b][9].ToCode()
+	if !pPosSys.IsEmptySq(b, 9) {
+		zeroFiles[8] = pPosSys.Board[b][9].ToCode()
 	}
 
 	var s1 = "\n" +
 		//
-		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPos.StartMovesNum, (pPos.StartMovesNum+pPos.OffsetMovesIndex), phase_str) +
+		fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPosSys.StartMovesNum, (pPosSys.StartMovesNum+pPosSys.OffsetMovesIndex), phase_str) +
 		//
 		"\n" +
 		//
 		"  r  b  g  s  n  l  p\n" +
 		"+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[b][7], pPos.Hands[b][8], pPos.Hands[b][9], pPos.Hands[b][10], pPos.Hands[b][11], pPos.Hands[b][12], pPos.Hands[b][13]) +
+		fmt.Sprintf("|%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPosSys.Hands[b][7], pPosSys.Hands[b][8], pPosSys.Hands[b][9], pPosSys.Hands[b][10], pPosSys.Hands[b][11], pPosSys.Hands[b][12], pPosSys.Hands[b][13]) +
 		//
 		"+--+--+--+--+--+--+--+\n" +
 		//
@@ -100,39 +100,39 @@ func (pPos *Position) Sprint(b BoardLayerT) string {
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][91].ToCode(), pPos.Board[b][81].ToCode(), pPos.Board[b][71].ToCode(), pPos.Board[b][61].ToCode(), pPos.Board[b][51].ToCode(), pPos.Board[b][41].ToCode(), pPos.Board[b][31].ToCode(), pPos.Board[b][21].ToCode(), pPos.Board[b][11].ToCode(), zeroFiles[0]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][91].ToCode(), pPosSys.Board[b][81].ToCode(), pPosSys.Board[b][71].ToCode(), pPosSys.Board[b][61].ToCode(), pPosSys.Board[b][51].ToCode(), pPosSys.Board[b][41].ToCode(), pPosSys.Board[b][31].ToCode(), pPosSys.Board[b][21].ToCode(), pPosSys.Board[b][11].ToCode(), zeroFiles[0]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][92].ToCode(), pPos.Board[b][82].ToCode(), pPos.Board[b][72].ToCode(), pPos.Board[b][62].ToCode(), pPos.Board[b][52].ToCode(), pPos.Board[b][42].ToCode(), pPos.Board[b][32].ToCode(), pPos.Board[b][22].ToCode(), pPos.Board[b][12].ToCode(), zeroFiles[1]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][92].ToCode(), pPosSys.Board[b][82].ToCode(), pPosSys.Board[b][72].ToCode(), pPosSys.Board[b][62].ToCode(), pPosSys.Board[b][52].ToCode(), pPosSys.Board[b][42].ToCode(), pPosSys.Board[b][32].ToCode(), pPosSys.Board[b][22].ToCode(), pPosSys.Board[b][12].ToCode(), zeroFiles[1]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][93].ToCode(), pPos.Board[b][83].ToCode(), pPos.Board[b][73].ToCode(), pPos.Board[b][63].ToCode(), pPos.Board[b][53].ToCode(), pPos.Board[b][43].ToCode(), pPos.Board[b][33].ToCode(), pPos.Board[b][23].ToCode(), pPos.Board[b][13].ToCode(), zeroFiles[2]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][93].ToCode(), pPosSys.Board[b][83].ToCode(), pPosSys.Board[b][73].ToCode(), pPosSys.Board[b][63].ToCode(), pPosSys.Board[b][53].ToCode(), pPosSys.Board[b][43].ToCode(), pPosSys.Board[b][33].ToCode(), pPosSys.Board[b][23].ToCode(), pPosSys.Board[b][13].ToCode(), zeroFiles[2]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][94].ToCode(), pPos.Board[b][84].ToCode(), pPos.Board[b][74].ToCode(), pPos.Board[b][64].ToCode(), pPos.Board[b][54].ToCode(), pPos.Board[b][44].ToCode(), pPos.Board[b][34].ToCode(), pPos.Board[b][24].ToCode(), pPos.Board[b][14].ToCode(), zeroFiles[3]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][94].ToCode(), pPosSys.Board[b][84].ToCode(), pPosSys.Board[b][74].ToCode(), pPosSys.Board[b][64].ToCode(), pPosSys.Board[b][54].ToCode(), pPosSys.Board[b][44].ToCode(), pPosSys.Board[b][34].ToCode(), pPosSys.Board[b][24].ToCode(), pPosSys.Board[b][14].ToCode(), zeroFiles[3]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][95].ToCode(), pPos.Board[b][85].ToCode(), pPos.Board[b][75].ToCode(), pPos.Board[b][65].ToCode(), pPos.Board[b][55].ToCode(), pPos.Board[b][45].ToCode(), pPos.Board[b][35].ToCode(), pPos.Board[b][25].ToCode(), pPos.Board[b][15].ToCode(), zeroFiles[4]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][95].ToCode(), pPosSys.Board[b][85].ToCode(), pPosSys.Board[b][75].ToCode(), pPosSys.Board[b][65].ToCode(), pPosSys.Board[b][55].ToCode(), pPosSys.Board[b][45].ToCode(), pPosSys.Board[b][35].ToCode(), pPosSys.Board[b][25].ToCode(), pPosSys.Board[b][15].ToCode(), zeroFiles[4]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][96].ToCode(), pPos.Board[b][86].ToCode(), pPos.Board[b][76].ToCode(), pPos.Board[b][66].ToCode(), pPos.Board[b][56].ToCode(), pPos.Board[b][46].ToCode(), pPos.Board[b][36].ToCode(), pPos.Board[b][26].ToCode(), pPos.Board[b][16].ToCode(), zeroFiles[5]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][96].ToCode(), pPosSys.Board[b][86].ToCode(), pPosSys.Board[b][76].ToCode(), pPosSys.Board[b][66].ToCode(), pPosSys.Board[b][56].ToCode(), pPosSys.Board[b][46].ToCode(), pPosSys.Board[b][36].ToCode(), pPosSys.Board[b][26].ToCode(), pPosSys.Board[b][16].ToCode(), zeroFiles[5]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][97].ToCode(), pPos.Board[b][87].ToCode(), pPos.Board[b][77].ToCode(), pPos.Board[b][67].ToCode(), pPos.Board[b][57].ToCode(), pPos.Board[b][47].ToCode(), pPos.Board[b][37].ToCode(), pPos.Board[b][27].ToCode(), pPos.Board[b][17].ToCode(), zeroFiles[6]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][97].ToCode(), pPosSys.Board[b][87].ToCode(), pPosSys.Board[b][77].ToCode(), pPosSys.Board[b][67].ToCode(), pPosSys.Board[b][57].ToCode(), pPosSys.Board[b][47].ToCode(), pPosSys.Board[b][37].ToCode(), pPosSys.Board[b][27].ToCode(), pPosSys.Board[b][17].ToCode(), zeroFiles[6]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][98].ToCode(), pPos.Board[b][88].ToCode(), pPos.Board[b][78].ToCode(), pPos.Board[b][68].ToCode(), pPos.Board[b][58].ToCode(), pPos.Board[b][48].ToCode(), pPos.Board[b][38].ToCode(), pPos.Board[b][28].ToCode(), pPos.Board[b][18].ToCode(), zeroFiles[7]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][98].ToCode(), pPosSys.Board[b][88].ToCode(), pPosSys.Board[b][78].ToCode(), pPosSys.Board[b][68].ToCode(), pPosSys.Board[b][58].ToCode(), pPosSys.Board[b][48].ToCode(), pPosSys.Board[b][38].ToCode(), pPosSys.Board[b][28].ToCode(), pPosSys.Board[b][18].ToCode(), zeroFiles[7]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPos.Board[b][99].ToCode(), pPos.Board[b][89].ToCode(), pPos.Board[b][79].ToCode(), pPos.Board[b][69].ToCode(), pPos.Board[b][59].ToCode(), pPos.Board[b][49].ToCode(), pPos.Board[b][39].ToCode(), pPos.Board[b][29].ToCode(), pPos.Board[b][19].ToCode(), zeroFiles[8]) +
+		fmt.Sprintf("|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%2s|%3s\n", pPosSys.Board[b][99].ToCode(), pPosSys.Board[b][89].ToCode(), pPosSys.Board[b][79].ToCode(), pPosSys.Board[b][69].ToCode(), pPosSys.Board[b][59].ToCode(), pPosSys.Board[b][49].ToCode(), pPosSys.Board[b][39].ToCode(), pPosSys.Board[b][29].ToCode(), pPosSys.Board[b][19].ToCode(), zeroFiles[8]) +
 		//
 		"+--+--+--+--+--+--+--+--+--+\n" +
 		//
@@ -141,7 +141,7 @@ func (pPos *Position) Sprint(b BoardLayerT) string {
 		"        R  B  G  S  N  L  P\n" +
 		"      +--+--+--+--+--+--+--+\n" +
 		//
-		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPos.Hands[b][0], pPos.Hands[b][1], pPos.Hands[b][2], pPos.Hands[b][3], pPos.Hands[b][4], pPos.Hands[b][5], pPos.Hands[b][6]) +
+		fmt.Sprintf("      |%2d|%2d|%2d|%2d|%2d|%2d|%2d|\n", pPosSys.Hands[b][0], pPosSys.Hands[b][1], pPosSys.Hands[b][2], pPosSys.Hands[b][3], pPosSys.Hands[b][4], pPosSys.Hands[b][5], pPosSys.Hands[b][6]) +
 		//
 		"      +--+--+--+--+--+--+--+\n" +
 		//
@@ -149,7 +149,7 @@ func (pPos *Position) Sprint(b BoardLayerT) string {
 		//
 		"moves"
 
-	moves_text := pPos.createMovesText()
+	moves_text := pPosSys.createMovesText()
 
 	// unsafe使うと速いみたいなんだが、読みにくくなるしな（＾～＾）
 	//return s1 + *(*string)(unsafe.Pointer(&moves_text)) + "\n"
@@ -157,9 +157,9 @@ func (pPos *Position) Sprint(b BoardLayerT) string {
 }
 
 // Print - ２局面の比較用画面出力（＾ｑ＾）
-func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
+func (pPosSys *PositionSystem) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	var phase_str string
-	switch pPos.GetPhase() {
+	switch pPosSys.GetPhase() {
 	case FIRST:
 		phase_str = "First"
 	case SECOND:
@@ -175,21 +175,21 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 
 	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
 	for file := 9; file > -1; file -= 1 {
-		if !pPos.IsEmptySq(b1, Square(file*10)) || !pPos.IsEmptySq(b2, Square(file*10)) {
-			zeroRanks[10-file] = fmt.Sprintf("%2s%2s", pPos.Board[b1][file*10].ToCode(), pPos.Board[b2][file*10].ToCode())
+		if !pPosSys.IsEmptySq(b1, Square(file*10)) || !pPosSys.IsEmptySq(b2, Square(file*10)) {
+			zeroRanks[10-file] = fmt.Sprintf("%2s%2s", pPosSys.Board[b1][file*10].ToCode(), pPosSys.Board[b2][file*10].ToCode())
 		}
 	}
 
 	// 0筋目
 	for rank := Square(1); rank < 10; rank += 1 {
-		if !pPos.IsEmptySq(b1, rank) || !pPos.IsEmptySq(b2, rank) {
-			zeroFiles[rank-1] = fmt.Sprintf("%2s%2s", pPos.Board[b1][rank].ToCode(), pPos.Board[b2][rank].ToCode())
+		if !pPosSys.IsEmptySq(b1, rank) || !pPosSys.IsEmptySq(b2, rank) {
+			zeroFiles[rank-1] = fmt.Sprintf("%2s%2s", pPosSys.Board[b1][rank].ToCode(), pPosSys.Board[b2][rank].ToCode())
 		}
 	}
 
 	lines := []string{}
 	lines = append(lines, "\n")
-	lines = append(lines, fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPos.StartMovesNum, (pPos.StartMovesNum+pPos.OffsetMovesIndex), phase_str))
+	lines = append(lines, fmt.Sprintf("[%d -> %d moves / %s / ? repeats]\n", pPosSys.StartMovesNum, (pPosSys.StartMovesNum+pPosSys.OffsetMovesIndex), phase_str))
 	lines = append(lines, "\n")
 	lines = append(lines, "    r    b    g    s    n    l    p\n")
 	lines = append(lines, "+----+----+----+----+----+----+----+\n")
@@ -197,7 +197,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
 	var buf bytes.Buffer
 	for i := 0; i < 7; i++ {
-		buf.WriteString(fmt.Sprintf("|%2d%2d", pPos.Hands[b1][i+7], pPos.Hands[b2][i+7]))
+		buf.WriteString(fmt.Sprintf("|%2d%2d", pPosSys.Hands[b1][i+7], pPosSys.Hands[b2][i+7]))
 	}
 	buf.WriteString("|\n")
 	lines = append(lines, buf.String())
@@ -216,7 +216,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank := 1
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -226,7 +226,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 2
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -236,7 +236,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 3
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -246,7 +246,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 4
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -256,7 +256,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 5
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -266,7 +266,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 6
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -276,7 +276,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 7
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -286,7 +286,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 8
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -296,7 +296,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	rank = 9
 	for file := 9; file > 0; file-- {
-		buf.WriteString(fmt.Sprintf("|%2s%2s", pPos.Board[b1][file*10+rank].ToCode(), pPos.Board[b2][file*10+rank].ToCode()))
+		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.Board[b1][file*10+rank].ToCode(), pPosSys.Board[b2][file*10+rank].ToCode()))
 	}
 	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
 	lines = append(lines, buf.String())
@@ -309,7 +309,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	buf.Reset()
 	buf.WriteString("      ")
 	for i := 0; i < 7; i++ {
-		buf.WriteString(fmt.Sprintf("|%2d%2d", pPos.Hands[b1][i], pPos.Hands[b2][i]))
+		buf.WriteString(fmt.Sprintf("|%2d%2d", pPosSys.Hands[b1][i], pPosSys.Hands[b2][i]))
 	}
 	buf.WriteString("|\n")
 	lines = append(lines, buf.String())
@@ -318,7 +318,7 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 	lines = append(lines, "\n")
 	lines = append(lines, "moves")
 
-	lines = append(lines, pPos.createMovesText())
+	lines = append(lines, pPosSys.createMovesText())
 	lines = append(lines, "\n")
 
 	buf.Reset()
@@ -329,11 +329,11 @@ func (pPos *Position) SprintDiff(b1 BoardLayerT, b2 BoardLayerT) string {
 }
 
 // CreateMovesList - " 7g7f 3c3d" みたいな部分を返します。最初は半角スペースです
-func (pPos *Position) createMovesText() string {
+func (pPosSys *PositionSystem) createMovesText() string {
 	moves_text := make([]byte, 0, MOVES_SIZE*6) // 6文字 512手分で ほとんどの大会で大丈夫だろ（＾～＾）
-	for i := 0; i < pPos.OffsetMovesIndex; i += 1 {
+	for i := 0; i < pPosSys.OffsetMovesIndex; i += 1 {
 		moves_text = append(moves_text, ' ')
-		moves_text = append(moves_text, pPos.Moves[i].ToCode()...)
+		moves_text = append(moves_text, pPosSys.Moves[i].ToCode()...)
 	}
 	return string(moves_text)
 }
@@ -343,7 +343,7 @@ func (pPos *Position) createMovesText() string {
 // Parameters
 // ----------
 // * `c` - 利き数ボードのレイヤー番号（＾～＾）
-func (pPos *Position) SprintControl(phase Phase, c ControlLayerT) string {
+func (pPosSys *PositionSystem) SprintControl(phase Phase, c ControlLayerT) string {
 	var board [BOARD_SIZE]int8
 	var phase_str string
 	var title string
@@ -360,7 +360,7 @@ func (pPos *Position) SprintControl(phase Phase, c ControlLayerT) string {
 	var ph = phase - 1
 	if 0 <= ph && ph < 2 {
 		title = fmt.Sprintf("Control(%d)%s", c, GetControlLayerName(c))
-		board = pPos.ControlBoards[ph][c]
+		board = pPosSys.ControlBoards[ph][c]
 	}
 
 	return "\n" +
@@ -413,7 +413,7 @@ func (pPos *Position) SprintControl(phase Phase, c ControlLayerT) string {
 }
 
 // SprintLocation - あの駒どこにいんの？を表示
-func (pPos *Position) SprintLocation(b BoardLayerT) string {
+func (pPosSys *PositionSystem) SprintLocation(b BoardLayerT) string {
 	return "\n" +
 		//
 		" K   k      R          B          L\n" +
@@ -421,11 +421,11 @@ func (pPos *Position) SprintLocation(b BoardLayerT) string {
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		// 持ち駒は３桁になるぜ（＾～＾）
 		fmt.Sprintf("|%3d|%3d|  |%3d|%3d|  |%3d|%3d|  |%3d|%3d|%3d|%3d|\n",
-			pPos.PieceLocations[b][PCLOC_K1], pPos.PieceLocations[b][PCLOC_K2],
-			pPos.PieceLocations[b][PCLOC_R1], pPos.PieceLocations[b][PCLOC_R2],
-			pPos.PieceLocations[b][PCLOC_B1], pPos.PieceLocations[b][PCLOC_B2],
-			pPos.PieceLocations[b][PCLOC_L1], pPos.PieceLocations[b][PCLOC_L2],
-			pPos.PieceLocations[b][PCLOC_L3], pPos.PieceLocations[b][PCLOC_L4]) +
+			pPosSys.PieceLocations[b][PCLOC_K1], pPosSys.PieceLocations[b][PCLOC_K2],
+			pPosSys.PieceLocations[b][PCLOC_R1], pPosSys.PieceLocations[b][PCLOC_R2],
+			pPosSys.PieceLocations[b][PCLOC_B1], pPosSys.PieceLocations[b][PCLOC_B2],
+			pPosSys.PieceLocations[b][PCLOC_L1], pPosSys.PieceLocations[b][PCLOC_L2],
+			pPosSys.PieceLocations[b][PCLOC_L3], pPosSys.PieceLocations[b][PCLOC_L4]) +
 		//
 		"+---+---+  +---+---+  +---+---+  +---+---+---+---+\n" +
 		//
@@ -433,7 +433,7 @@ func (pPos *Position) SprintLocation(b BoardLayerT) string {
 }
 
 // SprintSfen - SFEN文字列返せよ（＾～＾）
-func (pPos *Position) SprintSfen(b BoardLayerT) string {
+func (pPosSys *PositionSystem) SprintSfen(b BoardLayerT) string {
 	// 9x9=81 + 8slash = 89 文字 なんだが成り駒で増えるし めんどくさ（＾～＾）多めに取っとくか（＾～＾）
 	// 成り駒２文字なんで、byte型だとめんどくさ（＾～＾）
 	buf := make([]byte, 0, 200)
@@ -441,7 +441,7 @@ func (pPos *Position) SprintSfen(b BoardLayerT) string {
 	spaces := 0
 	for rank := Square(1); rank < 10; rank += 1 {
 		for file := Square(9); file > 0; file -= 1 {
-			piece := pPos.Board[b][SquareFrom(file, rank)]
+			piece := pPosSys.Board[b][SquareFrom(file, rank)]
 
 			if piece != PIECE_EMPTY {
 				if spaces > 0 {
@@ -479,109 +479,109 @@ func (pPos *Position) SprintSfen(b BoardLayerT) string {
 
 	// 手番
 	var phaseStr string
-	switch pPos.GetPhase() {
+	switch pPosSys.GetPhase() {
 	case FIRST:
 		phaseStr = "b"
 	case SECOND:
 		phaseStr = "w"
 	default:
-		panic(fmt.Errorf("LogicalError: Unknows phase=[%d]", pPos.GetPhase()))
+		panic(fmt.Errorf("LogicalError: Unknows phase=[%d]", pPosSys.GetPhase()))
 	}
 
 	// 持ち駒
 	hands := ""
-	num := pPos.Hands[b][0]
+	num := pPosSys.Hands[b][0]
 	if num == 1 {
 		hands += "R"
 	} else if num > 1 {
 		hands += fmt.Sprintf("R%d", num)
 	}
 
-	num = pPos.Hands[b][1]
+	num = pPosSys.Hands[b][1]
 	if num == 1 {
 		hands += "B"
 	} else if num > 1 {
 		hands += fmt.Sprintf("B%d", num)
 	}
 
-	num = pPos.Hands[b][2]
+	num = pPosSys.Hands[b][2]
 	if num == 1 {
 		hands += "G"
 	} else if num > 1 {
 		hands += fmt.Sprintf("G%d", num)
 	}
 
-	num = pPos.Hands[b][3]
+	num = pPosSys.Hands[b][3]
 	if num == 1 {
 		hands += "S"
 	} else if num > 1 {
 		hands += fmt.Sprintf("S%d", num)
 	}
 
-	num = pPos.Hands[b][4]
+	num = pPosSys.Hands[b][4]
 	if num == 1 {
 		hands += "N"
 	} else if num > 1 {
 		hands += fmt.Sprintf("N%d", num)
 	}
 
-	num = pPos.Hands[b][5]
+	num = pPosSys.Hands[b][5]
 	if num == 1 {
 		hands += "L"
 	} else if num > 1 {
 		hands += fmt.Sprintf("L%d", num)
 	}
 
-	num = pPos.Hands[b][6]
+	num = pPosSys.Hands[b][6]
 	if num == 1 {
 		hands += "P"
 	} else if num > 1 {
 		hands += fmt.Sprintf("P%d", num)
 	}
 
-	num = pPos.Hands[b][7]
+	num = pPosSys.Hands[b][7]
 	if num == 1 {
 		hands += "r"
 	} else if num > 1 {
 		hands += fmt.Sprintf("r%d", num)
 	}
 
-	num = pPos.Hands[b][8]
+	num = pPosSys.Hands[b][8]
 	if num == 1 {
 		hands += "b"
 	} else if num > 1 {
 		hands += fmt.Sprintf("b%d", num)
 	}
 
-	num = pPos.Hands[b][9]
+	num = pPosSys.Hands[b][9]
 	if num == 1 {
 		hands += "g"
 	} else if num > 1 {
 		hands += fmt.Sprintf("g%d", num)
 	}
 
-	num = pPos.Hands[b][10]
+	num = pPosSys.Hands[b][10]
 	if num == 1 {
 		hands += "s"
 	} else if num > 1 {
 		hands += fmt.Sprintf("s%d", num)
 	}
 
-	num = pPos.Hands[b][11]
+	num = pPosSys.Hands[b][11]
 	if num == 1 {
 		hands += "n"
 	} else if num > 1 {
 		hands += fmt.Sprintf("n%d", num)
 	}
 
-	num = pPos.Hands[b][12]
+	num = pPosSys.Hands[b][12]
 	if num == 1 {
 		hands += "l"
 	} else if num > 1 {
 		hands += fmt.Sprintf("l%d", num)
 	}
 
-	num = pPos.Hands[b][13]
+	num = pPosSys.Hands[b][13]
 	if num == 1 {
 		hands += "p"
 	} else if num > 1 {
@@ -593,23 +593,23 @@ func (pPos *Position) SprintSfen(b BoardLayerT) string {
 	}
 
 	// 手数
-	movesNum := pPos.StartMovesNum + pPos.OffsetMovesIndex
+	movesNum := pPosSys.StartMovesNum + pPosSys.OffsetMovesIndex
 
 	// 指し手
-	moves_text := pPos.createMovesText()
+	moves_text := pPosSys.createMovesText()
 
 	return fmt.Sprintf("position sfen %s %s %s %d moves%s\n", buf, phaseStr, hands, movesNum, moves_text)
 }
 
 // SprintRecord - 棋譜表示（＾～＾）
-func (pPos *Position) SprintRecord() string {
+func (pPosSys *PositionSystem) SprintRecord() string {
 
 	// "8h2b+ b \n" 1行9byteぐらいを想定（＾～＾）
 	record_text := make([]byte, 0, MOVES_SIZE*9)
-	for i := 0; i < pPos.OffsetMovesIndex; i += 1 {
-		record_text = append(record_text, pPos.Moves[i].ToCode()...)
+	for i := 0; i < pPosSys.OffsetMovesIndex; i += 1 {
+		record_text = append(record_text, pPosSys.Moves[i].ToCode()...)
 		record_text = append(record_text, ' ')
-		record_text = append(record_text, pPos.CapturedList[i].ToCode()...)
+		record_text = append(record_text, pPosSys.CapturedList[i].ToCode()...)
 		record_text = append(record_text, '\n')
 	}
 
@@ -617,50 +617,50 @@ func (pPos *Position) SprintRecord() string {
 }
 
 // Dump - 内部状態を全部出力しようぜ（＾～＾）？
-func (pPos *Position) Dump() string {
+func (pPosSys *PositionSystem) Dump() string {
 	// bytes.Bufferは、速くはないけど使いやすいぜ（＾～＾）
 	var buffer bytes.Buffer
 
 	for b := BoardLayerT(0); b < 2; b += 1 {
 		buffer.WriteString(fmt.Sprintf("Board[%d]:", b))
 		for i := 0; i < BOARD_SIZE; i += 1 {
-			buffer.WriteString(fmt.Sprintf("%d,", pPos.Board[i]))
+			buffer.WriteString(fmt.Sprintf("%d,", pPosSys.Board[i]))
 		}
 		buffer.WriteString("\n")
-		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d\n", b, pPos.PieceLocations[b][PCLOC_K1], pPos.PieceLocations[b][PCLOC_K2]))
-		buffer.WriteString(fmt.Sprintf("RookLocations[%d]:%d,%d\n", b, pPos.PieceLocations[b][PCLOC_R1], pPos.PieceLocations[b][PCLOC_R2]))
-		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:%d,%d\n", b, pPos.PieceLocations[b][PCLOC_B1], pPos.PieceLocations[b][PCLOC_B2]))
-		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:%d,%d,%d,%d\n", b, pPos.PieceLocations[b][PCLOC_L1], pPos.PieceLocations[b][PCLOC_L2], pPos.PieceLocations[b][PCLOC_L3], pPos.PieceLocations[b][PCLOC_L4]))
+		buffer.WriteString(fmt.Sprintf("KingLocations[%d]:%d,%d\n", b, pPosSys.PieceLocations[b][PCLOC_K1], pPosSys.PieceLocations[b][PCLOC_K2]))
+		buffer.WriteString(fmt.Sprintf("RookLocations[%d]:%d,%d\n", b, pPosSys.PieceLocations[b][PCLOC_R1], pPosSys.PieceLocations[b][PCLOC_R2]))
+		buffer.WriteString(fmt.Sprintf("BishopLocations[%d]:%d,%d\n", b, pPosSys.PieceLocations[b][PCLOC_B1], pPosSys.PieceLocations[b][PCLOC_B2]))
+		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:%d,%d,%d,%d\n", b, pPosSys.PieceLocations[b][PCLOC_L1], pPosSys.PieceLocations[b][PCLOC_L2], pPosSys.PieceLocations[b][PCLOC_L3], pPosSys.PieceLocations[b][PCLOC_L4]))
 	}
 
 	for phase := 0; phase < 2; phase += 1 {
 		// 利きボード
 		for c := ControlLayerT(0); c < CONTROL_LAYER_ALL_SIZE; c += 1 {
-			buffer.WriteString(pPos.SprintControl(Phase(phase+1), c))
+			buffer.WriteString(pPosSys.SprintControl(Phase(phase+1), c))
 		}
 	}
 
 	buffer.WriteString("Hands:")
 	for i := 0; i < 14; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.Hands[i]))
+		buffer.WriteString(fmt.Sprintf("%d,", pPosSys.Hands[i]))
 	}
 	buffer.WriteString("\n")
 
-	buffer.WriteString(fmt.Sprintf("Phase:%d,\n", pPos.GetPhase()))
+	buffer.WriteString(fmt.Sprintf("Phase:%d,\n", pPosSys.GetPhase()))
 
-	buffer.WriteString(fmt.Sprintf("StartMovesNum:%d,\n", pPos.StartMovesNum))
+	buffer.WriteString(fmt.Sprintf("StartMovesNum:%d,\n", pPosSys.StartMovesNum))
 
-	buffer.WriteString(fmt.Sprintf("OffsetMovesIndex:%d,\n", pPos.OffsetMovesIndex))
+	buffer.WriteString(fmt.Sprintf("OffsetMovesIndex:%d,\n", pPosSys.OffsetMovesIndex))
 
 	buffer.WriteString("Moves:")
 	for i := 0; i < MOVES_SIZE; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.Moves[i]))
+		buffer.WriteString(fmt.Sprintf("%d,", pPosSys.Moves[i]))
 	}
 	buffer.WriteString("\n")
 
 	buffer.WriteString("CapturedList:")
 	for i := 0; i < MOVES_SIZE; i += 1 {
-		buffer.WriteString(fmt.Sprintf("%d,", pPos.CapturedList[i]))
+		buffer.WriteString(fmt.Sprintf("%d,", pPosSys.CapturedList[i]))
 	}
 	buffer.WriteString("\n")
 
