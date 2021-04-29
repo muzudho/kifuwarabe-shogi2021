@@ -119,10 +119,13 @@ pos
 go
 
 position sfen 4k4/9/9/9/9/9/9/4p4/4K4 w - 1
+pos
 location 0
-# らいおんきゃっち
+# らいおんきゃっち（相手玉を取ったから自分の駒台に玉が乗る）
 do 5h5i
+pos
 location 0
+record
 undo
 # 玉が戻ってない
 pos

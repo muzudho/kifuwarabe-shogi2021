@@ -1204,6 +1204,8 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	sq_drop := mov_src_sq
 	var piece Piece
 	switch mov_src_sq {
+	case SQ_K1:
+		piece = PIECE_K1
 	case SQ_R1:
 		piece = PIECE_R1
 	case SQ_B1:
@@ -1218,6 +1220,8 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		piece = PIECE_L1
 	case SQ_P1:
 		piece = PIECE_P1
+	case SQ_K2:
+		piece = PIECE_K2
 	case SQ_R2:
 		piece = PIECE_R2
 	case SQ_B2:
