@@ -360,25 +360,40 @@ func diffBoard(pPos *Position) {
 	// 盤上
 	for sq := 0; sq < 100; sq += 1 {
 		if pPos.Board[1][sq] == pPos.Board[0][sq] {
-			pPos.Board[2][sq] = pPos.Board[0][sq]
-			pPos.Board[3][sq] = pPos.Board[1][sq]
-
-		} else {
+			// 等しければ空マス
 			pPos.Board[2][sq] = PIECE_EMPTY
 			pPos.Board[3][sq] = PIECE_EMPTY
+
+		} else {
+			// 異なったら
+			pPos.Board[2][sq] = pPos.Board[0][sq]
+			pPos.Board[3][sq] = pPos.Board[1][sq]
 		}
 	}
 
 	// 駒台
 	for i := HAND_IDX_START; i < HAND_IDX_END; i += 1 {
-		if pPos.Hands[0][i] != pPos.Hands[1][i] {
-			pPos.Hands[2][i] = pPos.Hands[0][i]
-			pPos.Hands[3][i] = pPos.Hands[1][i]
-		} else {
+		if pPos.Hands[0][i] == pPos.Hands[1][i] {
+			// 等しければゼロ
 			pPos.Hands[2][i] = 0
 			pPos.Hands[3][i] = 0
+		} else {
+			// 異なればその数
+			pPos.Hands[2][i] = pPos.Hands[0][i]
+			pPos.Hands[3][i] = pPos.Hands[1][i]
 		}
 	}
 
 	// 位置
+	for i := PCLOC_START; i < PCLOC_END; i += 1 {
+		if pPos.PieceLocations[0][i] == pPos.PieceLocations[1][i] {
+			// 等しければゼロ
+			pPos.PieceLocations[2][i] = 0
+			pPos.PieceLocations[3][i] = 0
+		} else {
+			// 異なればその数
+			pPos.PieceLocations[2][i] = pPos.PieceLocations[0][i]
+			pPos.PieceLocations[3][i] = pPos.PieceLocations[1][i]
+		}
+	}
 }

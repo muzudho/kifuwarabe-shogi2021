@@ -23,4 +23,12 @@ board copy
 
 # 盤[1]を表示（＾～＾）
 pos 1
+
+# 盤[0], [1] の比較
+posdiff 0 1
+
+board diff
+
+# 盤[2], [3] の比較
+posdiff 2 3
 ```
