@@ -67,7 +67,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -77,7 +77,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -87,7 +87,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -97,7 +97,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -107,7 +107,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -117,7 +117,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -127,7 +127,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -137,7 +137,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
@@ -147,7 +147,7 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 	for file := 9; file > 0; file-- {
 		buf.WriteString(fmt.Sprintf("|%2s%2s", pPosSys.PPosition[b1].Board[file*10+rank].ToCode(), pPosSys.PPosition[b2].Board[file*10+rank].ToCode()))
 	}
-	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[0]))
+	buf.WriteString(fmt.Sprintf("|%s\n", zeroFiles[rank-1]))
 	lines = append(lines, buf.String())
 
 	lines = append(lines, "+----+----+----+----+----+----+----+----+----+\n")
