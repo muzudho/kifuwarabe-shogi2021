@@ -146,49 +146,49 @@ MainLoop:
 			} else if length == 5 && tokens[1] == "diff" {
 				// control diff 11 0 12
 				// 利きボード 11番 から 0番を引いた結果を 12番へ入れる。
-				controlLayer1, err := strconv.Atoi(tokens[2])
+				c1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				controlLayer2, err := strconv.Atoi(tokens[3])
+				c2, err := strconv.Atoi(tokens[3])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				controlLayer3, err := strconv.Atoi(tokens[4])
+				c3, err := strconv.Atoi(tokens[4])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
 
-				pPos.DiffControl(controlLayer1, controlLayer2, controlLayer3)
+				pPos.DiffControl(ControlLayerT(c1), ControlLayerT(c2), ControlLayerT(c3))
 				ok = true
 			} else if length == 3 && tokens[1] == "recalc" {
 				// control recalc 12
 				// 利きの再計算
-				controlLayer1, err := strconv.Atoi(tokens[2])
+				c1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				pPos.RecalculateControl(BOARD_LAYER_MAIN, controlLayer1)
+				pPos.RecalculateControl(BOARD_LAYER_MAIN, ControlLayerT(c1))
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 利きテーブルの表示（＾～＾）
-				layer, err := strconv.Atoi(tokens[2])
+				c, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
-				} else if 0 <= layer && layer < CONTROL_LAYER_ALL_SIZE {
-					G.Chat.Debug(pPos.SprintControl(FIRST, layer))
-					G.Chat.Debug(pPos.SprintControl(SECOND, layer))
+				} else if 0 <= c && c < CONTROL_LAYER_ALL_SIZE {
+					G.Chat.Debug(pPos.SprintControl(FIRST, ControlLayerT(c)))
+					G.Chat.Debug(pPos.SprintControl(SECOND, ControlLayerT(c)))
 					ok = true
 				}
 			} else if length == 3 && tokens[1] == "sumabs" {
-				controlLayer1, err := strconv.Atoi(tokens[2])
+				c1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
 				// 利きのテスト
 				// 現局面の利きを覚え、ムーブ、アンドゥを行って
 				// 元の利きに戻るか確認
-				sumList := SumAbsControl(pPos, controlLayer1)
+				sumList := SumAbsControl(pPos, c1)
 				G.Chat.Debug("ControlTest: SumAbs=%d,%d\n", sumList[0], sumList[1])
 				ok = true
 			}

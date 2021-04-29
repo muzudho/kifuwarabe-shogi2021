@@ -170,8 +170,8 @@ func (pPos *Position) createMovesText() string {
 //
 // Parameters
 // ----------
-// * `layer` - 利き数ボードのレイヤー番号（＾～＾）
-func (pPos *Position) SprintControl(phase Phase, layer int) string {
+// * `c` - 利き数ボードのレイヤー番号（＾～＾）
+func (pPos *Position) SprintControl(phase Phase, c ControlLayerT) string {
 	var board [BOARD_SIZE]int8
 	var phase_str string
 	var title string
@@ -187,8 +187,8 @@ func (pPos *Position) SprintControl(phase Phase, layer int) string {
 
 	var ph = phase - 1
 	if 0 <= ph && ph < 2 {
-		title = fmt.Sprintf("Control(%d)%s", layer, GetControlLayerName(layer))
-		board = pPos.ControlBoards[ph][layer]
+		title = fmt.Sprintf("Control(%d)%s", c, GetControlLayerName(c))
+		board = pPos.ControlBoards[ph][c]
 	}
 
 	return "\n" +
@@ -473,8 +473,8 @@ func (pPos *Position) Dump() string {
 
 	for phase := 0; phase < 2; phase += 1 {
 		// 利きボード
-		for layer := 0; layer < CONTROL_LAYER_ALL_SIZE; layer += 1 {
-			buffer.WriteString(pPos.SprintControl(Phase(phase+1), layer))
+		for c := ControlLayerT(0); c < CONTROL_LAYER_ALL_SIZE; c += 1 {
+			buffer.WriteString(pPos.SprintControl(Phase(phase+1), c))
 		}
 	}
 
