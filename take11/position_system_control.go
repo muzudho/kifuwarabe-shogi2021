@@ -64,7 +64,7 @@ func (pPosSys *PositionSystem) AddControlRook(b PosLayerT, c ControlLayerT, sign
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
 		from := pPosSys.PPosition[b].PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
-			!pPosSys.IsEmptySq(b, from) && // 飛落ちも考えて 空マスは除外
+			!pPosSys.PPosition[b].IsEmptySq(from) && // 飛落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
 			pPosSys.AddControlDiff(b, c, from, sign)
 		}
@@ -76,7 +76,7 @@ func (pPosSys *PositionSystem) AddControlBishop(b PosLayerT, c ControlLayerT, si
 	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
 		from := pPosSys.PPosition[b].PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
-			!pPosSys.IsEmptySq(b, from) && // 角落ちも考えて 空マスは除外
+			!pPosSys.PPosition[b].IsEmptySq(from) && // 角落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
 			pPosSys.AddControlDiff(b, c, from, sign)
 		}
@@ -88,7 +88,7 @@ func (pPosSys *PositionSystem) AddControlLance(b PosLayerT, c ControlLayerT, sig
 	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
 		from := pPosSys.PPosition[b].PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
-			!pPosSys.IsEmptySq(b, from) && // 香落ちも考えて 空マスは除外
+			!pPosSys.PPosition[b].IsEmptySq(from) && // 香落ちも考えて 空マスは除外
 			from != excludeFrom && // 除外マスは除外
 			PIECE_TYPE_PL != What(pPosSys.PPosition[b].Board[from]) { // 杏は除外
 			pPosSys.AddControlDiff(b, c, from, sign)
@@ -156,7 +156,7 @@ func (pPosSys *PositionSystem) RecalculateControl(b PosLayerT, c1 ControlLayerT)
 	pPosSys.ClearControlLayer(c1)
 
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
-		if File(from) != 0 && Rank(from) != 0 && !pPosSys.IsEmptySq(b, from) {
+		if File(from) != 0 && Rank(from) != 0 && !pPosSys.PPosition[b].IsEmptySq(from) {
 			piece := pPosSys.PPosition[b].Board[from]
 			phase := Who(piece)
 			sq_list := GenControl(pPosSys, b, from)

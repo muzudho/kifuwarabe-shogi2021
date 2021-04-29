@@ -61,7 +61,7 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 		*/
 
 		// DoMove と UndoMove を繰り返していると、ずれてくる（＾～＾）
-		if pPosSys.IsEmptySq(POS_LAYER_MAIN, move.GetSource()) {
+		if pPosSys.PPosition[POS_LAYER_MAIN].IsEmptySq(move.GetSource()) {
 			// 強制終了した局面（＾～＾）
 			G.Chat.Debug(pPosSys.Sprint(POS_LAYER_MAIN))
 			// あの駒、どこにいんの（＾～＾）？

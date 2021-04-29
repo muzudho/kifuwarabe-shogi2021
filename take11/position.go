@@ -58,3 +58,52 @@ func (pPos *Position) setToStartpos() {
 	// 持ち駒の数
 	pPos.Hands = [14]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 }
+
+func (pPos *Position) GetPieceLocation(index int) Square {
+	return pPos.PieceLocations[index]
+}
+
+// clearBoard - 駒を置いていな状態でリセットします
+func (pPos *Position) clearBoard() {
+	pPos.Board = [BOARD_SIZE]Piece{
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
+	}
+
+	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
+	pPos.PieceLocations = [PCLOC_SIZE]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
+
+	// 持ち駒の数
+	pPos.Hands = [14]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+}
+
+// Homo - 移動元と移動先の駒を持つプレイヤーが等しければ真。移動先が空なら偽
+// 持ち駒は指定してはいけません。
+func (pPos *Position) Homo(from Square, to Square) bool {
+	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
+	return Who(pPos.Board[from]) == Who(pPos.Board[to])
+}
+
+// Hetero - 移動元と移動先の駒を持つプレイヤーが異なれば真。移動先が空マスでも真
+// 持ち駒は指定してはいけません。
+// Homo の逆だぜ（＾～＾）片方ありゃいいんだけど（＾～＾）
+func (pPos *Position) Hetero(from Square, to Square) bool {
+	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
+	return Who(pPos.Board[from]) != Who(pPos.Board[to])
+}
+
+// IsEmptySq - 空きマスなら真。持ち駒は偽
+func (pPos *Position) IsEmptySq(sq Square) bool {
+	if sq > 99 {
+		return false
+	}
+	return pPos.Board[sq] == PIECE_EMPTY
+}

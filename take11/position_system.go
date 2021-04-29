@@ -385,32 +385,6 @@ func (pPosSys *PositionSystem) GetPhase() Phase {
 	return pPosSys.phase
 }
 
-func (pPosSys *PositionSystem) GetPieceLocation(b PosLayerT, index int) Square {
-	return pPosSys.PPosition[b].PieceLocations[index]
-}
-
-// ResetToStartpos - 駒を置いていな状態でリセットします
-func (pPosSys *PositionSystem) clearBoard(b PosLayerT) {
-	pPosSys.PPosition[b].Board = [BOARD_SIZE]Piece{
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-		PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY, PIECE_EMPTY,
-	}
-
-	// 飛角香が存在しないので、仮に 0 を入れてるぜ（＾～＾）
-	pPosSys.PPosition[b].PieceLocations = [PCLOC_SIZE]Square{SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY, SQUARE_EMPTY}
-
-	// 持ち駒の数
-	pPosSys.PPosition[b].Hands = [14]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-}
-
 // ResetToStartpos - 駒を置いていな状態でリセットします
 func (pPosSys *PositionSystem) resetPosition() {
 	pPosSys.ControlBoards = [PHASE_ARRAY_SIZE][CONTROL_LAYER_ALL_SIZE][BOARD_SIZE]int8{{
@@ -746,7 +720,7 @@ func (pPosSys *PositionSystem) ReadPosition(b PosLayerT, command string) {
 	var i int
 	if strings.HasPrefix(command, "position startpos") {
 		// 平手初期局面をセット（＾～＾）
-		pPosSys.clearBoard(b)
+		pPosSys.PPosition[b].clearBoard()
 		pPosSys.resetPosition()
 		pPosSys.PPosition[b].setToStartpos()
 		i = 17
@@ -758,7 +732,7 @@ func (pPosSys *PositionSystem) ReadPosition(b PosLayerT, command string) {
 
 	} else if strings.HasPrefix(command, "position sfen ") {
 		// "position sfen " のはずだから 14 文字飛ばすぜ（＾～＾）
-		pPosSys.clearBoard(b)
+		pPosSys.PPosition[b].clearBoard()
 		pPosSys.resetPosition()
 		i = 14
 		var rank = Square(1)
@@ -1034,7 +1008,7 @@ func (pPosSys *PositionSystem) ReadPosition(b PosLayerT, command string) {
 	//fmt.Printf("Debug: 開始局面の利きを計算（＾～＾）\n")
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			if !pPosSys.IsEmptySq(b, sq) {
+			if !pPosSys.PPosition[b].IsEmptySq(sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
 				// あとですぐクリアーするので、どのレイヤー使ってても関係ないんで、仮で PUTレイヤーを使っているぜ（＾～＾）
 				pPosSys.AddControlDiff(b, CONTROL_LAYER_DIFF_PUT, sq, 1)
@@ -1182,7 +1156,7 @@ func (pPosSys *PositionSystem) DoMove(b PosLayerT, move Move) {
 	cap_piece_type := PIECE_TYPE_EMPTY
 
 	mov_src_sq := move.GetSource()
-	if pPosSys.IsEmptySq(b, mov_src_sq) {
+	if pPosSys.PPosition[b].IsEmptySq(mov_src_sq) {
 		// 人間の打鍵ミスか（＾～＾）
 		fmt.Printf("Error: %d square is empty\n", mov_src_sq)
 	}
@@ -1552,27 +1526,4 @@ func (pPosSys *PositionSystem) UndoMove(b PosLayerT) {
 	pPosSys.AddControlRook(b, CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
 
 	pPosSys.MergeControlDiff()
-}
-
-// Homo - 移動元と移動先の駒を持つプレイヤーが等しければ真。移動先が空なら偽
-// 持ち駒は指定してはいけません。
-func (pPosSys *PositionSystem) Homo(b PosLayerT, from Square, to Square) bool {
-	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
-	return Who(pPosSys.PPosition[b].Board[from]) == Who(pPosSys.PPosition[b].Board[to])
-}
-
-// Hetero - 移動元と移動先の駒を持つプレイヤーが異なれば真。移動先が空マスでも真
-// 持ち駒は指定してはいけません。
-// Homo の逆だぜ（＾～＾）片方ありゃいいんだけど（＾～＾）
-func (pPosSys *PositionSystem) Hetero(b PosLayerT, from Square, to Square) bool {
-	// fmt.Printf("Debug: from=%d to=%d\n", from, to)
-	return Who(pPosSys.PPosition[b].Board[from]) != Who(pPosSys.PPosition[b].Board[to])
-}
-
-// IsEmptySq - 空きマスなら真。持ち駒は偽
-func (pPosSys *PositionSystem) IsEmptySq(b PosLayerT, sq Square) bool {
-	if sq > 99 {
-		return false
-	}
-	return pPosSys.PPosition[b].Board[sq] == PIECE_EMPTY
 }

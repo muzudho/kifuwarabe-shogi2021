@@ -183,7 +183,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 			if num > 0 {
 				sq := Square(rand.Intn(100))
 				// うまく空マスなら移動成功
-				if OnBoard(sq) && pPosSys.IsEmptySq(b, sq) {
+				if OnBoard(sq) && pPosSys.PPosition[b].IsEmptySq(sq) {
 					pPosSys.PPosition[b].Board[sq] = HandPieceMap[hand_index]
 					pPosSys.PPosition[b].Hands[hand_index] -= 1
 				}
@@ -203,7 +203,7 @@ func ShuffleBoard(pPosSys *PositionSystem, b PosLayerT) {
 	for i := 0; i < 81*80; i += 1 {
 		sq1 := Square(rand.Intn(100))
 		sq2 := Square(rand.Intn(100))
-		if OnBoard(sq1) && OnBoard(sq2) && !pPosSys.IsEmptySq(b, sq1) {
+		if OnBoard(sq1) && OnBoard(sq2) && !pPosSys.PPosition[b].IsEmptySq(sq1) {
 			piece := pPosSys.PPosition[b].Board[sq1]
 			// 位置スワップ
 			pPosSys.PPosition[b].Board[sq1] = pPosSys.PPosition[b].Board[sq2]

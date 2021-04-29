@@ -76,34 +76,34 @@ func GenControl(pPosSys *PositionSystem, b PosLayerT, from Square) []Square {
 		// ２つ先のマスから斜めに長い利き
 		switch piece {
 		case PIECE_B1, PIECE_PB1, PIECE_B2, PIECE_PB2:
-			if File(from) < 8 && Rank(from) > 2 && pPosSys.IsEmptySq(b, from+9) { // 8～9筋にある駒でもなく、1～2段目でもなく、１つ左上が空マスなら
+			if File(from) < 8 && Rank(from) > 2 && pPosSys.PPosition[b].IsEmptySq(from+9) { // 8～9筋にある駒でもなく、1～2段目でもなく、１つ左上が空マスなら
 				for to := from + 18; File(to) != 0 && Rank(to) != 0; to += 9 { // ２つ左上から
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
 			}
-			if File(from) > 2 && Rank(from) > 2 && pPosSys.IsEmptySq(b, from-11) { // 1～2筋にある駒でもなく、1～2段目でもなく、１つ右上が空マスなら
+			if File(from) > 2 && Rank(from) > 2 && pPosSys.PPosition[b].IsEmptySq(from-11) { // 1～2筋にある駒でもなく、1～2段目でもなく、１つ右上が空マスなら
 				for to := from - 22; File(to) != 0 && Rank(to) != 0; to -= 11 { // ２つ右上から
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
 			}
-			if File(from) < 8 && Rank(from) < 8 && pPosSys.IsEmptySq(b, from+11) { // 8～9筋にある駒でもなく、8～9段目でもなく、１つ左下が空マスなら
+			if File(from) < 8 && Rank(from) < 8 && pPosSys.PPosition[b].IsEmptySq(from+11) { // 8～9筋にある駒でもなく、8～9段目でもなく、１つ左下が空マスなら
 				for to := from + 22; File(to) != 0 && Rank(to) != 0; to += 11 { // ２つ左下から
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
 			}
-			if File(from) > 2 && Rank(from) < 8 && pPosSys.IsEmptySq(b, from-9) { // 1～2筋にある駒でもなく、8～9段目でもなく、１つ右下が空マスなら
+			if File(from) > 2 && Rank(from) < 8 && pPosSys.PPosition[b].IsEmptySq(from-9) { // 1～2筋にある駒でもなく、8～9段目でもなく、１つ右下が空マスなら
 				for to := from - 18; File(to) != 0 && Rank(to) != 0; to -= 9 { // ２つ右下から
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
@@ -115,10 +115,10 @@ func GenControl(pPosSys *PositionSystem, b PosLayerT, from Square) []Square {
 		// ２つ先のマスから先手香車の長い利き
 		switch piece {
 		case PIECE_L1, PIECE_R1, PIECE_PR1, PIECE_R2, PIECE_PR2:
-			if Rank(from) > 2 && pPosSys.IsEmptySq(b, from-1) { // 1～2段目にある駒でもなく、１つ上が空マスなら
+			if Rank(from) > 2 && pPosSys.PPosition[b].IsEmptySq(from-1) { // 1～2段目にある駒でもなく、１つ上が空マスなら
 				for to := from - 2; Rank(to) != 0; to -= 1 { // 上
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
@@ -130,10 +130,10 @@ func GenControl(pPosSys *PositionSystem, b PosLayerT, from Square) []Square {
 		// ２つ先のマスから後手香車の長い利き
 		switch piece {
 		case PIECE_R1, PIECE_PR1, PIECE_L2, PIECE_R2, PIECE_PR2:
-			if Rank(from) < 8 && pPosSys.IsEmptySq(b, from+1) { // 8～9段目にある駒でもなく、１つ下が空マスなら
+			if Rank(from) < 8 && pPosSys.PPosition[b].IsEmptySq(from+1) { // 8～9段目にある駒でもなく、１つ下が空マスなら
 				for to := from + 2; Rank(to) != 0; to += 1 { // 下
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
@@ -145,18 +145,18 @@ func GenControl(pPosSys *PositionSystem, b PosLayerT, from Square) []Square {
 		// ２つ横のマスから飛の長い利き
 		switch piece {
 		case PIECE_R1, PIECE_PR1, PIECE_R2, PIECE_PR2:
-			if File(from) < 8 && pPosSys.IsEmptySq(b, from+10) { // 8～9筋にある駒でもなく、１つ左が空マスなら
+			if File(from) < 8 && pPosSys.PPosition[b].IsEmptySq(from+10) { // 8～9筋にある駒でもなく、１つ左が空マスなら
 				for to := from + 20; File(to) != 0; to += 10 { // 左
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
 			}
-			if File(from) > 2 && pPosSys.IsEmptySq(b, from-10) { // 1～2筋にある駒でもなく、１つ右が空マスなら
+			if File(from) > 2 && pPosSys.PPosition[b].IsEmptySq(from-10) { // 1～2筋にある駒でもなく、１つ右が空マスなら
 				for to := from - 20; File(to) != 0; to -= 10 { // 右
 					sq_list = append(sq_list, to)
-					if !pPosSys.IsEmptySq(b, to) {
+					if !pPosSys.PPosition[b].IsEmptySq(to) {
 						break
 					}
 				}
@@ -290,10 +290,10 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 	var hand_end int
 	// var opponentKingSq Square
 	if friend == FIRST {
-		friendKingSq = pPosSys.GetPieceLocation(b, PCLOC_K1)
+		friendKingSq = pPosSys.PPosition[b].GetPieceLocation(PCLOC_K1)
 		hand_start = HAND_IDX_START
 	} else if friend == SECOND {
-		friendKingSq = pPosSys.GetPieceLocation(b, PCLOC_K2)
+		friendKingSq = pPosSys.PPosition[b].GetPieceLocation(PCLOC_K2)
 		hand_start = HAND_IDX_START + HAND_TYPE_SIZE
 	} else {
 		panic(fmt.Errorf("Unknown phase=%d", friend))
@@ -312,7 +312,7 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 		for rank := 1; rank < 10; rank += 1 {
 			for file := 1; file < 10; file += 1 {
 				from := Square(file*10 + rank)
-				if pPosSys.Homo(b, from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
+				if pPosSys.PPosition[b].Homo(from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
 					control_list := GenControl(pPosSys, b, from)
 
 					piece := pPosSys.PPosition[b].Board[from]
@@ -323,7 +323,7 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 						for _, to := range control_list {
 							// 敵の長い駒の利きは、玉が逃げても伸びてくる方向があるので、
 							// いったん玉を動かしてから 再チェックするぜ（＾～＾）
-							if pPosSys.Hetero(b, from, to) { // 自駒の上には移動できません
+							if pPosSys.PPosition[b].Hetero(from, to) { // 自駒の上には移動できません
 								move := NewMoveValue2(from, to)
 								pPosSys.DoMove(b, move)
 
@@ -338,7 +338,7 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 						}
 					} else {
 						for _, to := range control_list {
-							if pPosSys.Hetero(b, from, to) { // 自駒の上には移動できません
+							if pPosSys.PPosition[b].Hetero(from, to) { // 自駒の上には移動できません
 								move := NewMoveValue2(from, to)
 								pPosSys.DoMove(b, move)
 
@@ -362,7 +362,7 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 				control_list := GenControl(pPosSys, b, hand_sq)
 
 				for _, to := range control_list {
-					if pPosSys.IsEmptySq(b, to) { // 駒の上には打てません
+					if pPosSys.PPosition[b].IsEmptySq(to) { // 駒の上には打てません
 						move := NewMoveValue2(hand_sq, to)
 						pPosSys.DoMove(b, move)
 
@@ -386,7 +386,7 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 		for rank := 1; rank < 10; rank += 1 {
 			for file := 1; file < 10; file += 1 {
 				from := Square(file*10 + rank)
-				if pPosSys.Homo(b, from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
+				if pPosSys.PPosition[b].Homo(from, friendKingSq) { // 自玉と同じプレイヤーの駒を動かします
 					control_list := GenControl(pPosSys, b, from)
 
 					piece := pPosSys.PPosition[b].Board[from]
@@ -395,13 +395,13 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 					if pieceType == PIECE_TYPE_K {
 						// 玉は自殺手を省きます
 						for _, to := range control_list {
-							if pPosSys.Hetero(b, from, to) && pPosSys.ControlBoards[opponent-1][CONTROL_LAYER_SUM][to] == 0 { // 自駒の上、敵の利きには移動できません
+							if pPosSys.PPosition[b].Hetero(from, to) && pPosSys.ControlBoards[opponent-1][CONTROL_LAYER_SUM][to] == 0 { // 自駒の上、敵の利きには移動できません
 								move_list = append(move_list, NewMoveValue2(from, to))
 							}
 						}
 					} else {
 						for _, to := range control_list {
-							if pPosSys.Hetero(b, from, to) { // 自駒の上には移動できません
+							if pPosSys.PPosition[b].Hetero(from, to) { // 自駒の上には移動できません
 								move_list = append(move_list, NewMoveValue2(from, to))
 							}
 						}
@@ -417,7 +417,7 @@ func GenMoveList(pPosSys *PositionSystem, b PosLayerT) []Move {
 				control_list := GenControl(pPosSys, b, hand_sq)
 
 				for _, to := range control_list {
-					if pPosSys.IsEmptySq(b, to) { // 駒の上には打てません
+					if pPosSys.PPosition[b].IsEmptySq(to) { // 駒の上には打てません
 						move_list = append(move_list, NewMoveValue2(hand_sq, to))
 					}
 				}

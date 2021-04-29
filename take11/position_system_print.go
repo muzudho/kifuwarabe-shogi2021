@@ -23,61 +23,61 @@ func (pPosSys *PositionSystem) Sprint(b PosLayerT) string {
 	zeroFiles := [9]string{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " i "}
 
 	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
-	if !pPosSys.IsEmptySq(b, 90) {
+	if !pPosSys.PPosition[b].IsEmptySq(90) {
 		zeroRanks[0] = pPosSys.PPosition[b].Board[90].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 80) {
+	if !pPosSys.PPosition[b].IsEmptySq(80) {
 		zeroRanks[1] = pPosSys.PPosition[b].Board[80].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 70) {
+	if !pPosSys.PPosition[b].IsEmptySq(70) {
 		zeroRanks[2] = pPosSys.PPosition[b].Board[70].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 60) {
+	if !pPosSys.PPosition[b].IsEmptySq(60) {
 		zeroRanks[3] = pPosSys.PPosition[b].Board[60].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 50) {
+	if !pPosSys.PPosition[b].IsEmptySq(50) {
 		zeroRanks[4] = pPosSys.PPosition[b].Board[50].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 40) {
+	if !pPosSys.PPosition[b].IsEmptySq(40) {
 		zeroRanks[5] = pPosSys.PPosition[b].Board[40].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 30) {
+	if !pPosSys.PPosition[b].IsEmptySq(30) {
 		zeroRanks[6] = pPosSys.PPosition[b].Board[30].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 20) {
+	if !pPosSys.PPosition[b].IsEmptySq(20) {
 		zeroRanks[7] = pPosSys.PPosition[b].Board[20].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 10) {
+	if !pPosSys.PPosition[b].IsEmptySq(10) {
 		zeroRanks[8] = pPosSys.PPosition[b].Board[10].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 0) {
+	if !pPosSys.PPosition[b].IsEmptySq(0) {
 		zeroRanks[9] = pPosSys.PPosition[b].Board[0].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 1) {
+	if !pPosSys.PPosition[b].IsEmptySq(1) {
 		zeroFiles[0] = pPosSys.PPosition[b].Board[1].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 2) {
+	if !pPosSys.PPosition[b].IsEmptySq(2) {
 		zeroFiles[1] = pPosSys.PPosition[b].Board[2].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 3) {
+	if !pPosSys.PPosition[b].IsEmptySq(3) {
 		zeroFiles[2] = pPosSys.PPosition[b].Board[3].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 4) {
+	if !pPosSys.PPosition[b].IsEmptySq(4) {
 		zeroFiles[3] = pPosSys.PPosition[b].Board[4].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 5) {
+	if !pPosSys.PPosition[b].IsEmptySq(5) {
 		zeroFiles[4] = pPosSys.PPosition[b].Board[5].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 6) {
+	if !pPosSys.PPosition[b].IsEmptySq(6) {
 		zeroFiles[5] = pPosSys.PPosition[b].Board[6].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 7) {
+	if !pPosSys.PPosition[b].IsEmptySq(7) {
 		zeroFiles[6] = pPosSys.PPosition[b].Board[7].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 8) {
+	if !pPosSys.PPosition[b].IsEmptySq(8) {
 		zeroFiles[7] = pPosSys.PPosition[b].Board[8].ToCode()
 	}
-	if !pPosSys.IsEmptySq(b, 9) {
+	if !pPosSys.PPosition[b].IsEmptySq(9) {
 		zeroFiles[8] = pPosSys.PPosition[b].Board[9].ToCode()
 	}
 
@@ -175,14 +175,14 @@ func (pPosSys *PositionSystem) SprintDiff(b1 PosLayerT, b2 PosLayerT) string {
 
 	// 0段目、0筋目に駒置いてたらそれも表示（＾～＾）
 	for file := 9; file > -1; file -= 1 {
-		if !pPosSys.IsEmptySq(b1, Square(file*10)) || !pPosSys.IsEmptySq(b2, Square(file*10)) {
+		if !pPosSys.PPosition[b1].IsEmptySq(Square(file*10)) || !pPosSys.PPosition[b2].IsEmptySq(Square(file*10)) {
 			zeroRanks[10-file] = fmt.Sprintf("%2s%2s", pPosSys.PPosition[b1].Board[file*10].ToCode(), pPosSys.PPosition[b2].Board[file*10].ToCode())
 		}
 	}
 
 	// 0筋目
 	for rank := Square(1); rank < 10; rank += 1 {
-		if !pPosSys.IsEmptySq(b1, rank) || !pPosSys.IsEmptySq(b2, rank) {
+		if !pPosSys.PPosition[b1].IsEmptySq(rank) || !pPosSys.PPosition[b2].IsEmptySq(rank) {
 			zeroFiles[rank-1] = fmt.Sprintf("%2s%2s", pPosSys.PPosition[b1].Board[rank].ToCode(), pPosSys.PPosition[b2].Board[rank].ToCode())
 		}
 	}
