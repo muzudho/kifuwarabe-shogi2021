@@ -1343,13 +1343,26 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	for j, piece_type := range piece_type_list {
 		switch piece_type {
 		case PIECE_TYPE_K:
-			switch prev_phase {
-			case FIRST:
-				pPos.PieceLocations[PCLOC_K1] = dst_sq_list[j]
-			case SECOND:
-				pPos.PieceLocations[PCLOC_K2] = dst_sq_list[j]
-			default:
-				panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
+			if j == 0 {
+				switch prev_phase {
+				case FIRST:
+					pPos.PieceLocations[PCLOC_K1] = dst_sq_list[j]
+				case SECOND:
+					pPos.PieceLocations[PCLOC_K2] = dst_sq_list[j]
+				default:
+					panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
+				}
+			} else {
+				// 取った時
+				switch prev_phase {
+				case FIRST:
+					// 相手玉
+					pPos.PieceLocations[PCLOC_K2] = dst_sq_list[j]
+				case SECOND:
+					pPos.PieceLocations[PCLOC_K1] = dst_sq_list[j]
+				default:
+					panic(fmt.Errorf("Unknown prev_phase=%d", prev_phase))
+				}
 			}
 		case PIECE_TYPE_R, PIECE_TYPE_PR:
 			for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
@@ -1453,6 +1466,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
 	switch mov_piece_type {
 	case PIECE_TYPE_K:
+		// 玉を動かした
 		switch pPosSys.phase { // next_phase
 		case FIRST:
 			pPos.PieceLocations[PCLOC_K1] = mov_src_sq
@@ -1511,10 +1525,12 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 取った駒
 	captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex]
-	// fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
+	fmt.Printf("Debug: CapturedPiece=%s\n", captured.ToCode())
 
 	// 取った駒に関係するのは行き先だけ（＾～＾）
 	mov_dst_sq := move.GetDestination()
+	fmt.Printf("Debug: mov_dst_sq=%d\n", mov_dst_sq)
+
 	mov_src_sq := move.GetSource()
 	var hand_sq = SQUARE_EMPTY
 
@@ -1575,7 +1591,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			fmt.Printf("Error: Unknown captured=[%d]", captured)
 		}
 
-		// fmt.Printf("Debug: hand_sq=%d\n", hand_sq)
+		fmt.Printf("Debug: hand_sq=%d\n", hand_sq)
 
 		if hand_sq != SQUARE_EMPTY {
 			pPos.Hands1[hand_sq-SQ_HAND_START] -= 1
@@ -1593,6 +1609,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
 	switch cap_piece_type {
 	case PIECE_TYPE_K:
+		// 玉を取っていた
 		switch pPosSys.phase { // next_phase
 		case FIRST:
 			// 後手の玉

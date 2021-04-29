@@ -141,4 +141,13 @@ position startpos moves 5i5h 4a3b 8g8f 6a5b 2g2f 5a4b 6g6f 3c3d 5h4h 2b6f
 
 # 強制終了（＾～＾） 後手玉の位置が、先手玉の位置になってる（＾～＾）
 go
+
+position sfen 4k4/4P4/9/9/9/9/9/9/4K4 b - 1
+pos
+do 5b5a
+location 0
+pos
+undo
+pos
+location 0
 ```
