@@ -96,21 +96,43 @@ var leftTopBrushingArea = []int32{
 	-10}
 
 // WaterColor - 水で薄めたような評価値にします
+// pCB3 = 0
+// pCB4 = 0
+// pCB5 = 0
 // pCB1 - pCB2 = pCB3
-func WaterColor(pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard) {
+// pCB3 - pCB4 = pCB5
+func WaterColor(pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard, pCB4 *ControlBoard, pCB5 *ControlBoard) {
 	// 将棋盤の内側をスキャンします。
 
 	pCB3.Clear()
+	pCB4.Clear()
+	pCB5.Clear()
 
-	waterColor2(centerScanningLine, centerBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(topScanningLine, topBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(rightTopScanningLine, rightTopBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(rightScanningLine, rightBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(rightBottomScanningLine, rightBottomBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(bottomScanningLine, bottomBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(leftBottomScanningLine, leftBottomBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(leftScanningLine, leftBrushingArea, pCB1, pCB2, pCB3)
-	waterColor2(leftTopScanningLine, leftTopBrushingArea, pCB1, pCB2, pCB3)
+	pW := pCB1
+	pX := pCB2
+	pY := pCB3
+	waterColor2(centerScanningLine, centerBrushingArea, pW, pX, pY)
+	waterColor2(topScanningLine, topBrushingArea, pW, pX, pY)
+	waterColor2(rightTopScanningLine, rightTopBrushingArea, pW, pX, pY)
+	waterColor2(rightScanningLine, rightBrushingArea, pW, pX, pY)
+	waterColor2(rightBottomScanningLine, rightBottomBrushingArea, pW, pX, pY)
+	waterColor2(bottomScanningLine, bottomBrushingArea, pW, pX, pY)
+	waterColor2(leftBottomScanningLine, leftBottomBrushingArea, pW, pX, pY)
+	waterColor2(leftScanningLine, leftBrushingArea, pW, pX, pY)
+	waterColor2(leftTopScanningLine, leftTopBrushingArea, pW, pX, pY)
+
+	pW = pCB3
+	pX = pCB4
+	pY = pCB5
+	waterColor2(centerScanningLine, centerBrushingArea, pW, pX, pY)
+	waterColor2(topScanningLine, topBrushingArea, pW, pX, pY)
+	waterColor2(rightTopScanningLine, rightTopBrushingArea, pW, pX, pY)
+	waterColor2(rightScanningLine, rightBrushingArea, pW, pX, pY)
+	waterColor2(rightBottomScanningLine, rightBottomBrushingArea, pW, pX, pY)
+	waterColor2(bottomScanningLine, bottomBrushingArea, pW, pX, pY)
+	waterColor2(leftBottomScanningLine, leftBottomBrushingArea, pW, pX, pY)
+	waterColor2(leftScanningLine, leftBrushingArea, pW, pX, pY)
+	waterColor2(leftTopScanningLine, leftTopBrushingArea, pW, pX, pY)
 }
 
 func waterColor2(scanningLine []Square, brushingArea []int32, pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard) {

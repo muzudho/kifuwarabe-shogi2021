@@ -37,14 +37,16 @@ const (
 	CONTROL_LAYER_TEST_ERROR2         = ControlLayerT(24)
 	CONTROL_LAYER_TEST_RECALCULATION2 = ControlLayerT(25)
 	// 評価値用
-	CONTROL_LAYER_EVAL = ControlLayerT(26) // 評価関数用
+	CONTROL_LAYER_EVAL1 = ControlLayerT(26) // 評価関数用
+	CONTROL_LAYER_EVAL2 = ControlLayerT(27) // 評価関数用
+	CONTROL_LAYER_EVAL3 = ControlLayerT(28) // 評価関数用
 	// 計測
 	CONTROL_LAYER_DIFF_TYPE_SIZE = ControlLayerT(9)
 	CONTROL_LAYER_DIFF1_START    = ControlLayerT(1)
 	CONTROL_LAYER_DIFF1_END      = CONTROL_LAYER_DIFF1_START + CONTROL_LAYER_DIFF_TYPE_SIZE // この数を含まない。テスト用も含まない
 	CONTROL_LAYER_DIFF2_START    = ControlLayerT(11)
 	CONTROL_LAYER_DIFF2_END      = CONTROL_LAYER_DIFF2_START + CONTROL_LAYER_DIFF_TYPE_SIZE // この数を含まない。テスト用も含まない
-	CONTROL_LAYER_ALL_SIZE       = ControlLayerT(27)                                        // この数を含まない
+	CONTROL_LAYER_ALL_SIZE       = ControlLayerT(29)                                        // この数を含まない
 )
 
 // ControlBoardSystem - 利きボード・システム
@@ -88,7 +90,9 @@ func NewControlBoardSystem() *ControlBoardSystem {
 		NewControlBoard("TestError2"),
 		NewControlBoard("TestRecalc2"),
 		// 評価値用
-		NewControlBoard("Eval"),
+		NewControlBoard("Eval1"),
+		NewControlBoard("Eval2"),
+		NewControlBoard("Eval3"),
 	}
 
 	return cbsys

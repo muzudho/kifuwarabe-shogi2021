@@ -418,10 +418,10 @@ MainLoop:
 			}
 		case "watercolor":
 			// 水彩絵の具でにじませたような、利きボード作り
-			// watercolor 0 10 26
+			// watercolor 0 10 26 27 28
 			length := len(tokens)
 			ok := false
-			if length == 4 {
+			if length == 6 {
 				// 盤番号
 				b1, err := strconv.Atoi(tokens[1])
 				if err != nil {
@@ -438,17 +438,29 @@ MainLoop:
 					G.Chat.Debug("Error: %s", err)
 				}
 
+				b4, err := strconv.Atoi(tokens[4])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b5, err := strconv.Atoi(tokens[5])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
 				WaterColor(
 					pPosSys.PControlBoardSystem.Boards[b1],
 					pPosSys.PControlBoardSystem.Boards[b2],
-					pPosSys.PControlBoardSystem.Boards[b3])
+					pPosSys.PControlBoardSystem.Boards[b3],
+					pPosSys.PControlBoardSystem.Boards[b4],
+					pPosSys.PControlBoardSystem.Boards[b5])
 				ok = true
 			}
 
 			if !ok {
 				G.Chat.Debug("Format\n")
 				G.Chat.Debug("------\n")
-				G.Chat.Debug("watercolor {control1} {control2} {control3}\n")
+				G.Chat.Debug("watercolor {control1} {control2} {control3} {control4} {control5}\n")
 			}
 		case "":
 			// Ignored

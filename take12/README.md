@@ -13,8 +13,9 @@ position startpos
 pos
 control layer 0
 control layer 10
-control layer 26
 
-watercolor 0 10 26
+watercolor 0 10 26 27 28
 control layer 26
+control layer 27
+control layer 28
 ```
