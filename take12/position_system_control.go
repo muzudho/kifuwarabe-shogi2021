@@ -116,7 +116,7 @@ func (pPosSys *PositionSystem) AddControlDiff(pPos *Position, c ControlLayerT, f
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
 		// 差分の方のテーブルを更新（＾～＾）
-		pPosSys.ControlBoards[ph][c][to] += sign * 1
+		pPosSys.ControlBoards1[ph][c].Board[to] += sign * 1
 	}
 }
 
@@ -131,8 +131,8 @@ func (pPosSys *PositionSystem) ClearControlDiff() {
 func (pPosSys *PositionSystem) ClearControlLayer(c ControlLayerT) {
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
-			pPosSys.ControlBoards[0][c][sq] = 0
-			pPosSys.ControlBoards[1][c][sq] = 0
+			pPosSys.ControlBoards1[0][c].Board[sq] = 0
+			pPosSys.ControlBoards1[1][c].Board[sq] = 0
 		}
 	}
 }
@@ -143,8 +143,8 @@ func (pPosSys *PositionSystem) MergeControlDiff() {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// c=0 を除く
 			for c := CONTROL_LAYER_DIFF_START; c < CONTROL_LAYER_DIFF_END; c += 1 {
-				pPosSys.ControlBoards[0][CONTROL_LAYER_SUM][sq] += pPosSys.ControlBoards[0][c][sq]
-				pPosSys.ControlBoards[1][CONTROL_LAYER_SUM][sq] += pPosSys.ControlBoards[1][c][sq]
+				pPosSys.ControlBoards1[0][CONTROL_LAYER_SUM].Board[sq] += pPosSys.ControlBoards1[0][c].Board[sq]
+				pPosSys.ControlBoards1[1][CONTROL_LAYER_SUM].Board[sq] += pPosSys.ControlBoards1[1][c].Board[sq]
 			}
 		}
 	}
@@ -162,7 +162,7 @@ func (pPosSys *PositionSystem) RecalculateControl(pPos *Position, c1 ControlLaye
 			sq_list := GenControl(pPos, from)
 
 			for _, to := range sq_list {
-				pPosSys.ControlBoards[phase-1][c1][to] += 1
+				pPosSys.ControlBoards1[phase-1][c1].Board[to] += 1
 			}
 
 		}
@@ -178,7 +178,7 @@ func (pPosSys *PositionSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c
 		for from := Square(11); from < BOARD_SIZE; from += 1 {
 			if File(from) != 0 && Rank(from) != 0 {
 
-				pPosSys.ControlBoards[phase][c3][from] = pPosSys.ControlBoards[phase][c1][from] - pPosSys.ControlBoards[phase][c2][from]
+				pPosSys.ControlBoards1[phase][c3].Board[from] = pPosSys.ControlBoards1[phase][c1].Board[from] - pPosSys.ControlBoards1[phase][c2].Board[from]
 
 			}
 		}

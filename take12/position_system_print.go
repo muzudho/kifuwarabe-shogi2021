@@ -209,7 +209,7 @@ func (pPosSys *PositionSystem) SprintControl(phase Phase, c ControlLayerT) strin
 	var ph = phase - 1
 	if 0 <= ph && ph < 2 {
 		title = fmt.Sprintf("Control(%d)%s", c, GetControlLayerName(c))
-		board = pPosSys.ControlBoards[ph][c]
+		board = pPosSys.ControlBoards1[ph][c].Board
 	}
 
 	return "\n" +
