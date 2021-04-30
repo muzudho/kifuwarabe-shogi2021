@@ -2,7 +2,6 @@ package take13
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 )
 
@@ -10,7 +9,7 @@ const RESIGN_VALUE = -32768
 const MAX_VALUE = 32767
 
 var nodesNum int
-var depthEnd int = 1
+var depthEnd int = 2 // 1
 
 type CuttingType int
 
@@ -147,16 +146,19 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 					panic(fmt.Errorf("Unknown phase=%d", pPosSys.phase))
 				}
 
-				// 利き評価が強すぎると 指し手がバラけないので、乱数を使って 確率的にします。
-				if control_val != 0 {
-					var sign int8
-					if control_val < 0 {
-						sign = -1
+				/*
+					// 利き評価が強すぎると 指し手がバラけないので、乱数を使って 確率的にします。
+					if control_val != 0 {
+						var sign int8
+						if control_val < 0 {
+							sign = -1
+						}
+						control_val = sign * int8(rand.Intn(int(math.Abs(float64(control_val)))))
 					}
-					control_val = sign * int8(rand.Intn(int(math.Abs(float64(control_val)))))
-				}
+				*/
 
 				leafVal := materialVal + int16(control_val)
+				fmt.Printf("move=%s leafVal=%6d materialVal=%6d(%s) control_val=%6d\n", move.ToCode(), leafVal, materialVal, captured.ToCode(), control_val)
 				if bestVal < leafVal {
 					// より高い価値が見つかったら更新
 					bestMoveList = nil

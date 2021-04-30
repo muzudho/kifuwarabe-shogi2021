@@ -13,30 +13,25 @@ func WaterColor(pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard, pCB4
 	pCB4.Clear()
 	pCB5.Clear()
 
-	pW := pCB1
-	pX := pCB2
-	pY := pCB3
-	waterColor2(pW, pX, pY)
-
-	pW = pCB3
-	pX = pCB4
-	pY = pCB5
-	waterColor2(pW, pX, pY)
+	waterColor2(pCB1, pCB2, pCB3)
+	waterColor2(pCB3, pCB4, pCB5)
 }
 
 // 81マス・スキャン
 func waterColor2(pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard) {
 	for rank := 1; rank < 10; rank += 1 {
 		for file := 9; file > 0; file -= 1 {
-			sum := waterColor3(rank, file, pCB1, pCB2)
+			sum16, squares16 := waterColor3(rank, file, pCB1, pCB2)
 			sq := SquareFrom(Square(file), Square(rank))
-			pCB3.Board[sq] = sum
+			// １６マスに利きが１つずつ入っていたとしても、マス数で割ったら、１になってしまう（＾～＾）
+			// 割り過ぎを防止（＾～＾）
+			pCB3.Board[sq] += (sum16 * 16) / squares16
 		}
 	}
 }
 
 // チェビシェフ距離で 2マス離れたところ、16マス・スキャン
-func waterColor3(rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) int8 {
+func waterColor3(rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (int8, int8) {
 
 	var sum int8 = 0
 	var squares int8 = 0
@@ -65,9 +60,7 @@ func waterColor3(rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) int
 		sum, squares = waterColor4(sum, squares, rank+relRank, file+relFile, pCB1, pCB2)
 	}
 
-	sum /= squares
-
-	return sum
+	return sum, squares
 }
 
 func waterColor4(sum int8, squares int8, rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (int8, int8) {
