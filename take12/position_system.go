@@ -711,7 +711,8 @@ func (pPosSys *PositionSystem) ReadPosition(pPos *Position, command string) {
 			if !pPos.IsEmptySq(sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
 				// あとですぐクリアーするので、どのレイヤー使ってても関係ないんで、仮で PUTレイヤーを使っているぜ（＾～＾）
-				pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_PUT, sq, 1)
+				pPosSys.PControlBoardSystem.AddControlDiff(
+					pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, sq, 1)
 			}
 		}
 	}
@@ -868,9 +869,12 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	pPosSys.PControlBoardSystem.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
-	pPosSys.PControlBoardSystem.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_OFF, -1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_OFF, -1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_OFF, -1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlRook(
+		pPos, CONTROL_LAYER_DIFF1_ROOK_OFF, CONTROL_LAYER_DIFF2_ROOK_OFF, -1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlBishop(
+		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, -1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlLance(
+		pPos, CONTROL_LAYER_DIFF1_LANCE_OFF, CONTROL_LAYER_DIFF2_LANCE_OFF, -1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	sq_drop := mov_src_sq
@@ -921,7 +925,8 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
+		pPosSys.PControlBoardSystem.AddControlDiff(
+			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -934,14 +939,16 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
 				// Ignored: 長い利きの駒は 既に除外しているので無視します
 			default:
-				pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, -1)
+				pPosSys.PControlBoardSystem.AddControlDiff(
+					pPos, CONTROL_LAYER_DIFF1_CAPTURED, CONTROL_LAYER_DIFF2_CAPTURED, mov_dst_sq, -1)
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
 
 		// 元位置の駒の利きを除去
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, -1)
+		pPosSys.PControlBoardSystem.AddControlDiff(
+			pPos, CONTROL_LAYER_DIFF1_REMOVE, CONTROL_LAYER_DIFF2_REMOVE, mov_src_sq, -1)
 
 		// 行き先の駒の上書き
 		if move.GetPromotion() {
@@ -953,7 +960,8 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		// 元位置の駒を削除してから、移動先の駒の利きを追加
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, 1)
+		pPosSys.PControlBoardSystem.AddControlDiff(
+			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1064,9 +1072,12 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
-	pPosSys.PControlBoardSystem.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_ON, 1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_ON, 1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_ON, 1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlLance(
+		pPos, CONTROL_LAYER_DIFF1_LANCE_ON, CONTROL_LAYER_DIFF2_LANCE_ON, 1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlBishop(
+		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, 1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlRook(
+		pPos, CONTROL_LAYER_DIFF1_ROOK_ON, CONTROL_LAYER_DIFF2_ROOK_ON, 1, mov_dst_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff()
 }
@@ -1098,9 +1109,12 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_ON, -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_ON, -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_ON, -1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlRook(
+		pPos, CONTROL_LAYER_DIFF1_ROOK_ON, CONTROL_LAYER_DIFF2_ROOK_ON, -1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlBishop(
+		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, -1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlLance(
+		pPos, CONTROL_LAYER_DIFF1_LANCE_ON, CONTROL_LAYER_DIFF2_LANCE_ON, -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1109,7 +1123,8 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		drop := mov_src_sq
 		// 行き先から駒を除去します
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
+		pPosSys.PControlBoardSystem.AddControlDiff(
+			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, -1)
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
@@ -1119,7 +1134,8 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 		// 行き先に進んでいた自駒の利きの除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_PUT, mov_dst_sq, -1)
+		pPosSys.PControlBoardSystem.AddControlDiff(
+			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, -1)
 
 		// 自駒を移動元へ戻します
 		if move.GetPromotion() {
@@ -1132,7 +1148,8 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 元の場所に戻した自駒の利きを復元します
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_REMOVE, mov_src_sq, 1)
+		pPosSys.PControlBoardSystem.AddControlDiff(
+			pPos, CONTROL_LAYER_DIFF1_REMOVE, CONTROL_LAYER_DIFF2_REMOVE, mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
@@ -1175,9 +1192,12 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlLance(
+		pPos, CONTROL_LAYER_DIFF1_LANCE_OFF, CONTROL_LAYER_DIFF2_LANCE_OFF, 1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlBishop(
+		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, 1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlRook(
+		pPos, CONTROL_LAYER_DIFF1_ROOK_OFF, CONTROL_LAYER_DIFF2_ROOK_OFF, 1, mov_src_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff()
 
@@ -1211,9 +1231,12 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_ON, -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_ON, -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_ON, -1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlRook(
+		pPos, CONTROL_LAYER_DIFF1_ROOK_ON, CONTROL_LAYER_DIFF2_ROOK_ON, -1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlBishop(
+		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, -1, mov_dst_sq)
+	pPosSys.PControlBoardSystem.AddControlLance(
+		pPos, CONTROL_LAYER_DIFF1_LANCE_ON, CONTROL_LAYER_DIFF2_LANCE_ON, -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1274,7 +1297,8 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
-			pPosSys.PControlBoardSystem.AddControlDiff(pPos, CONTROL_LAYER_DIFF_CAPTURED, mov_dst_sq, 1)
+			pPosSys.PControlBoardSystem.AddControlDiff(
+				pPos, CONTROL_LAYER_DIFF1_CAPTURED, CONTROL_LAYER_DIFF2_CAPTURED, mov_dst_sq, 1)
 		}
 	}
 
@@ -1320,9 +1344,12 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlLance(pPos, CONTROL_LAYER_DIFF_LANCE_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(pPos, CONTROL_LAYER_DIFF_BISHOP_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlRook(pPos, CONTROL_LAYER_DIFF_ROOK_OFF, 1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlLance(
+		pPos, CONTROL_LAYER_DIFF1_LANCE_OFF, CONTROL_LAYER_DIFF2_LANCE_OFF, 1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlBishop(
+		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, 1, mov_src_sq)
+	pPosSys.PControlBoardSystem.AddControlRook(
+		pPos, CONTROL_LAYER_DIFF1_ROOK_OFF, CONTROL_LAYER_DIFF2_ROOK_OFF, 1, mov_src_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff()
 }

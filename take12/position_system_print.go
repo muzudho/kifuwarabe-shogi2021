@@ -192,29 +192,13 @@ func (pPosSys *PositionSystem) createMovesText() string {
 // Parameters
 // ----------
 // * `c` - 利き数ボードのレイヤー番号（＾～＾）
-func (pPosSys *PositionSystem) SprintControl(phase Phase, c ControlLayerT) string {
-	var board [BOARD_SIZE]int8
-	var phase_str string
-	var title string
-
-	switch phase {
-	case FIRST:
-		phase_str = "First"
-	case SECOND:
-		phase_str = "Second"
-	default:
-		return "\n"
-	}
-
-	var ph = phase - 1
-	if 0 <= ph && ph < 2 {
-		title = fmt.Sprintf("Control(%d)%s", c, pPosSys.PControlBoardSystem.Boards[ph][c].Title)
-		board = pPosSys.PControlBoardSystem.Boards[ph][c].Board
-	}
+func (pPosSys *PositionSystem) SprintControl(c ControlLayerT) string {
+	title := fmt.Sprintf("Control(%d)%s", c, pPosSys.PControlBoardSystem.Boards[c].Title)
+	board := pPosSys.PControlBoardSystem.Boards[c].Board
 
 	return "\n" +
 		//
-		fmt.Sprintf("[%s %s]\n", title, phase_str) +
+		fmt.Sprintf("[%s]\n", title) +
 		//
 		"\n" +
 		//
@@ -481,11 +465,9 @@ func (pPosSys *PositionSystem) Dump() string {
 		buffer.WriteString(fmt.Sprintf("LanceLocations[%d]:%d,%d,%d,%d\n", b, pPos.PieceLocations[PCLOC_L1], pPos.PieceLocations[PCLOC_L2], pPos.PieceLocations[PCLOC_L3], pPos.PieceLocations[PCLOC_L4]))
 	}
 
-	for phase := 0; phase < 2; phase += 1 {
-		// 利きボード
-		for c := ControlLayerT(0); c < CONTROL_LAYER_ALL_SIZE; c += 1 {
-			buffer.WriteString(pPosSys.SprintControl(Phase(phase+1), c))
-		}
+	// 利きボード全部
+	for c := ControlLayerT(0); c < CONTROL_LAYER_ALL_SIZE; c += 1 {
+		buffer.WriteString(pPosSys.SprintControl(c))
 	}
 
 	buffer.WriteString("Hands:")

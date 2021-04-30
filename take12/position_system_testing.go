@@ -10,19 +10,20 @@ import (
 
 // TestControl
 func TestControl(pPosSys *PositionSystem, pPos *Position) (bool, string) {
-	pPosSys.PControlBoardSystem.Boards[FIRST-1][CONTROL_LAYER_TEST_COPY].Clear()
-	pPosSys.PControlBoardSystem.Boards[SECOND-1][CONTROL_LAYER_TEST_COPY].Clear()
+	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY1].Clear()
+	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY2].Clear()
 
-	pPosSys.PControlBoardSystem.Boards[FIRST-1][CONTROL_LAYER_TEST_ERROR].Clear()
-	pPosSys.PControlBoardSystem.Boards[SECOND-1][CONTROL_LAYER_TEST_ERROR].Clear()
+	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR1].Clear()
+	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR2].Clear()
 
 	// 利きをコピー
-	for phase := 0; phase < 2; phase += 1 {
-		copyCb := pPosSys.PControlBoardSystem.Boards[phase][CONTROL_LAYER_TEST_COPY]
-		sumCb := pPosSys.PControlBoardSystem.Boards[phase][CONTROL_LAYER_SUM]
-		for sq := 0; sq < BOARD_SIZE; sq += 1 {
-			copyCb.Board[sq] = sumCb.Board[sq]
-		}
+	copyCb1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY1]
+	sumCb1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1]
+	copyCb2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY2]
+	sumCb2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2]
+	for sq := 0; sq < BOARD_SIZE; sq += 1 {
+		copyCb1.Board[sq] = sumCb1.Board[sq]
+		copyCb2.Board[sq] = sumCb2.Board[sq]
 	}
 
 	// 指し手生成
@@ -53,16 +54,25 @@ func checkControl(pPosSys *PositionSystem, move_seq int, move_total int, move Mo
 	is_error := false
 
 	// 誤差調べ
-	for phase := 0; phase < 2; phase += 1 {
-		copyCB := pPosSys.PControlBoardSystem.Boards[phase][CONTROL_LAYER_TEST_COPY]
-		sumCB := pPosSys.PControlBoardSystem.Boards[phase][CONTROL_LAYER_SUM]
-		errorCB := pPosSys.PControlBoardSystem.Boards[phase][CONTROL_LAYER_TEST_ERROR]
-		for sq := 0; sq < BOARD_SIZE; sq += 1 {
-			diff := copyCB.Board[sq] - sumCB.Board[sq]
-			errorCB.Board[sq] = diff
-			if diff != 0 {
-				is_error = true
-			}
+	copyCB1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY1]
+	sumCB1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1]
+	errorCB1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR1]
+	copyCB2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY2]
+	sumCB2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2]
+	errorCB2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR2]
+	for sq := 0; sq < BOARD_SIZE; sq += 1 {
+		diff1 := copyCB1.Board[sq] - sumCB1.Board[sq]
+		errorCB1.Board[sq] = diff1
+		if diff1 != 0 {
+			is_error = true
+			break
+		}
+
+		diff2 := copyCB2.Board[sq] - sumCB2.Board[sq]
+		errorCB2.Board[sq] = diff2
+		if diff2 != 0 {
+			is_error = true
+			break
 		}
 	}
 
@@ -70,18 +80,25 @@ func checkControl(pPosSys *PositionSystem, move_seq int, move_total int, move Mo
 }
 
 // SumAbsControl - 利きテーブルの各マスを絶対値にし、その総和を返します
-func SumAbsControl(pPosSys *PositionSystem, layer1 int) [2]int {
+func SumAbsControl(pPosSys *PositionSystem, ph1_c ControlLayerT, ph2_c ControlLayerT) [2]int {
 
 	sumList := [2]int{0, 0}
 
-	for phase := 0; phase < 2; phase += 1 {
-		cb := pPosSys.PControlBoardSystem.Boards[phase][layer1]
-		for from := Square(11); from < BOARD_SIZE; from += 1 {
-			if File(from) != 0 && Rank(from) != 0 {
+	cb1 := pPosSys.PControlBoardSystem.Boards[ph1_c]
+	for from := Square(11); from < BOARD_SIZE; from += 1 {
+		if File(from) != 0 && Rank(from) != 0 {
 
-				sumList[phase] += int(math.Abs(float64(cb.Board[from])))
+			sumList[FIRST-1] += int(math.Abs(float64(cb1.Board[from])))
 
-			}
+		}
+	}
+
+	cb2 := pPosSys.PControlBoardSystem.Boards[ph2_c]
+	for from := Square(11); from < BOARD_SIZE; from += 1 {
+		if File(from) != 0 && Rank(from) != 0 {
+
+			sumList[SECOND-1] += int(math.Abs(float64(cb2.Board[from])))
+
 		}
 	}
 

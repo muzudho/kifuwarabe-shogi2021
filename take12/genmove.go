@@ -319,26 +319,26 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 
 	// 王手をされているときは、自玉を逃がす必要があります
 	friend := pPosSys.GetPhase()
-	opponent := FlipPhase(pPosSys.GetPhase())
 	var friendKingSq Square
 	var hand_start int
 	var hand_end int
 	// var opponentKingSq Square
+	var pOpponentSumCB *ControlBoard
 	if friend == FIRST {
 		friendKingSq = pPos.GetPieceLocation(PCLOC_K1)
 		hand_start = HAND_IDX_START
+		pOpponentSumCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2]
 	} else if friend == SECOND {
 		friendKingSq = pPos.GetPieceLocation(PCLOC_K2)
 		hand_start = HAND_IDX_START + HAND_TYPE_SIZE
+		pOpponentSumCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1]
 	} else {
 		panic(fmt.Errorf("Unknown phase=%d", friend))
 	}
 	hand_end = hand_start + HAND_TYPE_SIZE
 
-	opponentSumCB := pPosSys.PControlBoardSystem.Boards[opponent-1][CONTROL_LAYER_SUM]
-
 	// 相手の利きテーブルの自玉のマスに利きがあるか
-	if opponentSumCB.Board[friendKingSq] > 0 {
+	if pOpponentSumCB.Board[friendKingSq] > 0 {
 		// 王手されています
 		// fmt.Printf("Debug: Checked friendKingSq=%d opponentKingSq=%d friend=%d opponent=%d\n", friendKingSq, opponentKingSq, friend, opponent)
 		// TODO アタッカーがどの駒か調べたいが……。一手前に動かした駒か、空き王手のどちらかしかなくないか（＾～＾）？
@@ -364,7 +364,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 								move := NewMoveValue2(from, to)
 								pPosSys.DoMove(pPos, move)
 
-								if opponentSumCB.Board[to] == 0 {
+								if pOpponentSumCB.Board[to] == 0 {
 									// よっしゃ利きから逃げ切った（＾～＾）
 									// 王手が解除されてるから採用（＾～＾）
 									move_list = append(move_list, move)
@@ -379,7 +379,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 								move := NewMoveValue2(from, to)
 								pPosSys.DoMove(pPos, move)
 
-								if opponentSumCB.Board[friendKingSq] == 0 {
+								if pOpponentSumCB.Board[friendKingSq] == 0 {
 									// 王手が解除されてるから採用（＾～＾）
 									move_list = append(move_list, move)
 								}
@@ -403,7 +403,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 						move := NewMoveValue2(hand_sq, to)
 						pPosSys.DoMove(pPos, move)
 
-						if opponentSumCB.Board[friendKingSq] == 0 {
+						if pOpponentSumCB.Board[friendKingSq] == 0 {
 							// 王手が解除されてるから採用（＾～＾）
 							move_list = append(move_list, move)
 						}
@@ -432,7 +432,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 					if pieceType == PIECE_TYPE_K {
 						// 玉は自殺手を省きます
 						for _, to := range control_list {
-							if pPos.Hetero(from, to) && pPosSys.PControlBoardSystem.Boards[opponent-1][CONTROL_LAYER_SUM].Board[to] == 0 { // 自駒の上、敵の利きには移動できません
+							if pPos.Hetero(from, to) && pOpponentSumCB.Board[to] == 0 { // 自駒の上、敵の利きには移動できません
 								move_list = append(move_list, NewMoveValue2(from, to))
 							}
 						}

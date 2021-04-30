@@ -163,8 +163,8 @@ MainLoop:
 			ok := false
 			if length == 1 {
 				// 利きの表示（＾～＾）
-				G.Chat.Debug(pPosSys.SprintControl(FIRST, 0))
-				G.Chat.Debug(pPosSys.SprintControl(SECOND, 0))
+				G.Chat.Debug(pPosSys.SprintControl(CONTROL_LAYER_SUM1))
+				G.Chat.Debug(pPosSys.SprintControl(CONTROL_LAYER_SUM2))
 				ok = true
 			} else if length == 2 && tokens[1] == "test" {
 				// 利きのテスト
@@ -173,8 +173,8 @@ MainLoop:
 				is_error, message := TestControl(pPosSys, pPosSys.PPosition[POS_LAYER_MAIN])
 				if is_error {
 					G.Chat.Debug("ControlTest: error=%s\n", message)
-					G.Chat.Debug(pPosSys.SprintControl(FIRST, CONTROL_LAYER_TEST_ERROR))
-					G.Chat.Debug(pPosSys.SprintControl(SECOND, CONTROL_LAYER_TEST_ERROR))
+					G.Chat.Debug(pPosSys.SprintControl(CONTROL_LAYER_TEST_ERROR1))
+					G.Chat.Debug(pPosSys.SprintControl(CONTROL_LAYER_TEST_ERROR2))
 				}
 				ok = true
 			} else if length == 5 && tokens[1] == "diff" {
@@ -195,34 +195,46 @@ MainLoop:
 
 				pPosSys.PControlBoardSystem.DiffControl(ControlLayerT(c1), ControlLayerT(c2), ControlLayerT(c3))
 				ok = true
-			} else if length == 3 && tokens[1] == "recalc" {
-				// control recalc 12
+			} else if length == 4 && tokens[1] == "recalc" {
+				// control recalc 22 25
 				// 利きの再計算
 				c1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				pPosSys.PControlBoardSystem.RecalculateControl(pPosSys.PPosition[POS_LAYER_MAIN], ControlLayerT(c1))
+
+				c2, err := strconv.Atoi(tokens[3])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+
+				pPosSys.PControlBoardSystem.RecalculateControl(pPosSys.PPosition[POS_LAYER_MAIN], ControlLayerT(c1), ControlLayerT(c2))
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
-				// 利きテーブルの表示（＾～＾）
+				// 指定の利きテーブルの表示（＾～＾）
 				c, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
-				} else if 0 <= c && c < CONTROL_LAYER_ALL_SIZE {
-					G.Chat.Debug(pPosSys.SprintControl(FIRST, ControlLayerT(c)))
-					G.Chat.Debug(pPosSys.SprintControl(SECOND, ControlLayerT(c)))
+				} else if 0 <= c && ControlLayerT(c) < CONTROL_LAYER_ALL_SIZE {
+					G.Chat.Debug(pPosSys.SprintControl(ControlLayerT(c)))
+					G.Chat.Debug(pPosSys.SprintControl(ControlLayerT(c)))
 					ok = true
 				}
-			} else if length == 3 && tokens[1] == "sumabs" {
+			} else if length == 4 && tokens[1] == "sumabs" {
 				c1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
+
+				c2, err := strconv.Atoi(tokens[3])
+				if err != nil {
+					fmt.Printf("Error: %s", err)
+				}
+
 				// 利きのテスト
 				// 現局面の利きを覚え、ムーブ、アンドゥを行って
 				// 元の利きに戻るか確認
-				sumList := SumAbsControl(pPosSys, c1)
+				sumList := SumAbsControl(pPosSys, ControlLayerT(c1), ControlLayerT(c2))
 				G.Chat.Debug("ControlTest: SumAbs=%d,%d\n", sumList[0], sumList[1])
 				ok = true
 			}
@@ -232,9 +244,9 @@ MainLoop:
 				G.Chat.Debug("------\n")
 				G.Chat.Debug("control\n")
 				G.Chat.Debug("control layer {number}\n")
-				G.Chat.Debug("control recalc {number}\n")
+				G.Chat.Debug("control recalc {number} {number}\n")
 				G.Chat.Debug("control diff {layer_number} {layer_number} {layer_number}\n")
-				G.Chat.Debug("control sumabs {number}\n")
+				G.Chat.Debug("control sumabs {number} {number}\n")
 			}
 		case "location":
 			length := len(tokens)
