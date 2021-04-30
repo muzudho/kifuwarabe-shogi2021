@@ -15,8 +15,10 @@ func TestControl(pPosSys *PositionSystem, pPos *Position) (bool, string) {
 
 	// 利きをコピー
 	for phase := 0; phase < 2; phase += 1 {
+		copyCb := pPosSys.ControlBoards1[phase][CONTROL_LAYER_TEST_COPY]
+		sumCb := pPosSys.ControlBoards1[phase][CONTROL_LAYER_SUM]
 		for sq := 0; sq < BOARD_SIZE; sq += 1 {
-			pPosSys.ControlBoards1[phase][CONTROL_LAYER_TEST_COPY].Board[sq] = pPosSys.ControlBoards1[phase][CONTROL_LAYER_SUM].Board[sq]
+			copyCb.Board[sq] = sumCb.Board[sq]
 		}
 	}
 
@@ -49,9 +51,12 @@ func checkControl(pPosSys *PositionSystem, move_seq int, move_total int, move Mo
 
 	// 誤差調べ
 	for phase := 0; phase < 2; phase += 1 {
+		copyCB := pPosSys.ControlBoards1[phase][CONTROL_LAYER_TEST_COPY]
+		sumCB := pPosSys.ControlBoards1[phase][CONTROL_LAYER_SUM]
+		errorCB := pPosSys.ControlBoards1[phase][CONTROL_LAYER_TEST_ERROR]
 		for sq := 0; sq < BOARD_SIZE; sq += 1 {
-			diff := pPosSys.ControlBoards1[phase][CONTROL_LAYER_TEST_COPY].Board[sq] - pPosSys.ControlBoards1[phase][CONTROL_LAYER_SUM].Board[sq]
-			pPosSys.ControlBoards1[phase][CONTROL_LAYER_TEST_ERROR].Board[sq] = diff
+			diff := copyCB.Board[sq] - sumCB.Board[sq]
+			errorCB.Board[sq] = diff
 			if diff != 0 {
 				is_error = true
 			}
@@ -67,10 +72,11 @@ func SumAbsControl(pPosSys *PositionSystem, layer1 int) [2]int {
 	sumList := [2]int{0, 0}
 
 	for phase := 0; phase < 2; phase += 1 {
+		cb := pPosSys.ControlBoards1[phase][layer1]
 		for from := Square(11); from < BOARD_SIZE; from += 1 {
 			if File(from) != 0 && Rank(from) != 0 {
 
-				sumList[phase] += int(math.Abs(float64(pPosSys.ControlBoards1[phase][layer1].Board[from])))
+				sumList[phase] += int(math.Abs(float64(cb.Board[from])))
 
 			}
 		}
