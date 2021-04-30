@@ -117,12 +117,36 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 			} else {
 				// 葉ノードでは、相手の手ではなく、自分の局面に点数を付けます
 
-				if bestVal < materialVal {
+				// 自玉と相手玉のどちらが有利な場所にいるか比較
+				var control_val int8
+				switch pPosSys.phase {
+				case FIRST:
+					WaterColor(
+						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
+						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2],
+						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL])
+					my_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K1]
+					oppo_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K2]
+					control_val = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL].Board[my_king_sq] + pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL].Board[oppo_king_sq]
+				case SECOND:
+					WaterColor(
+						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2],
+						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
+						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL])
+					my_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K2]
+					oppo_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K1]
+					control_val = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL].Board[my_king_sq] + pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL].Board[oppo_king_sq]
+				default:
+					panic(fmt.Errorf("Unknown phase=%d", pPosSys.phase))
+				}
+
+				leafVal := materialVal + int16(control_val)
+				if bestVal < leafVal {
 					// より高い価値が見つかったら更新
 					bestMoveList = nil
 					bestMoveList = append(bestMoveList, move)
-					bestVal = materialVal
-				} else if bestVal == materialVal {
+					bestVal = leafVal
+				} else if bestVal == leafVal {
 					// 最高値が並んだら配列の要素として追加
 					bestMoveList = append(bestMoveList, move)
 				}
