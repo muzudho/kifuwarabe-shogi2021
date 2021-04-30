@@ -2,6 +2,7 @@ package take12
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 )
 
@@ -138,6 +139,15 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 					control_val = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL].Board[my_king_sq] + pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_EVAL].Board[oppo_king_sq]
 				default:
 					panic(fmt.Errorf("Unknown phase=%d", pPosSys.phase))
+				}
+
+				// 利き評価が強すぎると 指し手がバラけないので、乱数を使って 確率的にします。
+				if control_val != 0 {
+					var sign int8
+					if control_val < 0 {
+						sign = -1
+					}
+					control_val = sign * int8(rand.Intn(int(math.Abs(float64(control_val)))))
 				}
 
 				leafVal := materialVal + int16(control_val)
