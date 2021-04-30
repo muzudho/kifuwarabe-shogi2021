@@ -261,8 +261,8 @@ func (pPosSys *PositionSystem) SprintControl(phase Phase, c ControlLayerT) strin
 		"\n"
 }
 
-// SprintSfen - SFEN文字列返せよ（＾～＾）
-func (pPosSys *PositionSystem) SprintSfen(pPos *Position) string {
+// SprintSfen - SFEN文字列返せよ（＾～＾）投了図を返すぜ（＾～＾）棋譜の部分を捨てるぜ（＾～＾）
+func (pPosSys *PositionSystem) SprintSfenResignation(pPos *Position) string {
 	// 9x9=81 + 8slash = 89 文字 なんだが成り駒で増えるし めんどくさ（＾～＾）多めに取っとくか（＾～＾）
 	// 成り駒２文字なんで、byte型だとめんどくさ（＾～＾）
 	buf := make([]byte, 0, 200)
@@ -442,9 +442,10 @@ func (pPosSys *PositionSystem) SprintSfen(pPos *Position) string {
 	movesNum := pPosSys.StartMovesNum + pPosSys.OffsetMovesIndex
 
 	// 指し手
-	moves_text := pPosSys.createMovesText()
+	// moves_text := pPosSys.createMovesText()
 
-	return fmt.Sprintf("position sfen %s %s %s %d moves%s\n", buf, phaseStr, hands, movesNum, moves_text)
+	// return fmt.Sprintf("position sfen %s %s %s %d moves%s\n", buf, phaseStr, hands, movesNum, moves_text)
+	return fmt.Sprintf("position sfen %s %s %s %d\n", buf, phaseStr, hands, movesNum)
 }
 
 // SprintRecord - 棋譜表示（＾～＾）

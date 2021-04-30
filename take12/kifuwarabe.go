@@ -258,7 +258,7 @@ MainLoop:
 			}
 		case "sfen":
 			// SFEN文字列返せよ（＾～＾）
-			G.Chat.Debug(pPosSys.SprintSfen(pPosSys.PPosition[POS_LAYER_MAIN]))
+			G.Chat.Debug(pPosSys.SprintSfenResignation(pPosSys.PPosition[POS_LAYER_MAIN]))
 		case "record":
 			// 棋譜表示。取った駒を表示するためのもの（＾～＾）
 			G.Chat.Debug(pPosSys.SprintRecord())
@@ -269,28 +269,39 @@ MainLoop:
 			G.Chat.Debug("PositionSystem.Dump()\n")
 			G.Chat.Debug("---------------\n%s", pPosSys.Dump())
 		case "playout":
-			// とにかく１００手進めるぜ（＾～＾）
+			// とにかく手を進めるぜ（＾～＾）
 			G.Chat.Debug("Playout start\n")
 
-			for i := 0; i < 100; i += 1 {
-				G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].Sprint(
-					pPosSys.phase,
-					pPosSys.StartMovesNum,
-					pPosSys.OffsetMovesIndex,
-					pPosSys.createMovesText()))
-				// あの駒、どこにいんの（＾～＾）？
-				// G.Chat.Debug(pPosSys.SprintLocation())
+		PlayoutLoop:
+			// 棋譜を書き直してさらに多く続けるぜ（＾～＾）
+			for j := 0; j < 1000; j += 1 {
+				// 512手が最大だが（＾～＾）
+				for i := 0; i < MOVES_SIZE; i += 1 {
+					G.Chat.Debug(pPosSys.PPosition[POS_LAYER_MAIN].Sprint(
+						pPosSys.phase,
+						pPosSys.StartMovesNum,
+						pPosSys.OffsetMovesIndex,
+						pPosSys.createMovesText()))
+					// あの駒、どこにいんの（＾～＾）？
+					// G.Chat.Debug(pPosSys.SprintLocation())
 
-				// moveList(pPosSys)
-				bestmove := Search(pPosSys)
-				G.Chat.Print("bestmove %s\n", bestmove.ToCode())
+					// moveList(pPosSys)
+					bestmove := Search(pPosSys)
+					G.Chat.Print("bestmove %s\n", bestmove.ToCode())
 
-				if bestmove == Move(SQUARE_EMPTY) {
-					// 投了
-					break
+					if bestmove == Move(SQUARE_EMPTY) {
+						// 投了
+						break PlayoutLoop
+					}
+
+					pPosSys.DoMove(pPosSys.PPosition[POS_LAYER_MAIN], bestmove)
 				}
 
-				pPosSys.DoMove(pPosSys.PPosition[POS_LAYER_MAIN], bestmove)
+				sfen1 := pPosSys.SprintSfenResignation(pPosSys.PPosition[POS_LAYER_MAIN])
+				pPosSys.ReadPosition(pPosSys.PPosition[POS_LAYER_MAIN], sfen1)
+
+				// ここを開始局面ということにするぜ（＾～＾）
+				// pPosSys.StartMovesNum = 0
 			}
 
 			G.Chat.Debug("Playout finished\n")

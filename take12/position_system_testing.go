@@ -343,7 +343,7 @@ func ShuffleBoard(pPosSys *PositionSystem, pPos *Position) {
 	}
 
 	// position sfen 文字列を取得
-	command := pPosSys.SprintSfen(pPos)
+	command := pPosSys.SprintSfenResignation(pPos)
 	G.Chat.Debug("#command=%s", command)
 
 	// 利きの再計算もやってくれる
@@ -356,7 +356,7 @@ func ShuffleBoard(pPosSys *PositionSystem, pPos *Position) {
 		pPosSys.OffsetMovesIndex,
 		pPosSys.createMovesText()))
 	ShowAllPiecesCount(pPos)
-	command2 := pPosSys.SprintSfen(pPos)
+	command2 := pPosSys.SprintSfenResignation(pPos)
 	G.Chat.Debug("#command2=%s", command2)
 
 	// 駒の数を数えます
