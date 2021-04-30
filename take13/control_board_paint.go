@@ -12,11 +12,11 @@ import (
 // * `c` - 利き数ボードのレイヤー番号（＾～＾）
 func (pPosSys *PositionSystem) SprintControl(c ControlLayerT) string {
 	title := fmt.Sprintf("Control(%d)%s", c, pPosSys.PControlBoardSystem.Boards[c].Title)
-	board := pPosSys.PControlBoardSystem.Boards[c].Board
+	board := pPosSys.PControlBoardSystem.Boards[c].Board1
 
 	// 表示桁数を調べます
-	max_num := int8(math.MinInt8)
-	min_num := int8(math.MaxInt8)
+	max_num := int16(math.MinInt8)
+	min_num := int16(math.MaxInt8)
 	for _, val := range board {
 		if max_num < val {
 			max_num = val

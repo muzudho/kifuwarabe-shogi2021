@@ -115,7 +115,7 @@ func (pControlBoardSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 Con
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 {
 
-			cb3.Board[from] = cb1.Board[from] - cb2.Board[from]
+			cb3.Board1[from] = cb1.Board1[from] - cb2.Board1[from]
 
 		}
 	}
@@ -145,7 +145,7 @@ func (pControlBoardSys *ControlBoardSystem) RecalculateControl(
 			}
 
 			for _, to := range sq_list {
-				pCB.Board[to] += 1
+				pCB.Board1[to] += 1
 			}
 		}
 	}
@@ -159,10 +159,10 @@ func (pControlBoardSys *ControlBoardSystem) MergeControlDiff() {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// c=0 を除く
 			for c1 := CONTROL_LAYER_DIFF1_START; c1 < CONTROL_LAYER_DIFF1_END; c1 += 1 {
-				cb0sum.Board[sq] += pControlBoardSys.Boards[c1].Board[sq]
+				cb0sum.Board1[sq] += pControlBoardSys.Boards[c1].Board1[sq]
 			}
 			for c2 := CONTROL_LAYER_DIFF2_START; c2 < CONTROL_LAYER_DIFF2_END; c2 += 1 {
-				cb1sum.Board[sq] += pControlBoardSys.Boards[c2].Board[sq]
+				cb1sum.Board1[sq] += pControlBoardSys.Boards[c2].Board1[sq]
 			}
 		}
 	}
@@ -181,7 +181,7 @@ func (pControlBoardSys *ControlBoardSystem) ClearControlDiff() {
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pControlBoardSys *ControlBoardSystem) AddControlDiff(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, from Square, sign int8) {
+	ph1_c ControlLayerT, ph2_c ControlLayerT, from Square, sign int16) {
 
 	if from > 99 {
 		// 持ち駒は無視します
@@ -211,13 +211,13 @@ func (pControlBoardSys *ControlBoardSystem) AddControlDiff(pPos *Position,
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
 		// 差分の方のテーブルを更新（＾～＾）
-		pCB.Board[to] += sign * 1
+		pCB.Board1[to] += sign * 1
 	}
 }
 
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pControlBoardSys *ControlBoardSystem) AddControlLance(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int8, excludeFrom Square) {
+	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
 	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
 		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -231,7 +231,7 @@ func (pControlBoardSys *ControlBoardSystem) AddControlLance(pPos *Position,
 
 // AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pControlBoardSys *ControlBoardSystem) AddControlBishop(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int8, excludeFrom Square) {
+	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
 	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
 		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -244,7 +244,7 @@ func (pControlBoardSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pControlBoardSys *ControlBoardSystem) AddControlRook(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int8, excludeFrom Square) {
+	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
 		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外

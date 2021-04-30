@@ -25,16 +25,16 @@ func waterColor2(pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard) {
 			sq := SquareFrom(Square(file), Square(rank))
 			// １６マスに利きが１つずつ入っていたとしても、マス数で割ったら、１になってしまう（＾～＾）
 			// 割り過ぎを防止（＾～＾）
-			pCB3.Board[sq] += (sum16 * 16) / squares16
+			pCB3.Board1[sq] += (sum16 * 16) / squares16
 		}
 	}
 }
 
 // チェビシェフ距離で 2マス離れたところ、16マス・スキャン
-func waterColor3(rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (int8, int8) {
+func waterColor3(rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (int16, int16) {
 
-	var sum int8 = 0
-	var squares int8 = 0
+	var sum int16 = 0
+	var squares int16 = 0
 
 	// 上辺
 	relRank := -2
@@ -63,12 +63,12 @@ func waterColor3(rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (in
 	return sum, squares
 }
 
-func waterColor4(sum int8, squares int8, rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (int8, int8) {
+func waterColor4(sum int16, squares int16, rank int, file int, pCB1 *ControlBoard, pCB2 *ControlBoard) (int16, int16) {
 	// ブラシの面積分の利きを総和します
 
 	sq := SquareFrom(Square(file), Square(rank))
 	if OnBoard(sq) {
-		sum += pCB1.Board[sq] - pCB2.Board[sq]
+		sum += pCB1.Board1[sq] - pCB2.Board1[sq]
 		squares += 1
 	}
 
