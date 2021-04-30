@@ -212,12 +212,11 @@ MainLoop:
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 指定の利きテーブルの表示（＾～＾）
-				c, err := strconv.Atoi(tokens[2])
+				c1, err := strconv.Atoi(tokens[2])
 				if err != nil {
 					fmt.Printf("Error: %s", err)
-				} else if 0 <= c && ControlLayerT(c) < CONTROL_LAYER_ALL_SIZE {
-					G.Chat.Debug(pPosSys.SprintControl(ControlLayerT(c)))
-					G.Chat.Debug(pPosSys.SprintControl(ControlLayerT(c)))
+				} else if 0 <= c1 && ControlLayerT(c1) < CONTROL_LAYER_ALL_SIZE {
+					G.Chat.Debug(pPosSys.SprintControl(ControlLayerT(c1)))
 					ok = true
 				}
 			} else if length == 4 && tokens[1] == "sumabs" {
@@ -417,6 +416,42 @@ MainLoop:
 				G.Chat.Debug("    *3 boardLayerIndex Temp\n")
 				G.Chat.Debug("    *4 boardLayerIndex Temp\n")
 			}
+		case "watercolor":
+			// 水彩絵の具でにじませたような、利きボード作り
+			// watercolor 0 10 26
+			length := len(tokens)
+			ok := false
+			if length == 4 {
+				// 盤番号
+				b1, err := strconv.Atoi(tokens[1])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b2, err := strconv.Atoi(tokens[2])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				b3, err := strconv.Atoi(tokens[3])
+				if err != nil {
+					G.Chat.Debug("Error: %s", err)
+				}
+
+				WaterColor(
+					pPosSys.PControlBoardSystem.Boards[b1],
+					pPosSys.PControlBoardSystem.Boards[b2],
+					pPosSys.PControlBoardSystem.Boards[b3])
+				ok = true
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("watercolor {control1} {control2} {control3}\n")
+			}
+		case "":
+			// Ignored
 		default:
 			fmt.Printf("Unknown command=%s\n", command)
 		}
