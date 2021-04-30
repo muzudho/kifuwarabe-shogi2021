@@ -10,8 +10,8 @@ import (
 
 // TestControl
 func TestControl(pPosSys *PositionSystem, pPos *Position) (bool, string) {
-	pPosSys.ClearControlLayer(CONTROL_LAYER_TEST_COPY)
-	pPosSys.ClearControlLayer(CONTROL_LAYER_TEST_ERROR)
+	pPosSys.PControlBoardSystem.ClearControlLayer(CONTROL_LAYER_TEST_COPY)
+	pPosSys.PControlBoardSystem.ClearControlLayer(CONTROL_LAYER_TEST_ERROR)
 
 	// 利きをコピー
 	for phase := 0; phase < 2; phase += 1 {

@@ -92,18 +92,7 @@ func (pPosSys *PositionSystem) AddControlDiff(pPos *Position, c ControlLayerT, f
 func (pPosSys *PositionSystem) ClearControlDiff() {
 	// c=0 を除く
 	for c := CONTROL_LAYER_DIFF_START; c < CONTROL_LAYER_DIFF_END; c += 1 {
-		pPosSys.ClearControlLayer(c)
-	}
-}
-
-func (pPosSys *PositionSystem) ClearControlLayer(c ControlLayerT) {
-	cb0 := pPosSys.PControlBoardSystem.Boards[0][c]
-	cb1 := pPosSys.PControlBoardSystem.Boards[1][c]
-	for sq := Square(11); sq < 100; sq += 1 {
-		if File(sq) != 0 && Rank(sq) != 0 {
-			cb0.Board[sq] = 0
-			cb1.Board[sq] = 0
-		}
+		pPosSys.PControlBoardSystem.ClearControlLayer(c)
 	}
 }
 
@@ -125,7 +114,7 @@ func (pPosSys *PositionSystem) MergeControlDiff() {
 // RecalculateControl - 利きの再計算
 func (pPosSys *PositionSystem) RecalculateControl(pPos *Position, c1 ControlLayerT) {
 
-	pPosSys.ClearControlLayer(c1)
+	pPosSys.PControlBoardSystem.ClearControlLayer(c1)
 
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
@@ -145,7 +134,7 @@ func (pPosSys *PositionSystem) RecalculateControl(pPos *Position, c1 ControlLaye
 // DiffControl - 利きテーブルの差分計算
 func (pPosSys *PositionSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c3 ControlLayerT) {
 
-	pPosSys.ClearControlLayer(c3)
+	pPosSys.PControlBoardSystem.ClearControlLayer(c3)
 
 	for phase := 0; phase < 2; phase += 1 {
 		cb3 := pPosSys.PControlBoardSystem.Boards[phase][c3]

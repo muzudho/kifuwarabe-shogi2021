@@ -57,3 +57,15 @@ func NewControlBoardSystem() *ControlBoardSystem {
 
 	return cbsys
 }
+
+// ClearControlLayer - 利きボードのクリアー
+func (pControlBoardSys *ControlBoardSystem) ClearControlLayer(c ControlLayerT) {
+	cb0 := pControlBoardSys.Boards[0][c]
+	cb1 := pControlBoardSys.Boards[1][c]
+	for sq := Square(11); sq < 100; sq += 1 {
+		if File(sq) != 0 && Rank(sq) != 0 {
+			cb0.Board[sq] = 0
+			cb1.Board[sq] = 0
+		}
+	}
+}
