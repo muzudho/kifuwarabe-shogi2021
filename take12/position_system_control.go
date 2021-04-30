@@ -17,47 +17,14 @@ const (
 	CONTROL_LAYER_DIFF_LANCE_ON      = ControlLayerT(7)
 	CONTROL_LAYER_DIFF_BISHOP_ON     = ControlLayerT(8)
 	CONTROL_LAYER_DIFF_ROOK_ON       = ControlLayerT(9)
-	CONTROL_LAYER_TEST_COPY          = ControlLayerT(10) // テスト用
-	CONTROL_LAYER_TEST_ERROR         = ControlLayerT(11) // テスト用
-	CONTROL_LAYER_TEST_RECALCULATION = ControlLayerT(12) // テスト用 再計算
+	CONTROL_LAYER_EVAL               = ControlLayerT(10) // 評価関数用
+	CONTROL_LAYER_TEST_COPY          = ControlLayerT(11) // テスト用
+	CONTROL_LAYER_TEST_ERROR         = ControlLayerT(12) // テスト用
+	CONTROL_LAYER_TEST_RECALCULATION = ControlLayerT(13) // テスト用 再計算
 	CONTROL_LAYER_DIFF_START         = ControlLayerT(1)
 	CONTROL_LAYER_DIFF_END           = ControlLayerT(10) // この数を含まない。テスト用も含まない
-	CONTROL_LAYER_ALL_SIZE           = 13                // この数を含まない
+	CONTROL_LAYER_ALL_SIZE           = 14                // この数を含まない
 )
-
-// GetControlLayerName - 利きボードのレイヤーの名前
-func GetControlLayerName(c ControlLayerT) string {
-	switch c {
-	case CONTROL_LAYER_SUM:
-		return "Sum"
-	case CONTROL_LAYER_DIFF_ROOK_OFF:
-		return "RookOff"
-	case CONTROL_LAYER_DIFF_BISHOP_OFF:
-		return "BishopOff"
-	case CONTROL_LAYER_DIFF_LANCE_OFF:
-		return "LanceOff"
-	case CONTROL_LAYER_DIFF_PUT:
-		return "Put"
-	case CONTROL_LAYER_DIFF_REMOVE:
-		return "Remove"
-	case CONTROL_LAYER_DIFF_CAPTURED:
-		return "Captured"
-	case CONTROL_LAYER_DIFF_LANCE_ON:
-		return "LanceOn"
-	case CONTROL_LAYER_DIFF_BISHOP_ON:
-		return "BishopOn"
-	case CONTROL_LAYER_DIFF_ROOK_ON:
-		return "RookOn"
-	case CONTROL_LAYER_TEST_COPY:
-		return "TestCopy"
-	case CONTROL_LAYER_TEST_ERROR:
-		return "TestError"
-	case CONTROL_LAYER_TEST_RECALCULATION:
-		return "TestRecalc"
-	default:
-		panic(fmt.Errorf("Unknown controlLayer=%d", c))
-	}
-}
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pPosSys *PositionSystem) AddControlRook(pPos *Position, c ControlLayerT, sign int8, excludeFrom Square) {
