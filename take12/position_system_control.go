@@ -80,7 +80,7 @@ func (pPosSys *PositionSystem) AddControlDiff(pPos *Position, c ControlLayerT, f
 
 	sq_list := GenControl(pPos, from)
 
-	cb := pPosSys.ControlBoards1[ph][c]
+	cb := pPosSys.PControlBoardSystem.Boards[ph][c]
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
 		// 差分の方のテーブルを更新（＾～＾）
@@ -97,8 +97,8 @@ func (pPosSys *PositionSystem) ClearControlDiff() {
 }
 
 func (pPosSys *PositionSystem) ClearControlLayer(c ControlLayerT) {
-	cb0 := pPosSys.ControlBoards1[0][c]
-	cb1 := pPosSys.ControlBoards1[1][c]
+	cb0 := pPosSys.PControlBoardSystem.Boards[0][c]
+	cb1 := pPosSys.PControlBoardSystem.Boards[1][c]
 	for sq := Square(11); sq < 100; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			cb0.Board[sq] = 0
@@ -109,14 +109,14 @@ func (pPosSys *PositionSystem) ClearControlLayer(c ControlLayerT) {
 
 // MergeControlDiff - 利きの差分を解消するぜ（＾～＾）
 func (pPosSys *PositionSystem) MergeControlDiff() {
-	cb0sum := pPosSys.ControlBoards1[0][CONTROL_LAYER_SUM]
-	cb1sum := pPosSys.ControlBoards1[1][CONTROL_LAYER_SUM]
+	cb0sum := pPosSys.PControlBoardSystem.Boards[0][CONTROL_LAYER_SUM]
+	cb1sum := pPosSys.PControlBoardSystem.Boards[1][CONTROL_LAYER_SUM]
 	for sq := Square(11); sq < BOARD_SIZE; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// c=0 を除く
 			for c := CONTROL_LAYER_DIFF_START; c < CONTROL_LAYER_DIFF_END; c += 1 {
-				cb0sum.Board[sq] += pPosSys.ControlBoards1[0][c].Board[sq]
-				cb1sum.Board[sq] += pPosSys.ControlBoards1[1][c].Board[sq]
+				cb0sum.Board[sq] += pPosSys.PControlBoardSystem.Boards[0][c].Board[sq]
+				cb1sum.Board[sq] += pPosSys.PControlBoardSystem.Boards[1][c].Board[sq]
 			}
 		}
 	}
@@ -133,7 +133,7 @@ func (pPosSys *PositionSystem) RecalculateControl(pPos *Position, c1 ControlLaye
 			phase := Who(piece)
 			sq_list := GenControl(pPos, from)
 
-			cb1 := pPosSys.ControlBoards1[phase-1][c1]
+			cb1 := pPosSys.PControlBoardSystem.Boards[phase-1][c1]
 			for _, to := range sq_list {
 				cb1.Board[to] += 1
 			}
@@ -148,9 +148,9 @@ func (pPosSys *PositionSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c
 	pPosSys.ClearControlLayer(c3)
 
 	for phase := 0; phase < 2; phase += 1 {
-		cb3 := pPosSys.ControlBoards1[phase][c3]
-		cb1 := pPosSys.ControlBoards1[phase][c1]
-		cb2 := pPosSys.ControlBoards1[phase][c2]
+		cb3 := pPosSys.PControlBoardSystem.Boards[phase][c3]
+		cb1 := pPosSys.PControlBoardSystem.Boards[phase][c1]
+		cb2 := pPosSys.PControlBoardSystem.Boards[phase][c2]
 		for from := Square(11); from < BOARD_SIZE; from += 1 {
 			if File(from) != 0 && Rank(from) != 0 {
 

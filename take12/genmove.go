@@ -335,7 +335,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 	}
 	hand_end = hand_start + HAND_TYPE_SIZE
 
-	opponentSumCB := pPosSys.ControlBoards1[opponent-1][CONTROL_LAYER_SUM]
+	opponentSumCB := pPosSys.PControlBoardSystem.Boards[opponent-1][CONTROL_LAYER_SUM]
 
 	// 相手の利きテーブルの自玉のマスに利きがあるか
 	if opponentSumCB.Board[friendKingSq] > 0 {
@@ -432,7 +432,7 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 					if pieceType == PIECE_TYPE_K {
 						// 玉は自殺手を省きます
 						for _, to := range control_list {
-							if pPos.Hetero(from, to) && pPosSys.ControlBoards1[opponent-1][CONTROL_LAYER_SUM].Board[to] == 0 { // 自駒の上、敵の利きには移動できません
+							if pPos.Hetero(from, to) && pPosSys.PControlBoardSystem.Boards[opponent-1][CONTROL_LAYER_SUM].Board[to] == 0 { // 自駒の上、敵の利きには移動できません
 								move_list = append(move_list, NewMoveValue2(from, to))
 							}
 						}
