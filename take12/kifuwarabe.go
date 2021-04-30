@@ -193,7 +193,7 @@ MainLoop:
 					fmt.Printf("Error: %s", err)
 				}
 
-				pPosSys.DiffControl(ControlLayerT(c1), ControlLayerT(c2), ControlLayerT(c3))
+				pPosSys.PControlBoardSystem.DiffControl(ControlLayerT(c1), ControlLayerT(c2), ControlLayerT(c3))
 				ok = true
 			} else if length == 3 && tokens[1] == "recalc" {
 				// control recalc 12
@@ -202,7 +202,7 @@ MainLoop:
 				if err != nil {
 					fmt.Printf("Error: %s", err)
 				}
-				pPosSys.RecalculateControl(pPosSys.PPosition[POS_LAYER_MAIN], ControlLayerT(c1))
+				pPosSys.PControlBoardSystem.RecalculateControl(pPosSys.PPosition[POS_LAYER_MAIN], ControlLayerT(c1))
 				ok = true
 			} else if length == 3 && tokens[1] == "layer" {
 				// 利きテーブルの表示（＾～＾）
