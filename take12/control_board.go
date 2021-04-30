@@ -26,3 +26,12 @@ func NewControlBoard(title string) *ControlBoard {
 	}
 	return c
 }
+
+// Clear - 利きボードのクリアー
+func (pCB *ControlBoard) Clear() {
+	for sq := Square(11); sq < 100; sq += 1 {
+		if File(sq) != 0 && Rank(sq) != 0 {
+			pCB.Board[sq] = 0
+		}
+	}
+}

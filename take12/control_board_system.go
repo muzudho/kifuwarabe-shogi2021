@@ -84,21 +84,18 @@ func NewControlBoardSystem() *ControlBoardSystem {
 }
 
 // ClearControlLayer - 利きボードのクリアー
-func (pControlBoardSys *ControlBoardSystem) ClearControlLayer(c ControlLayerT) {
+func (pControlBoardSys *ControlBoardSystem) ClearControlLayer1(c ControlLayerT) {
 	cb0 := pControlBoardSys.Boards[0][c]
 	cb1 := pControlBoardSys.Boards[1][c]
-	for sq := Square(11); sq < 100; sq += 1 {
-		if File(sq) != 0 && Rank(sq) != 0 {
-			cb0.Board[sq] = 0
-			cb1.Board[sq] = 0
-		}
-	}
+	cb0.Clear()
+	cb1.Clear()
 }
 
 // DiffControl - 利きテーブルの差分計算
 func (pControlBoardSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c3 ControlLayerT) {
 
-	pControlBoardSys.ClearControlLayer(c3)
+	pControlBoardSys.Boards[FIRST-1][c3].Clear()
+	pControlBoardSys.Boards[SECOND-1][c3].Clear()
 
 	for phase := 0; phase < 2; phase += 1 {
 		cb3 := pControlBoardSys.Boards[phase][c3]
@@ -117,7 +114,8 @@ func (pControlBoardSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 Con
 // RecalculateControl - 利きの再計算
 func (pControlBoardSys *ControlBoardSystem) RecalculateControl(pPos *Position, c1 ControlLayerT) {
 
-	pControlBoardSys.ClearControlLayer(c1)
+	pControlBoardSys.Boards[FIRST-1][c1].Clear()
+	pControlBoardSys.Boards[SECOND-1][c1].Clear()
 
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
@@ -153,7 +151,8 @@ func (pControlBoardSys *ControlBoardSystem) MergeControlDiff() {
 func (pControlBoardSys *ControlBoardSystem) ClearControlDiff() {
 	// c=0 を除く
 	for c := CONTROL_LAYER_DIFF_START; c < CONTROL_LAYER_DIFF_END; c += 1 {
-		pControlBoardSys.ClearControlLayer(c)
+		pControlBoardSys.Boards[FIRST-1][c].Clear()
+		pControlBoardSys.Boards[SECOND-1][c].Clear()
 	}
 }
 
@@ -215,6 +214,45 @@ func (pControlBoardSys *ControlBoardSystem) AddControlRook(pPos *Position, c Con
 			!pPos.IsEmptySq(from) && // 飛落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
 			pControlBoardSys.AddControlDiff(pPos, c, from, sign)
+		}
+	}
+}
+
+// 将棋盤の内側をスキャンします。
+var scanningLine = []Square{
+	82, 72, 62, 52, 42, 32, 22, 12,
+	83, 73, 63, 53, 43, 33, 23, 13,
+	84, 74, 64, 54, 44, 34, 24, 14,
+	85, 75, 65, 55, 45, 35, 25, 15,
+	86, 76, 66, 56, 46, 36, 26, 16,
+	87, 77, 67, 57, 47, 37, 27, 17,
+	88, 78, 68, 58, 48, 38, 28, 18,
+}
+
+// ブラシの太さ
+var brushingArea = []int32{
+	9, -1, -11,
+	10, 0, -10,
+	11, 1, -9}
+
+// WaterColor - 水で薄めたような評価値にします
+// pCB1 - pCB2 = pCB3
+func WaterColor(pCB1 *ControlBoard, pCB2 *ControlBoard, pCB3 *ControlBoard) {
+	// 将棋盤の内側をスキャンします。
+
+	pCB3.Clear()
+
+	for _, sq1 := range scanningLine {
+		// ブラシの面積分の利きを総和します
+		var sum int8 = 0
+		for _, rel := range brushingArea {
+			sq2 := Square(int32(sq1) + rel)
+			sum += pCB1.Board[sq2] - pCB2.Board[sq2]
+		}
+		// 総和したものを、結果表に上乗せします
+		for _, rel := range brushingArea {
+			sq2 := Square(int32(sq1) + rel)
+			pCB3.Board[sq2] += sum
 		}
 	}
 }
