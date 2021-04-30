@@ -151,3 +151,17 @@ undo
 pos
 location 0
 ```
+
+## Test7
+
+```shell
+position startpos moves 7g7f 9c9d 6i7h 9d9e 7i6h 9e9f 9g9f 1c1d 9f9e 8b5b 3i4h 7a7b 9e9d 4a4b 5i6i 5b6b 6h7g 2a1c 4i5h 3c3d 3g3f 2b5e 4h3g 1d1e 1g1f 6a7a 1f1e 6b5b 5g5f 5e2b 2g2f 2b4d 1e1d 6c6d 1d1c+ 2c2d P*1b 7b6a 1b1a+ 4d1a N*2c
+
+pos
+location 0
+record
+count
+movelist
+
+# >2:go btime 81000 wtime 58000 binc 2000 winc 2000
+```

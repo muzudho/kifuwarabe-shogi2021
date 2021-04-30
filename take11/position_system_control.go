@@ -114,7 +114,7 @@ func (pPosSys *PositionSystem) AddControlDiff(pPos *Position, c ControlLayerT, f
 	sq_list := GenControl(pPos, from)
 
 	for _, to := range sq_list {
-		// fmt.Printf("Debug: to=%d\n", to)
+		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
 		// 差分の方のテーブルを更新（＾～＾）
 		pPosSys.ControlBoards[ph][c][to] += sign * 1
 	}

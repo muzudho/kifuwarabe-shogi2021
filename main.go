@@ -9,6 +9,8 @@ import (
 
 // main - 最初に実行されます
 func main() {
+	// fmt.Printf("(11-12) mod 10=%d\n", (11-12)%10)
+
 	// fmt.Println("Hello, world!")
 	// take1.MainLoop()
 	// take2.MainLoop()
