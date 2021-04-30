@@ -375,7 +375,7 @@ type PositionSystem struct {
 	// [10] テスト用
 	// [11] テスト用
 	// [12] テスト用(再計算)
-	ControlBoards1 [2][CONTROL_LAYER_ALL_SIZE]*ControlBoard
+	ControlBoards1 [PHASE_ARRAY_SIZE][CONTROL_LAYER_ALL_SIZE]*ControlBoard
 
 	// 先手が1、後手が2（＾～＾）
 	phase Phase
