@@ -1007,6 +1007,13 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
+
+			// 駒得評価値の計算（＾ｑ＾）
+			material_val := EvalMaterial(captured)
+			if before_move_phase != FIRST {
+				material_val = -material_val
+			}
+			pPos.MaterialValue += material_val
 		}
 
 		// 開発中は、利き計算を差分で行うぜ（＾～＾）実戦中は、差分は取らずに 利きテーブル本体を直接編集するぜ（＾～＾）
@@ -1506,6 +1513,13 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			}
 		}
 	}
+
+	// 駒得評価値の計算（＾ｑ＾）
+	material_val := EvalMaterial(captured)
+	if pPosSys.phase != FIRST {
+		material_val = -material_val
+	}
+	pPos.MaterialValue -= material_val
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）

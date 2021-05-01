@@ -11,6 +11,9 @@ type Position struct {
 	PieceLocations [PCLOC_SIZE]Square
 	// 持ち駒の数だぜ（＾～＾）玉もある（＾～＾） K, R, B, G, S, N, L, P, k, r, b, g, s, n, l, p
 	Hands1 [HAND_SIZE]int
+
+	// 先手から見た駒得評価値
+	MaterialValue int16
 }
 
 func NewPosition() *Position {

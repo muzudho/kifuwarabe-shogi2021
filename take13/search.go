@@ -2,7 +2,6 @@ package take13
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 )
 
@@ -89,14 +88,11 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 
 		// 取った駒は棋譜の１手前に記録されています
 		captured := pPosSys.CapturedList[pPosSys.OffsetMovesIndex-1]
-		materialVal := EvalMaterial(captured)
 
 		// 玉を取るのは最善手
 		if What(captured) == PIECE_TYPE_K {
 			bestmove = move
-			// bestMoveList = nil
-			// bestMoveList = append(bestMoveList, move)
-			bestVal = materialVal
+			bestVal = pPosSys.PPosition[POS_LAYER_MAIN].MaterialValue
 			cutting = CuttingKingCapture
 		} else {
 			if curDepth < depthEnd {
@@ -119,46 +115,8 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 				// 葉ノードでは、相手の手ではなく、自分の局面に点数を付けます
 
 				// 自玉と相手玉のどちらが有利な場所にいるか比較
-				// control_val := EvalControlVal()
-				var control_val int16
-				switch pPosSys.phase {
-				case FIRST:
-					WaterColor(
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL1],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL2],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL3])
-					my_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K1]
-					oppo_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K2]
-					control_val = pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL3].Board1[my_king_sq] +
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL3].Board1[oppo_king_sq]
-				case SECOND:
-					WaterColor(
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL1],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL2],
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL3])
-					my_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K2]
-					oppo_king_sq := pPosSys.PPosition[POS_LAYER_MAIN].PieceLocations[PCLOC_K1]
-					control_val = pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL3].Board1[my_king_sq] +
-						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_EVAL3].Board1[oppo_king_sq]
-				default:
-					panic(fmt.Errorf("Unknown phase=%d", pPosSys.phase))
-				}
-
-				// 利き評価が強すぎると 指し手がバラけません
-				control_val /= 50
-
-				// 乱数を使って 確率的にします。
-				if control_val != 0 {
-					var sign int16
-					if control_val < 0 {
-						sign = -1
-					}
-					control_val = sign * int16(rand.Intn(int(math.Abs(float64(control_val)))))
-				}
+				control_val := EvalControlVal(pPosSys)
+				materialVal := pPosSys.PPosition[POS_LAYER_MAIN].MaterialValue
 
 				leafVal := materialVal + int16(control_val)
 
