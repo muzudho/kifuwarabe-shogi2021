@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/muzudho/kifuwarabe-shogi2021/take13"
-)
+import "github.com/muzudho/kifuwarabe-shogi2021/take14"
 
 // main - 最初に実行されます
 func main() {
@@ -25,5 +23,7 @@ func main() {
 	// take10.MainLoop()
 	// take11.MainLoop()
 	// take12.MainLoop()
-	take13.MainLoop()
+
+	// take13.MainLoop()
+	take14.MainLoop()
 }
