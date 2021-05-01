@@ -25,14 +25,14 @@ func Search(pPosSys *PositionSystem) Move {
 	curDepth := 0
 	//fmt.Printf("Search: depth=%d/%d nodesNum=%d\n", curDepth, depthEnd, nodesNum)
 
-	bestmove, bestVal := search2(pPosSys, curDepth)
+	bestMove, bestVal := search2(pPosSys, curDepth)
 
 	// 評価値出力（＾～＾）
 	G.Chat.Print("info depth %d nodes %d score cp %d currmove %s pv %s\n",
-		curDepth, nodesNum, bestVal, bestmove.ToCode(), bestmove.ToCode())
+		curDepth, nodesNum, bestVal, bestMove.ToCode(), bestMove.ToCode())
 
 	// ゲーム向けの軽い乱数
-	return bestmove
+	return bestMove
 }
 
 // search2 - 探索部
@@ -51,7 +51,7 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 
 	// 同じ価値のベストムーブがいっぱいあるかも（＾～＾）
 	var bestMoveList []Move
-	var bestmove = RESIGN_MOVE
+	var bestMove = RESIGN_MOVE
 	// 最初に最低値を入れておけば、更新されるだろ（＾～＾）
 	var bestVal int16 = RESIGN_VALUE
 
@@ -91,7 +91,7 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 
 		// 玉を取るのは最善手
 		if What(captured) == PIECE_TYPE_K {
-			bestmove = move
+			bestMove = move
 			bestVal = pPosSys.PPosition[POS_LAYER_MAIN].MaterialValue
 			cutting = CuttingKingCapture
 		} else {
@@ -169,13 +169,13 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 		//fmt.Printf("%d/%d bestmove_length=%d\n", curDepth, depthEnd, bestmove_length)
 		if bestmove_length > 0 {
 			// 0件を避ける（＾～＾）
-			bestmove = bestMoveList[rand.Intn(bestmove_length)]
+			bestMove = bestMoveList[rand.Intn(bestmove_length)]
 		}
 
 		// 評価値出力（＾～＾）
-		// G.Chat.Print("info depth 0 nodes %d score cp %d currmove %s pv %s\n", nodesNum, bestVal, bestmove.ToCode(), bestmove.ToCode())
+		// G.Chat.Print("info depth 0 nodes %d score cp %d currmove %s pv %s\n", nodesNum, bestVal, bestMove.ToCode(), bestMove.ToCode())
 
 	}
 
-	return bestmove, bestVal
+	return bestMove, bestVal
 }

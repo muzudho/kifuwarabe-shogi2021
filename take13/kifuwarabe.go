@@ -473,6 +473,11 @@ MainLoop:
 		case "dev":
 			// 乱数のタネを0固定（＾～＾）
 			rand.Seed(0)
+		case "value":
+			// 現局面の評価値を表示（＾～＾）
+			G.Chat.Debug("Value\n")
+			G.Chat.Debug("-----\n")
+			G.Chat.Debug("MaterialValue(First)=%d\n", pPosSys.PPosition[POS_LAYER_MAIN].MaterialValue)
 		case "":
 			// Ignored
 		default:
