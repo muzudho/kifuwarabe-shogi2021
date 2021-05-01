@@ -357,6 +357,8 @@ const (
 
 // PositionSystem - 局面にいろいろな機能を付けたもの
 type PositionSystem struct {
+	// 開発モードフラグ。デフォルト値：真。 'usi' コマンドで解除
+	Development bool
 	// 局面
 	PPosition [POS_LAYER_SIZE]*Position
 
@@ -378,6 +380,7 @@ type PositionSystem struct {
 
 func NewPositionSystem() *PositionSystem {
 	var pPosSys = new(PositionSystem)
+	pPosSys.Development = true
 
 	pPosSys.PPosition = [POS_LAYER_SIZE]*Position{NewPosition(), NewPosition(), NewPosition(), NewPosition()}
 
@@ -711,8 +714,22 @@ func (pPosSys *PositionSystem) ReadPosition(pPos *Position, command string) {
 			if !pPos.IsEmptySq(sq) {
 				//fmt.Printf("Debug: sq=%d\n", sq)
 				// あとですぐクリアーするので、どのレイヤー使ってても関係ないんで、仮で PUTレイヤーを使っているぜ（＾～＾）
-				pPosSys.PControlBoardSystem.AddControlDiff(
-					pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, sq, 1)
+
+				piece := pPos.Board[sq]
+				ValidateThereArePieceIn(pPos, sq)
+				phase := Who(piece)
+				// fmt.Printf("Debug: ph=%d\n", ph)
+				var pCB *ControlBoard
+				switch phase {
+				case FIRST:
+					pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT]
+				case SECOND:
+					pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT]
+				default:
+					panic(fmt.Errorf("Unknown phase=%d", phase))
+				}
+
+				pPosSys.PControlBoardSystem.AddControlDiff(pPos, pCB, sq, 1)
 			}
 		}
 	}
@@ -925,8 +942,23 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 
 		// 行き先に駒を置きます
 		pPos.Board[mov_dst_sq] = piece
+
+		piece := pPos.Board[mov_dst_sq]
+		ValidateThereArePieceIn(pPos, mov_dst_sq)
+		phase := Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+		var pCB *ControlBoard
+		switch phase {
+		case FIRST:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT]
+		case SECOND:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT]
+		default:
+			panic(fmt.Errorf("Unknown phase=%d", phase))
+		}
+
 		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, 1)
+			pPos, pCB, mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -939,16 +971,45 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			case PIECE_TYPE_R, PIECE_TYPE_PR, PIECE_TYPE_B, PIECE_TYPE_PB, PIECE_TYPE_L:
 				// Ignored: 長い利きの駒は 既に除外しているので無視します
 			default:
+
+				piece := pPos.Board[mov_dst_sq]
+				ValidateThereArePieceIn(pPos, mov_dst_sq)
+				phase := Who(piece)
+				// fmt.Printf("Debug: ph=%d\n", ph)
+				var pCB *ControlBoard
+				switch phase {
+				case FIRST:
+					pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_CAPTURED]
+				case SECOND:
+					pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_CAPTURED]
+				default:
+					panic(fmt.Errorf("Unknown phase=%d", phase))
+				}
+
 				pPosSys.PControlBoardSystem.AddControlDiff(
-					pPos, CONTROL_LAYER_DIFF1_CAPTURED, CONTROL_LAYER_DIFF2_CAPTURED, mov_dst_sq, -1)
+					pPos, pCB, mov_dst_sq, -1)
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
 		}
 
+		piece := pPos.Board[mov_src_sq]
+		ValidateThereArePieceIn(pPos, mov_src_sq)
+		phase := Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+		var pCB *ControlBoard
+		switch phase {
+		case FIRST:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_REMOVE]
+		case SECOND:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_REMOVE]
+		default:
+			panic(fmt.Errorf("Unknown phase=%d", phase))
+		}
+
 		// 元位置の駒の利きを除去
 		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, CONTROL_LAYER_DIFF1_REMOVE, CONTROL_LAYER_DIFF2_REMOVE, mov_src_sq, -1)
+			pPos, pCB, mov_src_sq, -1)
 
 		// 行き先の駒の上書き
 		if move.GetPromotion() {
@@ -960,8 +1021,22 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
 		// 元位置の駒を削除してから、移動先の駒の利きを追加
 		pPos.Board[mov_src_sq] = PIECE_EMPTY
+
+		piece = pPos.Board[mov_dst_sq]
+		ValidateThereArePieceIn(pPos, mov_dst_sq)
+		phase = Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+		switch phase {
+		case FIRST:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT]
+		case SECOND:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT]
+		default:
+			panic(fmt.Errorf("Unknown phase=%d", phase))
+		}
+
 		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, 1)
+			pPos, pCB, mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1123,8 +1198,22 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		drop := mov_src_sq
 		// 行き先から駒を除去します
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
-		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, -1)
+
+		piece := pPos.Board[mov_dst_sq]
+		ValidateThereArePieceIn(pPos, mov_dst_sq)
+		phase := Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+		var pCB *ControlBoard
+		switch phase {
+		case FIRST:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT]
+		case SECOND:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT]
+		default:
+			panic(fmt.Errorf("Unknown phase=%d", phase))
+		}
+
+		pPosSys.PControlBoardSystem.AddControlDiff(pPos, pCB, mov_dst_sq, -1)
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
@@ -1134,8 +1223,23 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 		// 行き先に進んでいた自駒の利きの除去
 		mov_piece_type = What(pPos.Board[mov_dst_sq])
+
+		piece := pPos.Board[mov_dst_sq]
+		ValidateThereArePieceIn(pPos, mov_dst_sq)
+		phase := Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+		var pCB *ControlBoard
+		switch phase {
+		case FIRST:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT]
+		case SECOND:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT]
+		default:
+			panic(fmt.Errorf("Unknown phase=%d", phase))
+		}
+
 		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, CONTROL_LAYER_DIFF1_PUT, CONTROL_LAYER_DIFF2_PUT, mov_dst_sq, -1)
+			pPos, pCB, mov_dst_sq, -1)
 
 		// 自駒を移動元へ戻します
 		if move.GetPromotion() {
@@ -1147,9 +1251,22 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
+		piece = pPos.Board[mov_src_sq]
+		ValidateThereArePieceIn(pPos, mov_src_sq)
+		phase = Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+		switch phase {
+		case FIRST:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_REMOVE]
+		case SECOND:
+			pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_REMOVE]
+		default:
+			panic(fmt.Errorf("Unknown phase=%d", phase))
+		}
+
 		// 元の場所に戻した自駒の利きを復元します
 		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, CONTROL_LAYER_DIFF1_REMOVE, CONTROL_LAYER_DIFF2_REMOVE, mov_src_sq, 1)
+			pPos, pCB, mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
@@ -1295,10 +1412,21 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			cap_piece_type = What(captured)
 			pPos.Board[mov_dst_sq] = captured
 
+			ValidateThereArePieceIn(pPos, mov_dst_sq)
+			// fmt.Printf("Debug: ph=%d\n", ph)
+			var pCB *ControlBoard
+			switch pPosSys.phase {
+			case FIRST:
+				pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_CAPTURED]
+			case SECOND:
+				pCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_CAPTURED]
+			default:
+				panic(fmt.Errorf("Unknown pPosSys.phase=%d", pPosSys.phase))
+			}
+
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
-			pPosSys.PControlBoardSystem.AddControlDiff(
-				pPos, CONTROL_LAYER_DIFF1_CAPTURED, CONTROL_LAYER_DIFF2_CAPTURED, mov_dst_sq, 1)
+			pPosSys.PControlBoardSystem.AddControlDiff(pPos, pCB, mov_dst_sq, 1)
 		}
 	}
 

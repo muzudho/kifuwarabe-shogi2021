@@ -181,32 +181,29 @@ func (pControlBoardSys *ControlBoardSystem) ClearControlDiff() {
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pControlBoardSys *ControlBoardSystem) AddControlDiff(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, from Square, sign int16) {
+	pCB *ControlBoard, from Square, sign int16) {
 
 	if from > 99 {
 		// 持ち駒は無視します
 		return
 	}
 
-	piece := pPos.Board[from]
-	if piece == PIECE_EMPTY {
-		panic(fmt.Errorf("LogicalError: Piece from empty square. It has no control. from=%d", from))
-	}
-
-	phase := Who(piece)
-	// fmt.Printf("Debug: ph=%d\n", ph)
-
 	sq_list := GenControl(pPos, from)
 
-	var pCB *ControlBoard
-	switch phase {
-	case FIRST:
-		pCB = pControlBoardSys.Boards[ph1_c]
-	case SECOND:
-		pCB = pControlBoardSys.Boards[ph2_c]
-	default:
-		panic(fmt.Errorf("Unknown phase=%d", phase))
-	}
+	/*
+		ValidateThereArePieceIn(pPos, from)
+		phase := Who(piece)
+		// fmt.Printf("Debug: ph=%d\n", ph)
+			var pCB *ControlBoard
+			switch phase {
+			case FIRST:
+				pCB = pControlBoardSys.Boards[ph1_c]
+			case SECOND:
+				pCB = pControlBoardSys.Boards[ph2_c]
+			default:
+				panic(fmt.Errorf("Unknown phase=%d", phase))
+			}
+	*/
 
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
@@ -224,7 +221,22 @@ func (pControlBoardSys *ControlBoardSystem) AddControlLance(pPos *Position,
 			!pPos.IsEmptySq(from) && // 香落ちも考えて 空マスは除外
 			from != excludeFrom && // 除外マスは除外
 			PIECE_TYPE_PL != What(pPos.Board[from]) { // 杏は除外
-			pControlBoardSys.AddControlDiff(pPos, ph1_c, ph2_c, from, sign)
+
+			piece := pPos.Board[from]
+			ValidateThereArePieceIn(pPos, from)
+			phase := Who(piece)
+			// fmt.Printf("Debug: ph=%d\n", ph)
+			var pCB *ControlBoard
+			switch phase {
+			case FIRST:
+				pCB = pControlBoardSys.Boards[ph1_c]
+			case SECOND:
+				pCB = pControlBoardSys.Boards[ph2_c]
+			default:
+				panic(fmt.Errorf("Unknown phase=%d", phase))
+			}
+
+			pControlBoardSys.AddControlDiff(pPos, pCB, from, sign)
 		}
 	}
 }
@@ -237,7 +249,22 @@ func (pControlBoardSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 		if !OnHands(from) && // 持ち駒は除外
 			!pPos.IsEmptySq(from) && // 角落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
-			pControlBoardSys.AddControlDiff(pPos, ph1_c, ph2_c, from, sign)
+
+			piece := pPos.Board[from]
+			ValidateThereArePieceIn(pPos, from)
+			phase := Who(piece)
+			// fmt.Printf("Debug: ph=%d\n", ph)
+			var pCB *ControlBoard
+			switch phase {
+			case FIRST:
+				pCB = pControlBoardSys.Boards[ph1_c]
+			case SECOND:
+				pCB = pControlBoardSys.Boards[ph2_c]
+			default:
+				panic(fmt.Errorf("Unknown phase=%d", phase))
+			}
+
+			pControlBoardSys.AddControlDiff(pPos, pCB, from, sign)
 		}
 	}
 }
@@ -250,7 +277,22 @@ func (pControlBoardSys *ControlBoardSystem) AddControlRook(pPos *Position,
 		if !OnHands(from) && // 持ち駒は除外
 			!pPos.IsEmptySq(from) && // 飛落ちも考えて 空マスは除外
 			from != excludeFrom { // 除外マスは除外
-			pControlBoardSys.AddControlDiff(pPos, ph1_c, ph2_c, from, sign)
+
+			piece := pPos.Board[from]
+			ValidateThereArePieceIn(pPos, from)
+			phase := Who(piece)
+			// fmt.Printf("Debug: ph=%d\n", ph)
+			var pCB *ControlBoard
+			switch phase {
+			case FIRST:
+				pCB = pControlBoardSys.Boards[ph1_c]
+			case SECOND:
+				pCB = pControlBoardSys.Boards[ph2_c]
+			default:
+				panic(fmt.Errorf("Unknown phase=%d", phase))
+			}
+
+			pControlBoardSys.AddControlDiff(pPos, pCB, from, sign)
 		}
 	}
 }

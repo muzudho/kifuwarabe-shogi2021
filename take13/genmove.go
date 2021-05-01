@@ -12,13 +12,6 @@ func Rank(sq Square) Square {
 	return sq % 10
 }
 
-// マス番号が正常値でなければ強制終了させます
-func ValidateSq(sq Square) {
-	if !OnBoard(sq) && !OnHands(sq) {
-		panic(fmt.Errorf("TestSq: sq=%d", sq))
-	}
-}
-
 // GenControl - 利いているマスの一覧を返します。動けるマスではありません。
 func GenControl(pPos *Position, from Square) []Square {
 	sq_list := []Square{}

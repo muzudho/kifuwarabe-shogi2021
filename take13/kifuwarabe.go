@@ -93,6 +93,7 @@ MainLoop:
 		case "usi":
 			G.Chat.Print("id name %s\n", config.Profile.Name)
 			G.Chat.Print("id author %s\n", config.Profile.Author)
+			pPosSys.Development = false
 			G.Chat.Print("usiok\n")
 		case "isready":
 			G.Chat.Print("readyok\n")
