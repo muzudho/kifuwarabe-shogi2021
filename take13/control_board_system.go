@@ -137,11 +137,12 @@ func (pCtrlBrdSys *ControlBoardSystem) RecalculateControl(
 		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
 			piece := pPos.Board[from]
 			phase := Who(piece)
-			sq_list := GenControl(pPos, from)
+			control_list := GenControl(pPos, from)
 
 			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.PBoards[ph1_c1], pCtrlBrdSys.PBoards[ph2_c1])
 
-			for _, to := range sq_list {
+			for _, moveEnd := range control_list {
+				to := moveEnd.GetDestination()
 				pCB.Board1[to] += 1
 			}
 		}
@@ -212,7 +213,7 @@ func AddControlLance(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControl(GenControl(pPos, from), from, sign)
+			pCB.AddControl(MoveEndListToControlList(GenControl(pPos, from)), from, sign)
 		}
 	}
 }
@@ -230,7 +231,7 @@ func AddControlBishop(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControl(GenControl(pPos, from), from, sign)
+			pCB.AddControl(MoveEndListToControlList(GenControl(pPos, from)), from, sign)
 		}
 	}
 }
@@ -248,7 +249,7 @@ func AddControlRook(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControl(GenControl(pPos, from), from, sign)
+			pCB.AddControl(MoveEndListToControlList(GenControl(pPos, from)), from, sign)
 		}
 	}
 }
@@ -265,4 +266,14 @@ func ControllBoardFromPhase(
 	default:
 		panic(fmt.Errorf("Unknown phase=%d", phase))
 	}
+}
+
+// MoveEndListToControlList - 移動先、成りのリストを、移動先のリストに変換します
+func MoveEndListToControlList(moveEndList []MoveEnd) []Square {
+	sqList := []Square{}
+	for _, moveEnd := range moveEndList {
+		// 成るか、成らないかの情報は欠落させます
+		sqList = append(sqList, moveEnd.GetDestination())
+	}
+	return sqList
 }

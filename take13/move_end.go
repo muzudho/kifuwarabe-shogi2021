@@ -24,7 +24,7 @@ func NewMoveEndValue2(dst_sq Square, promote bool) MoveEnd {
 	return moveEnd.ReplacePromotion(promote)
 }
 
-// ReplaceSource - 移動先マス
+// ReplaceDestination - 移動先マス
 // 1000 0000 (Clear) 0x80
 // pddd dddd
 func (moveEnd MoveEnd) ReplaceDestination(sq Square) MoveEnd {
@@ -37,7 +37,7 @@ func (moveEnd MoveEnd) ReplaceDestination(sq Square) MoveEnd {
 // pddd dddd
 func (moveEnd MoveEnd) ReplacePromotion(promotion bool) MoveEnd {
 	if promotion {
-		return MoveEnd(uint16(moveEnd) | 0x80)
+		return MoveEnd(uint8(moveEnd) | 0x80)
 	}
 
 	return MoveEnd(uint8(moveEnd) & 0x7f)
@@ -54,7 +54,7 @@ func (moveEnd MoveEnd) GetDestination() Square {
 // 1000 0000 (Mask) 0x80
 // pddd dddd
 func (moveEnd MoveEnd) GetPromotion() bool {
-	return uint16(moveEnd)&0x80 != 0
+	return uint8(moveEnd)&0x80 != 0
 }
 
 // ToString - 確認用の文字列
