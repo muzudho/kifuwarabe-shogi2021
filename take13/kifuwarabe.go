@@ -470,10 +470,16 @@ MainLoop:
 				G.Chat.Debug("------\n")
 				G.Chat.Debug("watercolor {control1} {control2} {control3} {control4} {control5}\n")
 			}
+		case "dev":
+			// 乱数のタネを0固定（＾～＾）
+			rand.Seed(0)
 		case "":
 			// Ignored
 		default:
-			fmt.Printf("Unknown command=%s\n", command)
+			// 将棋所からいろいろメッセージ飛んでくるから、リリースモードでは無視しろだぜ（＾～＾）
+			if pPosSys.BuildType == BUILD_DEV {
+				fmt.Printf("Unknown command=%s\n", command)
+			}
 		}
 
 		G.Log.FlushAllLogs()

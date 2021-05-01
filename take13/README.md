@@ -5,14 +5,17 @@
 次は深さ２を目指すかだぜ（＾～＾）  
 １手詰めも欲しいけど（＾～＾）  
 処理時間を計測したいぜ（＾～＾）  
+ベータカットも欲しいなあ（＾～＾）  
 
 ## 計測
 
 ```plain
 usi
 position startpos
+
+dev
 playout
-# 36.898604 seconds
+# depthEnd=2のとき 36.898604 seconds
 ```
 
 ## Test

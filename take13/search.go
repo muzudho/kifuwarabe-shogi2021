@@ -10,7 +10,7 @@ const RESIGN_VALUE = -32768
 const MAX_VALUE = 32767
 
 var nodesNum int
-var depthEnd int = 2 // 1 // 3 はまだ遅い
+var depthEnd int = 3 // 2 // 1 // 3 はまだ遅い
 
 type CuttingType int
 
@@ -119,6 +119,7 @@ func search2(pPosSys *PositionSystem, curDepth int) (Move, int16) {
 				// 葉ノードでは、相手の手ではなく、自分の局面に点数を付けます
 
 				// 自玉と相手玉のどちらが有利な場所にいるか比較
+				// control_val := EvalControlVal()
 				var control_val int16
 				switch pPosSys.phase {
 				case FIRST:
