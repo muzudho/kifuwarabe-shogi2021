@@ -110,6 +110,32 @@ MainLoop:
 			G.Chat.Print("bestmove %s\n", bestmove.ToCode())
 		case "quit":
 			break MainLoop
+		case "gameover":
+			// 時間切れのときなど、将棋所から このメッセージがくるぜ（＾～＾）
+			// gameover win
+			// gameover lose
+			// gameover draw
+			length := len(tokens)
+			// fmt.Printf("length=%d", length)
+			ok := false
+			if length == 2 {
+				switch tokens[1] {
+				case "win":
+					ok = true
+				case "lose":
+					ok = true
+				case "draw":
+					ok = true
+				}
+			}
+
+			if !ok {
+				G.Chat.Debug("Format\n")
+				G.Chat.Debug("------\n")
+				G.Chat.Debug("gameover win\n")
+				G.Chat.Debug("gameover lose\n")
+				G.Chat.Debug("gameover draw\n")
+			}
 		// 以下、きふわらべ独自拡張コマンド
 		case "pos":
 			length := len(tokens)

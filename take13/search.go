@@ -9,7 +9,7 @@ const RESIGN_VALUE = -32768
 const MAX_VALUE = 32767
 
 var nodesNum int
-var depthEnd int = 3 // 2 // 1 // 3 はまだ遅い
+var depthEnd int = 2 // 1 // 3 はまだ遅い
 
 type CuttingType int
 
