@@ -193,44 +193,86 @@ func GenControl(pPos *Position, from Square) []MoveEnd {
 		}
 
 		// 先手桂の利き
-		if piece == PIECE_N1 && 2 < Rank(from) && Rank(from) < 10 {
-			if 0 < File(from) && File(from) < 9 { // 左上桂馬飛び
-				to := from + 8
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
+		if piece == PIECE_N1 {
+			// 成らず の動きを作るか（＾～＾）？
+			var keepGoing bool
+			if File(from) == 3 {
+				keepGoing = false
+			} else {
+				keepGoing = true
 			}
-			if 1 < File(from) && File(from) < 10 { // 右上桂馬飛び
-				to := from - 12
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
+
+			if 2 < Rank(from) && Rank(from) < 10 {
+				if 0 < File(from) && File(from) < 9 { // 左上桂馬飛び
+					to := from + 8
+					ValidateSq(to)
+					if keepGoing {
+						moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+					}
+					// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+				}
+				if 1 < File(from) && File(from) < 10 { // 右上桂馬飛び
+					to := from - 12
+					ValidateSq(to)
+					if keepGoing {
+						moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+					}
+					// moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				}
 			}
 		}
 
 		// 後手桂の利き
 		if piece == PIECE_N2 {
+			// 成らず の動きを作るか（＾～＾）？
+			var keepGoing bool
+			if File(from) == 7 {
+				keepGoing = false
+			} else {
+				keepGoing = true
+			}
+
 			if to := from + 12; File(to) != 0 && Rank(to) != 0 && Rank(to) != 9 { // 左下
 				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
+				if keepGoing {
+					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				}
+				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
 			}
 			if to := from - 8; File(to) != 0 && Rank(to) != 0 && Rank(to) != 9 { // 右下
 				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
+				if keepGoing {
+					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				}
+				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
 			}
 		}
 
 		// 先手歩の利き
 		switch piece {
-		case PIECE_K1, PIECE_R1, PIECE_PR1, PIECE_PB1, PIECE_G1, PIECE_S1, PIECE_L1, PIECE_P1, PIECE_PS1,
+		case PIECE_L1, PIECE_P1:
+			// 成らず の動きを作るか（＾～＾）？
+			var keepGoing bool
+			if File(from) == 2 {
+				keepGoing = false
+			} else {
+				keepGoing = true
+			}
+
+			if to := from - 1; Rank(to) != 0 { // 上
+				ValidateSq(to)
+				if keepGoing {
+					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				}
+				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+		case PIECE_K1, PIECE_R1, PIECE_PR1, PIECE_PB1, PIECE_G1, PIECE_S1, PIECE_PS1,
 			PIECE_PN1, PIECE_PL1, PIECE_PP1, PIECE_K2, PIECE_R2, PIECE_PR2, PIECE_PB2, PIECE_G2, PIECE_PS2,
 			PIECE_PN2, PIECE_PL2, PIECE_PP2:
 			if to := from - 1; Rank(to) != 0 { // 上
 				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
 			}
 		default:
 			// Ignored
@@ -238,13 +280,29 @@ func GenControl(pPos *Position, from Square) []MoveEnd {
 
 		// 後手歩の利き
 		switch piece {
-		case PIECE_K2, PIECE_R2, PIECE_PR2, PIECE_PB2, PIECE_G2, PIECE_S2, PIECE_L2, PIECE_P2, PIECE_PS2,
+		case PIECE_L2, PIECE_P2:
+			// 成らず の動きを作るか（＾～＾）？
+			var keepGoing bool
+			if File(from) == 8 {
+				keepGoing = false
+			} else {
+				keepGoing = true
+			}
+
+			if to := from + 1; Rank(to) != 0 { // 下
+				ValidateSq(to)
+				if keepGoing {
+					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				}
+				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+		case PIECE_K2, PIECE_R2, PIECE_PR2, PIECE_PB2, PIECE_G2, PIECE_S2, PIECE_PS2,
 			PIECE_PN2, PIECE_PL2, PIECE_PP2, PIECE_K1, PIECE_R1, PIECE_PR1, PIECE_PB1, PIECE_G1, PIECE_PS1,
 			PIECE_PN1, PIECE_PL1, PIECE_PP1:
 			if to := from + 1; Rank(to) != 0 { // 下
 				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
 			}
 		default:
 			// Ignored
