@@ -171,23 +171,6 @@ func (pCtrlBrdSys *ControlBoardSystem) ClearControlDiff() {
 	}
 }
 
-// AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pCtrlBrdSys *ControlBoardSystem) AddControlDiff(pPos *Position,
-	pCB *ControlBoard, from Square, sign int16) {
-
-	if from > 99 {
-		// 持ち駒は無視します
-		return
-	}
-
-	sq_list := GenControl(pPos, from)
-	for _, to := range sq_list {
-		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
-		// 差分の方のテーブルを更新（＾～＾）
-		pCB.Board1[to] += sign * 1
-	}
-}
-
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pCtrlBrdSys *ControlBoardSystem) AddControlLance(pPos *Position,
 	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
@@ -202,7 +185,7 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlLance(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
-			pCtrlBrdSys.AddControlDiff(pPos, pCB, from, sign)
+			pCB.AddControlDiff(pPos, from, sign)
 		}
 	}
 }
@@ -220,14 +203,14 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
-			pCtrlBrdSys.AddControlDiff(pPos, pCB, from, sign)
+			pCB.AddControlDiff(pPos, from, sign)
 		}
 	}
 }
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
 func (pCtrlBrdSys *ControlBoardSystem) AddControlRook(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
+	pPh1_CB *ControlBoard, pPh2_CB *ControlBoard, sign int16, excludeFrom Square) {
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
 		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -237,8 +220,8 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlRook(pPos *Position,
 			piece := pPos.Board[from]
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
-			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
-			pCtrlBrdSys.AddControlDiff(pPos, pCB, from, sign)
+			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
+			pCB.AddControlDiff(pPos, from, sign)
 		}
 	}
 }

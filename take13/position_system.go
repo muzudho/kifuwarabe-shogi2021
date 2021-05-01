@@ -729,7 +729,7 @@ func (pPosSys *PositionSystem) ReadPosition(pPos *Position, command string) {
 					panic(fmt.Errorf("Unknown phase=%d", phase))
 				}
 
-				pPosSys.PControlBoardSystem.AddControlDiff(pPos, pCB, sq, 1)
+				pCB.AddControlDiff(pPos, sq, 1)
 			}
 		}
 	}
@@ -887,7 +887,8 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
 	pPosSys.PControlBoardSystem.AddControlRook(
-		pPos, CONTROL_LAYER_DIFF1_ROOK_OFF, CONTROL_LAYER_DIFF2_ROOK_OFF, -1, mov_src_sq)
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], -1, mov_src_sq)
 	pPosSys.PControlBoardSystem.AddControlBishop(
 		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, -1, mov_src_sq)
 	pPosSys.PControlBoardSystem.AddControlLance(
@@ -957,8 +958,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, pCB, mov_dst_sq, 1)
+		pCB.AddControlDiff(pPos, mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -986,8 +986,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 					panic(fmt.Errorf("Unknown phase=%d", phase))
 				}
 
-				pPosSys.PControlBoardSystem.AddControlDiff(
-					pPos, pCB, mov_dst_sq, -1)
+				pCB.AddControlDiff(pPos, mov_dst_sq, -1)
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
@@ -1008,8 +1007,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		}
 
 		// 元位置の駒の利きを除去
-		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, pCB, mov_src_sq, -1)
+		pCB.AddControlDiff(pPos, mov_src_sq, -1)
 
 		// 行き先の駒の上書き
 		if move.GetPromotion() {
@@ -1035,8 +1033,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, pCB, mov_dst_sq, 1)
+		pCB.AddControlDiff(pPos, mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1152,7 +1149,8 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	pPosSys.PControlBoardSystem.AddControlBishop(
 		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, 1, mov_dst_sq)
 	pPosSys.PControlBoardSystem.AddControlRook(
-		pPos, CONTROL_LAYER_DIFF1_ROOK_ON, CONTROL_LAYER_DIFF2_ROOK_ON, 1, mov_dst_sq)
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], 1, mov_dst_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff()
 }
@@ -1185,7 +1183,8 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
 	pPosSys.PControlBoardSystem.AddControlRook(
-		pPos, CONTROL_LAYER_DIFF1_ROOK_ON, CONTROL_LAYER_DIFF2_ROOK_ON, -1, mov_dst_sq)
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
 	pPosSys.PControlBoardSystem.AddControlBishop(
 		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, -1, mov_dst_sq)
 	pPosSys.PControlBoardSystem.AddControlLance(
@@ -1213,7 +1212,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pPosSys.PControlBoardSystem.AddControlDiff(pPos, pCB, mov_dst_sq, -1)
+		pCB.AddControlDiff(pPos, mov_dst_sq, -1)
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
@@ -1238,8 +1237,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, pCB, mov_dst_sq, -1)
+		pCB.AddControlDiff(pPos, mov_dst_sq, -1)
 
 		// 自駒を移動元へ戻します
 		if move.GetPromotion() {
@@ -1265,8 +1263,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		}
 
 		// 元の場所に戻した自駒の利きを復元します
-		pPosSys.PControlBoardSystem.AddControlDiff(
-			pPos, pCB, mov_src_sq, 1)
+		pCB.AddControlDiff(pPos, mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
@@ -1314,7 +1311,8 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	pPosSys.PControlBoardSystem.AddControlBishop(
 		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, 1, mov_src_sq)
 	pPosSys.PControlBoardSystem.AddControlRook(
-		pPos, CONTROL_LAYER_DIFF1_ROOK_OFF, CONTROL_LAYER_DIFF2_ROOK_OFF, 1, mov_src_sq)
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff()
 
@@ -1349,7 +1347,8 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
 	pPosSys.PControlBoardSystem.AddControlRook(
-		pPos, CONTROL_LAYER_DIFF1_ROOK_ON, CONTROL_LAYER_DIFF2_ROOK_ON, -1, mov_dst_sq)
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
 	pPosSys.PControlBoardSystem.AddControlBishop(
 		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, -1, mov_dst_sq)
 	pPosSys.PControlBoardSystem.AddControlLance(
@@ -1426,7 +1425,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
-			pPosSys.PControlBoardSystem.AddControlDiff(pPos, pCB, mov_dst_sq, 1)
+			pCB.AddControlDiff(pPos, mov_dst_sq, 1)
 		}
 	}
 
@@ -1477,7 +1476,8 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	pPosSys.PControlBoardSystem.AddControlBishop(
 		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, 1, mov_src_sq)
 	pPosSys.PControlBoardSystem.AddControlRook(
-		pPos, CONTROL_LAYER_DIFF1_ROOK_OFF, CONTROL_LAYER_DIFF2_ROOK_OFF, 1, mov_src_sq)
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff()
 }
