@@ -10,17 +10,17 @@ import (
 
 // TestControl
 func TestControl(pPosSys *PositionSystem, pPos *Position) (bool, string) {
-	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY1].Clear()
-	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY2].Clear()
+	pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_COPY1].Clear()
+	pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_COPY2].Clear()
 
-	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR1].Clear()
-	pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR2].Clear()
+	pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_ERROR1].Clear()
+	pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_ERROR2].Clear()
 
 	// 利きをコピー
-	copyCb1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY1]
-	sumCb1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1]
-	copyCb2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY2]
-	sumCb2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2]
+	copyCb1 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_COPY1]
+	sumCb1 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1]
+	copyCb2 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_COPY2]
+	sumCb2 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2]
 	for sq := 0; sq < BOARD_SIZE; sq += 1 {
 		copyCb1.Board1[sq] = sumCb1.Board1[sq]
 		copyCb2.Board1[sq] = sumCb2.Board1[sq]
@@ -54,12 +54,12 @@ func checkControl(pPosSys *PositionSystem, move_seq int, move_total int, move Mo
 	is_error := false
 
 	// 誤差調べ
-	copyCB1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY1]
-	sumCB1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1]
-	errorCB1 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR1]
-	copyCB2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_COPY2]
-	sumCB2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2]
-	errorCB2 := pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_TEST_ERROR2]
+	copyCB1 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_COPY1]
+	sumCB1 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1]
+	errorCB1 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_ERROR1]
+	copyCB2 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_COPY2]
+	sumCB2 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2]
+	errorCB2 := pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_TEST_ERROR2]
 	for sq := 0; sq < BOARD_SIZE; sq += 1 {
 		diff1 := copyCB1.Board1[sq] - sumCB1.Board1[sq]
 		errorCB1.Board1[sq] = diff1
@@ -84,7 +84,7 @@ func SumAbsControl(pPosSys *PositionSystem, ph1_c ControlLayerT, ph2_c ControlLa
 
 	sumList := [2]int{0, 0}
 
-	cb1 := pPosSys.PControlBoardSystem.Boards[ph1_c]
+	cb1 := pPosSys.PControlBoardSystem.PBoards[ph1_c]
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 {
 
@@ -93,7 +93,7 @@ func SumAbsControl(pPosSys *PositionSystem, ph1_c ControlLayerT, ph2_c ControlLa
 		}
 	}
 
-	cb2 := pPosSys.PControlBoardSystem.Boards[ph2_c]
+	cb2 := pPosSys.PControlBoardSystem.PBoards[ph2_c]
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 {
 

@@ -57,13 +57,13 @@ const (
 // ControlBoardSystem - 利きボード・システム
 type ControlBoardSystem struct {
 	// マスへの利き数、または差分が入っています。デバッグ目的で無駄に分けてるんだけどな（＾～＾）
-	Boards [CONTROL_LAYER_ALL_SIZE]*ControlBoard
+	PBoards [CONTROL_LAYER_ALL_SIZE]*ControlBoard
 }
 
 func NewControlBoardSystem() *ControlBoardSystem {
 	cbsys := new(ControlBoardSystem)
 
-	cbsys.Boards = [CONTROL_LAYER_ALL_SIZE]*ControlBoard{
+	cbsys.PBoards = [CONTROL_LAYER_ALL_SIZE]*ControlBoard{
 		// 先手用
 		NewControlBoard("Sum1"),
 		NewControlBoard("RookOff1"),
@@ -105,18 +105,18 @@ func NewControlBoardSystem() *ControlBoardSystem {
 
 // ClearControlLayer - 利きボードのクリアー
 func (pCtrlBrdSys *ControlBoardSystem) ClearControlLayer1(ph1_c ControlLayerT, ph2_c ControlLayerT) {
-	pCtrlBrdSys.Boards[ph1_c].Clear()
-	pCtrlBrdSys.Boards[ph2_c].Clear()
+	pCtrlBrdSys.PBoards[ph1_c].Clear()
+	pCtrlBrdSys.PBoards[ph2_c].Clear()
 }
 
 // DiffControl - 利きテーブルの差分計算
 func (pCtrlBrdSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c3 ControlLayerT) {
 
-	pCtrlBrdSys.Boards[c3].Clear()
+	pCtrlBrdSys.PBoards[c3].Clear()
 
-	cb3 := pCtrlBrdSys.Boards[c3]
-	cb1 := pCtrlBrdSys.Boards[c1]
-	cb2 := pCtrlBrdSys.Boards[c2]
+	cb3 := pCtrlBrdSys.PBoards[c3]
+	cb1 := pCtrlBrdSys.PBoards[c1]
+	cb2 := pCtrlBrdSys.PBoards[c2]
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 {
 
@@ -130,8 +130,8 @@ func (pCtrlBrdSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 ControlL
 func (pCtrlBrdSys *ControlBoardSystem) RecalculateControl(
 	pPos *Position, ph1_c1 ControlLayerT, ph2_c1 ControlLayerT) {
 
-	pCtrlBrdSys.Boards[ph1_c1].Clear()
-	pCtrlBrdSys.Boards[ph2_c1].Clear()
+	pCtrlBrdSys.PBoards[ph1_c1].Clear()
+	pCtrlBrdSys.PBoards[ph2_c1].Clear()
 
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
@@ -139,7 +139,7 @@ func (pCtrlBrdSys *ControlBoardSystem) RecalculateControl(
 			phase := Who(piece)
 			sq_list := GenControl(pPos, from)
 
-			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c1], pCtrlBrdSys.Boards[ph2_c1])
+			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.PBoards[ph1_c1], pCtrlBrdSys.PBoards[ph2_c1])
 
 			for _, to := range sq_list {
 				pCB.Board1[to] += 1
@@ -150,8 +150,8 @@ func (pCtrlBrdSys *ControlBoardSystem) RecalculateControl(
 
 // MergeControlDiff - 利きの差分を解消するぜ（＾～＾）
 func (pCtrlBrdSys *ControlBoardSystem) MergeControlDiff(buildType BuildT) {
-	cb0sum := pCtrlBrdSys.Boards[CONTROL_LAYER_SUM1]
-	cb1sum := pCtrlBrdSys.Boards[CONTROL_LAYER_SUM2]
+	cb0sum := pCtrlBrdSys.PBoards[CONTROL_LAYER_SUM1]
+	cb1sum := pCtrlBrdSys.PBoards[CONTROL_LAYER_SUM2]
 
 	var end1 ControlLayerT
 	var end2 ControlLayerT
@@ -167,10 +167,10 @@ func (pCtrlBrdSys *ControlBoardSystem) MergeControlDiff(buildType BuildT) {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// c=0 を除く
 			for c1 := CONTROL_LAYER_DIFF1_START; c1 < end1; c1 += 1 {
-				cb0sum.Board1[sq] += pCtrlBrdSys.Boards[c1].Board1[sq]
+				cb0sum.Board1[sq] += pCtrlBrdSys.PBoards[c1].Board1[sq]
 			}
 			for c2 := CONTROL_LAYER_DIFF2_START; c2 < end2; c2 += 1 {
-				cb1sum.Board1[sq] += pCtrlBrdSys.Boards[c2].Board1[sq]
+				cb1sum.Board1[sq] += pCtrlBrdSys.PBoards[c2].Board1[sq]
 			}
 		}
 	}
@@ -191,10 +191,10 @@ func (pCtrlBrdSys *ControlBoardSystem) ClearControlDiff(buildType BuildT) {
 
 	// c=0 を除く
 	for c1 := CONTROL_LAYER_DIFF1_START; c1 < end1; c1 += 1 {
-		pCtrlBrdSys.Boards[c1].Clear()
+		pCtrlBrdSys.PBoards[c1].Clear()
 	}
 	for c2 := CONTROL_LAYER_DIFF2_START; c2 < end2; c2 += 1 {
-		pCtrlBrdSys.Boards[c2].Clear()
+		pCtrlBrdSys.PBoards[c2].Clear()
 	}
 }
 

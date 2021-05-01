@@ -457,11 +457,11 @@ MainLoop:
 				}
 
 				WaterColor(
-					pPosSys.PControlBoardSystem.Boards[b1],
-					pPosSys.PControlBoardSystem.Boards[b2],
-					pPosSys.PControlBoardSystem.Boards[b3],
-					pPosSys.PControlBoardSystem.Boards[b4],
-					pPosSys.PControlBoardSystem.Boards[b5])
+					pPosSys.PControlBoardSystem.PBoards[b1],
+					pPosSys.PControlBoardSystem.PBoards[b2],
+					pPosSys.PControlBoardSystem.PBoards[b3],
+					pPosSys.PControlBoardSystem.PBoards[b4],
+					pPosSys.PControlBoardSystem.PBoards[b5])
 				ok = true
 			}
 

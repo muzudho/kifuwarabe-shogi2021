@@ -320,11 +320,11 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 	if friend == FIRST {
 		friendKingSq = pPos.GetPieceLocation(PCLOC_K1)
 		hand_start = HAND_IDX_START
-		pOpponentSumCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2]
+		pOpponentSumCB = pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2]
 	} else if friend == SECOND {
 		friendKingSq = pPos.GetPieceLocation(PCLOC_K2)
 		hand_start = HAND_IDX_START + HAND_TYPE_SIZE
-		pOpponentSumCB = pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1]
+		pOpponentSumCB = pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1]
 	} else {
 		panic(fmt.Errorf("Unknown phase=%d", friend))
 	}

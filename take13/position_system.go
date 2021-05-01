@@ -733,12 +733,12 @@ func (pPosSys *PositionSystem) ReadPosition(pPos *Position, command string) {
 				var pCB7 *ControlBoard
 				if pPosSys.BuildType == BUILD_DEV {
 					pCB7 = ControllBoardFromPhase(phase,
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT],
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT])
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_PUT],
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_PUT])
 				} else {
 					pCB7 = ControllBoardFromPhase(phase,
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 				}
 				pCB7.AddControl(GenControl(pPos, sq), sq, 1)
 			}
@@ -902,16 +902,16 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
 	AddControlRook(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], -1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_ROOK_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_ROOK_OFF], -1, mov_src_sq)
 	AddControlBishop(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_OFF], -1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_BISHOP_OFF], -1, mov_src_sq)
 	AddControlLance(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_OFF], -1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_LANCE_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_LANCE_OFF], -1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	sq_drop := mov_src_sq
@@ -969,12 +969,12 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		var pCB *ControlBoard
 		if pPosSys.BuildType == BUILD_DEV {
 			pCB = ControllBoardFromPhase(before_move_phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_PUT],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_PUT])
 		} else {
 			pCB = ControllBoardFromPhase(before_move_phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 		}
 		pCB.AddControl(GenControl(pPos, mov_dst_sq), mov_dst_sq, 1)
 	} else {
@@ -996,12 +996,12 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 				var pCB *ControlBoard
 				if pPosSys.BuildType == BUILD_DEV {
 					pCB = ControllBoardFromPhase(phase,
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_CAPTURED],
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_CAPTURED])
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_CAPTURED],
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_CAPTURED])
 				} else {
 					pCB = ControllBoardFromPhase(phase,
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-						pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+						pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 				}
 				pCB.AddControl(GenControl(pPos, mov_dst_sq), mov_dst_sq, -1)
 			}
@@ -1016,12 +1016,12 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		var pCB1 *ControlBoard
 		if pPosSys.BuildType == BUILD_DEV {
 			pCB1 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_REMOVE],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_REMOVE])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_REMOVE],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_REMOVE])
 		} else {
 			pCB1 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 		}
 		// 元位置の駒の利きを除去
 		pCB1.AddControl(GenControl(pPos, mov_src_sq), mov_src_sq, -1)
@@ -1045,12 +1045,12 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		var pCB2 *ControlBoard
 		if pPosSys.BuildType == BUILD_DEV {
 			pCB2 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_PUT],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_PUT])
 		} else {
 			pCB2 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 		}
 		pCB2.AddControl(GenControl(pPos, mov_dst_sq), mov_dst_sq, 1)
 
@@ -1163,14 +1163,14 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
 	AddControlLance(
-		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_ON], 1, mov_dst_sq)
+		pPos, pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_LANCE_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_LANCE_ON], 1, mov_dst_sq)
 	AddControlBishop(
-		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_ON], 1, mov_dst_sq)
+		pPos, pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_BISHOP_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_BISHOP_ON], 1, mov_dst_sq)
 	AddControlRook(
-		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], 1, mov_dst_sq)
+		pPos, pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_ROOK_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_ROOK_ON], 1, mov_dst_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff(pPosSys.BuildType)
 }
@@ -1204,16 +1204,16 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	// アンドゥなので逆さになっているぜ（＾～＾）
 	AddControlRook(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_ROOK_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
 	AddControlBishop(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_ON], -1, mov_dst_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_BISHOP_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_BISHOP_ON], -1, mov_dst_sq)
 	AddControlLance(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_ON], -1, mov_dst_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_LANCE_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_LANCE_ON], -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1231,12 +1231,12 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		var pCB3 *ControlBoard
 		if pPosSys.BuildType == BUILD_DEV {
 			pCB3 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_PUT],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_PUT])
 		} else {
 			pCB3 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 		}
 		pCB3.AddControl(GenControl(pPos, mov_dst_sq), mov_dst_sq, -1)
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
@@ -1256,12 +1256,12 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		var pCB4 *ControlBoard
 		if pPosSys.BuildType == BUILD_DEV {
 			pCB4 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_PUT],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_PUT])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_PUT],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_PUT])
 		} else {
 			pCB4 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 		}
 		pCB4.AddControl(GenControl(pPos, mov_dst_sq), mov_dst_sq, -1)
 
@@ -1283,12 +1283,12 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		var pCB5 *ControlBoard
 		if pPosSys.BuildType == BUILD_DEV {
 			pCB5 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_REMOVE],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_REMOVE])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_REMOVE],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_REMOVE])
 		} else {
 			pCB5 = ControllBoardFromPhase(phase,
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1],
-				pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2])
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1],
+				pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2])
 		}
 		// 元の場所に戻した自駒の利きを復元します
 		pCB5.AddControl(GenControl(pPos, mov_src_sq), mov_src_sq, 1)
@@ -1336,16 +1336,16 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 	// アンドゥなので逆さになっているぜ（＾～＾）
 	AddControlLance(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_OFF], 1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_LANCE_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_LANCE_OFF], 1, mov_src_sq)
 	AddControlBishop(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_OFF], 1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_BISHOP_OFF], 1, mov_src_sq)
 	AddControlRook(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_ROOK_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff(pPosSys.BuildType)
 
@@ -1381,16 +1381,16 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	// アンドゥなので逆さになっているぜ（＾～＾）
 	AddControlRook(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_ROOK_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
 	AddControlBishop(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_ON], -1, mov_dst_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_BISHOP_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_BISHOP_ON], -1, mov_dst_sq)
 	AddControlLance(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_ON],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_ON], -1, mov_dst_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_LANCE_ON],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_LANCE_ON], -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1454,12 +1454,12 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 			var pCB6 *ControlBoard
 			if pPosSys.BuildType == BUILD_DEV {
 				pCB6 = ControllBoardFromPhase(pPosSys.phase,
-					pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_CAPTURED],
-					pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_CAPTURED])
+					pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_CAPTURED],
+					pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_CAPTURED])
 			} else {
 				pCB6 = ControllBoardFromPhase(pPosSys.phase,
-					pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM2],
-					pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_SUM1])
+					pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM2],
+					pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_SUM1])
 			}
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
@@ -1511,16 +1511,16 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 	// アンドゥなので逆さになっているぜ（＾～＾）
 	AddControlLance(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_OFF], 1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_LANCE_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_LANCE_OFF], 1, mov_src_sq)
 	AddControlBishop(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_OFF], 1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_BISHOP_OFF], 1, mov_src_sq)
 	AddControlRook(
 		pPos,
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
-		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF1_ROOK_OFF],
+		pPosSys.PControlBoardSystem.PBoards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
 
 	pPosSys.PControlBoardSystem.MergeControlDiff(pPosSys.BuildType)
 }
