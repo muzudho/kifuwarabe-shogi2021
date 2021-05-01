@@ -3,34 +3,34 @@ package take14
 import "fmt"
 
 // 盤上の駒、駒台の駒に対して、37個のルールを実装すればいいはず（＾～＾）
-var genmv_k1 = []int{2}
+var genmv_k1 = []int{8, 9, 10} // 2
 var genmv_r1 = []int{13}
 var genmv_b1 = []int{14}
-var genmv_g1 = []int{3}
+var genmv_g1 = []int{8, 10} // 3
 var genmv_s1 = []int{19, 21}
 var genmv_n1 = []int{15}
 var genmv_l1 = []int{17, 22}
 var genmv_p1 = []int{17}
-var genmv_pr1 = []int{5}
-var genmv_pb1 = []int{6}
-var genmv_ps1 = []int{3}
-var genmv_pn1 = []int{3}
-var genmv_pl1 = []int{3}
-var genmv_pp1 = []int{3}
-var genmv_k2 = []int{2}
+var genmv_pr1 = []int{5, 8, 9, 10}
+var genmv_pb1 = []int{6, 8, 9, 10}
+var genmv_ps1 = []int{8, 10}   // 3
+var genmv_pn1 = []int{8, 10}   // 3
+var genmv_pl1 = []int{8, 10}   // 3
+var genmv_pp1 = []int{8, 10}   // 3
+var genmv_k2 = []int{8, 9, 10} // 2
 var genmv_r2 = []int{13}
 var genmv_b2 = []int{14}
-var genmv_g2 = []int{4}
+var genmv_g2 = []int{9, 10} // 4
 var genmv_s2 = []int{20, 21}
 var genmv_n2 = []int{16}
 var genmv_l2 = []int{18, 23}
 var genmv_p2 = []int{18}
-var genmv_pr2 = []int{5}
-var genmv_pb2 = []int{6}
-var genmv_ps2 = []int{4}
-var genmv_pn2 = []int{4}
-var genmv_pl2 = []int{4}
-var genmv_pp2 = []int{4}
+var genmv_pr2 = []int{5, 8, 9, 10}
+var genmv_pb2 = []int{6, 8, 9, 10}
+var genmv_ps2 = []int{9, 10} // 4
+var genmv_pn2 = []int{9, 10} // 4
+var genmv_pl2 = []int{9, 10} // 4
+var genmv_pp2 = []int{9, 10} // 4
 
 var genmv_dr1 = []int{31}
 var genmv_db1 = []int{31}
@@ -167,294 +167,185 @@ func GenControl(pPos *Position, from Square) []MoveEnd {
 		}
 
 	} else {
-
-	}
-
-	if from == SQUARE_EMPTY {
-		panic(fmt.Errorf("GenControl has empty square"))
-	} else if OnHands(from) {
-		// Obsoleted
-
-	} else {
-		// 盤上の駒の利き
+		// 打でないなら
 		piece := pPos.Board[from]
+		phase := Who(piece)
 
-		// ２つ先のマスから斜めに長い利き
 		switch piece {
-		case PIECE_B1, PIECE_PB1, PIECE_B2, PIECE_PB2:
-			if File(from) < 8 && Rank(from) > 2 && pPos.IsEmptySq(from+9) { // 8～9筋にある駒でもなく、1～2段目でもなく、１つ左上が空マスなら
-				for to := from + 18; File(to) != 0 && Rank(to) != 0; to += 9 { // ２つ左上から
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
-			if File(from) > 2 && Rank(from) > 2 && pPos.IsEmptySq(from-11) { // 1～2筋にある駒でもなく、1～2段目でもなく、１つ右上が空マスなら
-				for to := from - 22; File(to) != 0 && Rank(to) != 0; to -= 11 { // ２つ右上から
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
-			if File(from) < 8 && Rank(from) < 8 && pPos.IsEmptySq(from+11) { // 8～9筋にある駒でもなく、8～9段目でもなく、１つ左下が空マスなら
-				for to := from + 22; File(to) != 0 && Rank(to) != 0; to += 11 { // ２つ左下から
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
-			if File(from) > 2 && Rank(from) < 8 && pPos.IsEmptySq(from-9) { // 1～2筋にある駒でもなく、8～9段目でもなく、１つ右下が空マスなら
-				for to := from - 18; File(to) != 0 && Rank(to) != 0; to -= 9 { // ２つ右下から
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
+		case PIECE_EMPTY:
+			panic(fmt.Errorf("Piece empty"))
+		case PIECE_K1:
+			genmv_list = genmv_k1
+		case PIECE_R1:
+			genmv_list = genmv_r1
+		case PIECE_B1:
+			genmv_list = genmv_b1
+		case PIECE_G1:
+			genmv_list = genmv_g1
+		case PIECE_S1:
+			genmv_list = genmv_s1
+		case PIECE_N1:
+			genmv_list = genmv_n1
+		case PIECE_L1:
+			genmv_list = genmv_l1
+		case PIECE_P1:
+			genmv_list = genmv_p1
+		case PIECE_PR1:
+			genmv_list = genmv_pr1
+		case PIECE_PB1:
+			genmv_list = genmv_pb1
+		case PIECE_PS1:
+			genmv_list = genmv_ps1
+		case PIECE_PN1:
+			genmv_list = genmv_pn1
+		case PIECE_PL1:
+			genmv_list = genmv_pl1
+		case PIECE_PP1:
+			genmv_list = genmv_pp1
+		case PIECE_K2:
+			genmv_list = genmv_k2
+		case PIECE_R2:
+			genmv_list = genmv_r2
+		case PIECE_B2:
+			genmv_list = genmv_b2
+		case PIECE_G2:
+			genmv_list = genmv_g2
+		case PIECE_S2:
+			genmv_list = genmv_s2
+		case PIECE_N2:
+			genmv_list = genmv_n2
+		case PIECE_L2:
+			genmv_list = genmv_l2
+		case PIECE_P2:
+			genmv_list = genmv_p2
+		case PIECE_PR2:
+			genmv_list = genmv_pr2
+		case PIECE_PB2:
+			genmv_list = genmv_pb2
+		case PIECE_PS2:
+			genmv_list = genmv_ps2
+		case PIECE_PN2:
+			genmv_list = genmv_pn2
+		case PIECE_PL2:
+			genmv_list = genmv_pl2
+		case PIECE_PP2:
+			genmv_list = genmv_pp2
 		default:
-			// Ignored
+			panic(fmt.Errorf("Unknown piece=%d", piece))
 		}
 
-		// ２つ先のマスから先手香車の長い利き
-		switch piece {
-		case PIECE_L1, PIECE_R1, PIECE_PR1, PIECE_R2, PIECE_PR2:
-			if Rank(from) > 2 && pPos.IsEmptySq(from-1) { // 1～2段目にある駒でもなく、１つ上が空マスなら
-				for to := from - 2; Rank(to) != 0; to -= 1 { // 上
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
+		for _, step := range genmv_list {
+			switch step {
+			case 1:
+				// 成れない (Ignored)
+			case 2:
+				// genmv_list = append(genmv_list, 1)
+			case 3:
+				// genmv_list = append(genmv_list, 1)
+			case 4:
+				// genmv_list = append(genmv_list, 1)
+			case 5:
+				// ２つ先のマスからの上への長い利き
+				makeFrontLong(pPos, from, false, moveEndList)
+				// ２つ先のマスからの下への長い利き
+				makeBackLong(pPos, from, false, moveEndList)
+				// ２つ先のマスからの横への長い利き
+				makeSideLong(pPos, from, false, moveEndList)
+				// genmv_list = append(genmv_list, 1)
+			case 6:
+				// ２つ先のマスからの斜めへの長い利き
+				makeDiagonalLong(pPos, from, moveEndList)
+				// genmv_list = append(genmv_list, 1)
+			case 7:
+				genmv_list = append(genmv_list, 2)
+				genmv_list = append(genmv_list, 5)
+				genmv_list = append(genmv_list, 6)
+			case 8:
+				// 先手から見て斜め前の利き
+				makeFrontDiagonal(from, moveEndList)
+				genmv_list = append(genmv_list, 3)
+				genmv_list = append(genmv_list, 7)
+			case 9:
+				genmv_list = append(genmv_list, 4)
+				genmv_list = append(genmv_list, 7)
+			case 10:
+				// 先手から見て１つ上への利き
+				makeFront(from, moveEndList)
+
+				// 先手から見て１つ後ろへの利き
+				makeBack(from, moveEndList)
+
+				// 先手から見て１つ横への利き
+				makeSide(from, false, moveEndList)
+				genmv_list = append(genmv_list, 3)
+				genmv_list = append(genmv_list, 4)
+				genmv_list = append(genmv_list, 7)
+			case 11:
+				// Ignored
+			case 12:
+				// Ignored
+			case 13:
+				// 移動元または移動先が敵陣なら成れる
+				var promote bool
+				switch phase {
+				case FIRST:
+					promote = File(from) < 4
+				case SECOND:
+					promote = File(from) > 6
+				default:
+					panic(fmt.Errorf("Unknown phase=%d", phase))
 				}
-			}
-		default:
-			// Ignored
-		}
 
-		// ２つ先のマスから後手香車の長い利き
-		switch piece {
-		case PIECE_R1, PIECE_PR1, PIECE_L2, PIECE_R2, PIECE_PR2:
-			if Rank(from) < 8 && pPos.IsEmptySq(from+1) { // 8～9段目にある駒でもなく、１つ下が空マスなら
-				for to := from + 2; Rank(to) != 0; to += 1 { // 下
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
-		default:
-			// Ignored
-		}
+				// ２つ先のマスからの横への長い利き
+				makeSideLong(pPos, from, promote, moveEndList)
 
-		// ２つ横のマスから飛の長い利き
-		switch piece {
-		case PIECE_R1, PIECE_PR1, PIECE_R2, PIECE_PR2:
-			if File(from) < 8 && pPos.IsEmptySq(from+10) { // 8～9筋にある駒でもなく、１つ左が空マスなら
-				for to := from + 20; File(to) != 0; to += 10 { // 左
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
-			if File(from) > 2 && pPos.IsEmptySq(from-10) { // 1～2筋にある駒でもなく、１つ右が空マスなら
-				for to := from - 20; File(to) != 0; to -= 10 { // 右
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-					if !pPos.IsEmptySq(to) {
-						break
-					}
-				}
-			}
-		default:
-			// Ignored
-		}
+				// 先手から見て１つ横への利き
+				makeSide(from, promote, moveEndList)
 
-		// 先手桂の利き
-		if piece == PIECE_N1 {
-			// 成らず の動きを作るか（＾～＾）？
-			var keepGoing bool
-			if File(from) == 3 {
-				keepGoing = false
-			} else {
-				keepGoing = true
+				genmv_list = append(genmv_list, 12)
+			case 14:
+				// ２つ先のマスからの斜めへの長い利き
+				makeDiagonalLong(pPos, from, moveEndList)
+				genmv_list = append(genmv_list, 12)
+			case 15:
+				// 先手桂の利き
+				makeFrontKnight(from, moveEndList)
+				genmv_list = append(genmv_list, 12)
+			case 16:
+				// 後手桂の利き
+				makeBackKnight(from, moveEndList)
+				genmv_list = append(genmv_list, 12)
+			case 17:
+				// 先手から見て１つ上への利き
+				makeFront(from, moveEndList)
+				genmv_list = append(genmv_list, 12)
+			case 18:
+				// 先手から見て１つ後ろへの利き
+				makeBack(from, moveEndList)
+				genmv_list = append(genmv_list, 12)
+			case 19:
+				// 先手から見て１つ上への利き
+				makeFront(from, moveEndList)
+				genmv_list = append(genmv_list, 13)
+			case 20:
+				// 先手から見て１つ後ろへの利き
+				makeBack(from, moveEndList)
+				genmv_list = append(genmv_list, 13)
+			case 21:
+				// 先手から見て斜め前の利き
+				makeFrontDiagonal(from, moveEndList)
+				// 先手から見て斜め後ろの利き
+				makeBackDiagonal(from, moveEndList)
+				genmv_list = append(genmv_list, 13)
+			case 22:
+				// ２つ先のマスからの上への長い利き
+				makeFrontLong(pPos, from, true, moveEndList)
+				genmv_list = append(genmv_list, 13)
+			case 23:
+				genmv_list = append(genmv_list, 13)
+			default:
+				panic(fmt.Errorf("Unknown step=%d", step))
 			}
-
-			if 2 < Rank(from) && Rank(from) < 10 {
-				if 0 < File(from) && File(from) < 9 { // 左上桂馬飛び
-					to := from + 8
-					ValidateSq(to)
-					if keepGoing {
-						moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-					}
-					// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-				}
-				if 1 < File(from) && File(from) < 10 { // 右上桂馬飛び
-					to := from - 12
-					ValidateSq(to)
-					if keepGoing {
-						moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-					}
-					// moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				}
-			}
-		}
-
-		// 後手桂の利き
-		if piece == PIECE_N2 {
-			// 成らず の動きを作るか（＾～＾）？
-			var keepGoing bool
-			if File(from) == 7 {
-				keepGoing = false
-			} else {
-				keepGoing = true
-			}
-
-			if to := from + 12; File(to) != 0 && Rank(to) != 0 && Rank(to) != 9 { // 左下
-				ValidateSq(to)
-				if keepGoing {
-					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				}
-				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-			}
-			if to := from - 8; File(to) != 0 && Rank(to) != 0 && Rank(to) != 9 { // 右下
-				ValidateSq(to)
-				if keepGoing {
-					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				}
-				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-			}
-		}
-
-		// 先手歩の利き
-		switch piece {
-		case PIECE_L1, PIECE_P1:
-			// 成らず の動きを作るか（＾～＾）？
-			var keepGoing bool
-			if File(from) == 2 {
-				keepGoing = false
-			} else {
-				keepGoing = true
-			}
-
-			if to := from - 1; Rank(to) != 0 { // 上
-				ValidateSq(to)
-				if keepGoing {
-					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				}
-				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-			}
-		case PIECE_K1, PIECE_R1, PIECE_PR1, PIECE_PB1, PIECE_G1, PIECE_S1, PIECE_PS1,
-			PIECE_PN1, PIECE_PL1, PIECE_PP1, PIECE_K2, PIECE_R2, PIECE_PR2, PIECE_PB2, PIECE_G2, PIECE_PS2,
-			PIECE_PN2, PIECE_PL2, PIECE_PP2:
-			if to := from - 1; Rank(to) != 0 { // 上
-				ValidateSq(to)
-				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-			}
-		default:
-			// Ignored
-		}
-
-		// 後手歩の利き
-		switch piece {
-		case PIECE_L2, PIECE_P2:
-			// 成らず の動きを作るか（＾～＾）？
-			var keepGoing bool
-			if File(from) == 8 {
-				keepGoing = false
-			} else {
-				keepGoing = true
-			}
-
-			if to := from + 1; Rank(to) != 0 { // 下
-				ValidateSq(to)
-				if keepGoing {
-					moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				}
-				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-			}
-		case PIECE_K2, PIECE_R2, PIECE_PR2, PIECE_PB2, PIECE_G2, PIECE_S2, PIECE_PS2,
-			PIECE_PN2, PIECE_PL2, PIECE_PP2, PIECE_K1, PIECE_R1, PIECE_PR1, PIECE_PB1, PIECE_G1, PIECE_PS1,
-			PIECE_PN1, PIECE_PL1, PIECE_PP1:
-			if to := from + 1; Rank(to) != 0 { // 下
-				ValidateSq(to)
-				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
-				// moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
-			}
-		default:
-			// Ignored
-		}
-
-		// 先手斜め前の利き
-		switch piece {
-		case PIECE_K1, PIECE_PR1, PIECE_B1, PIECE_PB1, PIECE_G1, PIECE_S1, PIECE_PS1, PIECE_PN1, PIECE_PL1,
-			PIECE_PP1, PIECE_K2, PIECE_PR2, PIECE_B2, PIECE_PB2, PIECE_S2:
-			if to := from + 9; File(to) != 0 && Rank(to) != 0 { // 左上
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
-			}
-			if to := from - 11; File(to) != 0 && Rank(to) != 0 { // 右上
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
-			}
-		default:
-			// Ignored
-		}
-
-		// 後手斜め前の利き
-		switch piece {
-		case PIECE_K2, PIECE_PR2, PIECE_B2, PIECE_PB2, PIECE_G2, PIECE_S2, PIECE_PS2, PIECE_PN2, PIECE_PL2,
-			PIECE_PP2, PIECE_K1, PIECE_PR1, PIECE_B1, PIECE_PB1, PIECE_S1:
-			if to := from + 11; File(to) != 0 && Rank(to) != 0 { // 左下
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
-			}
-			if to := from - 9; File(to) != 0 && Rank(to) != 0 { // 右下
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
-			}
-		default:
-			// Ignored
-		}
-
-		// 横１マスの利き
-		switch piece {
-		case PIECE_K1, PIECE_R1, PIECE_PR1, PIECE_PB1, PIECE_G1, PIECE_PS1, PIECE_PN1, PIECE_PL1, PIECE_PP1,
-			PIECE_K2, PIECE_R2, PIECE_PR2, PIECE_PB2, PIECE_G2, PIECE_PS2, PIECE_PN2, PIECE_PL2, PIECE_PP2:
-			if to := from + 10; File(to) != 0 { // 左
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
-			}
-			if to := from - 10; File(to) != 0 { // 右
-				ValidateSq(to)
-				moveEnd := NewMoveEndValue2(to, false)
-				moveEndList = append(moveEndList, moveEnd)
-			}
-		default:
-			// Ignored
 		}
 	}
 
@@ -470,6 +361,247 @@ func makeDrop(pPos *Position, rank Square, moveEndList []MoveEnd, nifuCheck bool
 		ValidateSq(to)
 		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
 	}
+}
+
+// ２つ先のマスからの上への長い利き
+func makeFrontLong(pPos *Position, from Square, promote bool, moveEndList []MoveEnd) {
+	if Rank(from) > 2 && pPos.IsEmptySq(from-1) { // 1～2段目にある駒でもなく、１つ上が空マスなら
+		for to := from - 2; Rank(to) != 0; to -= 1 { // 上
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if promote {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			}
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+}
+
+// ２つ先のマスからの下への長い利き
+func makeBackLong(pPos *Position, from Square, promote bool, moveEndList []MoveEnd) {
+	if Rank(from) < 8 && pPos.IsEmptySq(from+1) { // 8～9段目にある駒でもなく、１つ下が空マスなら
+		for to := from + 2; Rank(to) != 0; to += 1 { // 下
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if promote {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+}
+
+// ２つ先のマスからの横への長い利き
+func makeSideLong(pPos *Position, from Square, promote bool, moveEndList []MoveEnd) {
+	// ２つ先のマスからの左への長い利き
+	if File(from) < 8 && pPos.IsEmptySq(from+10) { // 8～9筋にある駒でもなく、１つ左が空マスなら
+		for to := from + 20; File(to) != 0; to += 10 { // 左
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if promote {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+
+	// ２つ先のマスからの右への長い利き
+	if File(from) > 2 && pPos.IsEmptySq(from-10) { // 1～2筋にある駒でもなく、１つ右が空マスなら
+		for to := from - 20; File(to) != 0; to -= 10 { // 右
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if promote {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+}
+
+// 先手から見て斜め前の利き
+func makeFrontDiagonal(from Square, moveEndList []MoveEnd) {
+	if to := from + 9; File(to) != 0 && Rank(to) != 0 { // 左上
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+	}
+	if to := from - 11; File(to) != 0 && Rank(to) != 0 { // 右上
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+	}
+}
+
+// 先手から見て斜め後ろの利き
+func makeBackDiagonal(from Square, moveEndList []MoveEnd) {
+	// 先手から見て斜め後ろの利き
+	if to := from + 11; File(to) != 0 && Rank(to) != 0 { // 左下
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+	}
+	if to := from - 9; File(to) != 0 && Rank(to) != 0 { // 右下
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+	}
+}
+
+// 先手から見て１つ上への利き
+func makeFront(from Square, moveEndList []MoveEnd) {
+	// 移動元が２段目のときは必ずならなければならない
+	var keepGoing = File(from) != 2
+	// 移動元または移動先が敵陣なら成れる
+	var promote = File(from) < 5
+
+	if to := from - 1; Rank(to) != 0 { // 上
+		ValidateSq(to)
+		if keepGoing {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		}
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+}
+
+// 先手から見て１つ横への利き
+func makeSide(from Square, promote bool, moveEndList []MoveEnd) {
+	if to := from + 10; File(to) != 0 { // 左
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+	if to := from - 10; File(to) != 0 { // 右
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+}
+
+// 先手から見て１つ後ろへの利き
+func makeBack(from Square, moveEndList []MoveEnd) {
+	// 移動元が８段目のときは必ずならなければならない
+	var keepGoing = File(from) != 8
+	// 移動元または移動先が敵陣なら成れる
+	var promote = File(from) > 5
+
+	if to := from + 1; Rank(to) != 0 { // 下
+		ValidateSq(to)
+		if keepGoing {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		}
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+}
+
+// 先手桂の利き
+func makeFrontKnight(from Square, moveEndList []MoveEnd) {
+	// 移動元が３段目のときは必ずならなければならない
+	var keepGoing = File(from) != 3
+	// 移動元または移動先が敵陣なら成れる
+	var promote = File(from) < 6
+
+	if 2 < Rank(from) && Rank(from) < 10 {
+		if 0 < File(from) && File(from) < 9 { // 左上桂馬飛び
+			to := from + 8
+			ValidateSq(to)
+			if keepGoing {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			}
+			if promote {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+		}
+		if 1 < File(from) && File(from) < 10 { // 右上桂馬飛び
+			to := from - 12
+			ValidateSq(to)
+			if keepGoing {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			}
+			if promote {
+				moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+			}
+		}
+	}
+}
+
+// 後手桂の利き
+func makeBackKnight(from Square, moveEndList []MoveEnd) {
+	// 移動元が７段目のときは必ずならなければならない
+	var keepGoing = File(from) != 7
+	// 移動元または移動先が敵陣なら成れる
+	var promote = File(from) > 4
+
+	if to := from + 12; File(to) != 0 && Rank(to) != 0 && Rank(to) != 9 { // 左下
+		ValidateSq(to)
+		if keepGoing {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		}
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+	if to := from - 8; File(to) != 0 && Rank(to) != 0 && Rank(to) != 9 { // 右下
+		ValidateSq(to)
+		if keepGoing {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		}
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+}
+
+// ２つ先のマスからの斜めへの長い利き
+func makeDiagonalLong(pPos *Position, from Square, moveEndList []MoveEnd) {
+	if File(from) < 8 && Rank(from) > 2 && pPos.IsEmptySq(from+9) { // 8～9筋にある駒でもなく、1～2段目でもなく、１つ左上が空マスなら
+		for to := from + 18; File(to) != 0 && Rank(to) != 0; to += 9 { // ２つ左上から
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+	if File(from) > 2 && Rank(from) > 2 && pPos.IsEmptySq(from-11) { // 1～2筋にある駒でもなく、1～2段目でもなく、１つ右上が空マスなら
+		for to := from - 22; File(to) != 0 && Rank(to) != 0; to -= 11 { // ２つ右上から
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+	if File(from) < 8 && Rank(from) < 8 && pPos.IsEmptySq(from+11) { // 8～9筋にある駒でもなく、8～9段目でもなく、１つ左下が空マスなら
+		for to := from + 22; File(to) != 0 && Rank(to) != 0; to += 11 { // ２つ左下から
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+	if File(from) > 2 && Rank(from) < 8 && pPos.IsEmptySq(from-9) { // 1～2筋にある駒でもなく、8～9段目でもなく、１つ右下が空マスなら
+		for to := from - 18; File(to) != 0 && Rank(to) != 0; to -= 9 { // ２つ右下から
+			ValidateSq(to)
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+			if !pPos.IsEmptySq(to) {
+				break
+			}
+		}
+	}
+
 }
 
 // NifuFirst - 先手で二歩になるか筋調べ
