@@ -2,6 +2,51 @@ package take14
 
 import "fmt"
 
+// 盤上の駒、駒台の駒に対して、37個のルールを実装すればいいはず（＾～＾）
+var genmv_k1 = []int{2}
+var genmv_r1 = []int{13}
+var genmv_b1 = []int{14}
+var genmv_g1 = []int{3}
+var genmv_s1 = []int{19, 21}
+var genmv_n1 = []int{15}
+var genmv_l1 = []int{17, 22}
+var genmv_p1 = []int{17}
+var genmv_pr1 = []int{5}
+var genmv_pb1 = []int{6}
+var genmv_ps1 = []int{3}
+var genmv_pn1 = []int{3}
+var genmv_pl1 = []int{3}
+var genmv_pp1 = []int{3}
+var genmv_k2 = []int{2}
+var genmv_r2 = []int{13}
+var genmv_b2 = []int{14}
+var genmv_g2 = []int{4}
+var genmv_s2 = []int{20, 21}
+var genmv_n2 = []int{16}
+var genmv_l2 = []int{18, 23}
+var genmv_p2 = []int{18}
+var genmv_pr2 = []int{5}
+var genmv_pb2 = []int{6}
+var genmv_ps2 = []int{4}
+var genmv_pn2 = []int{4}
+var genmv_pl2 = []int{4}
+var genmv_pp2 = []int{4}
+
+var genmv_dr1 = []int{31}
+var genmv_db1 = []int{31}
+var genmv_dg1 = []int{31}
+var genmv_ds1 = []int{31}
+var genmv_dn1 = []int{32}
+var genmv_dl1 = []int{34}
+var genmv_dp1 = []int{36}
+var genmv_dr2 = []int{31}
+var genmv_db2 = []int{31}
+var genmv_dg2 = []int{31}
+var genmv_ds2 = []int{31}
+var genmv_dn2 = []int{33}
+var genmv_dl2 = []int{35}
+var genmv_dp2 = []int{37}
+
 // File - マス番号から筋（列）を取り出します
 func File(sq Square) Square {
 	return sq / 10 % 10
@@ -18,115 +63,118 @@ func Rank(sq Square) Square {
 func GenControl(pPos *Position, from Square) []MoveEnd {
 	moveEndList := []MoveEnd{}
 
-	/*
-		// 盤上の駒、駒台の駒に対して、37個のルールを実装すればいいはず（＾～＾）
-		k1 := []int{2}
-		r1 := []int{13}
-		b1 := []int{14}
-		g1 := []int{3}
-		s1 := []int{19, 21}
-		n1 := []int{15}
-		l1 := []int{17, 22}
-		p1 := []int{17}
-		pr1 := []int{5}
-		pb1 := []int{6}
-		ps1 := []int{3}
-		pn1 := []int{3}
-		pl1 := []int{3}
-		pp1 := []int{3}
-		k2 := []int{2}
-		r2 := []int{13}
-		b2 := []int{14}
-		g2 := []int{4}
-		s2 := []int{20, 21}
-		n2 := []int{16}
-		l2 := []int{18, 23}
-		p2 := []int{18}
-		pr2 := []int{5}
-		pb2 := []int{6}
-		ps2 := []int{4}
-		pn2 := []int{4}
-		pl2 := []int{4}
-		pp2 := []int{4}
-
-		dr1 := []int{31}
-		db1 := []int{31}
-		dg1 := []int{31}
-		ds1 := []int{31}
-		dn1 := []int{32}
-		dl1 := []int{34}
-		dp1 := []int{36}
-		dr2 := []int{31}
-		db2 := []int{31}
-		dg2 := []int{31}
-		ds2 := []int{31}
-		dn2 := []int{33}
-		dl2 := []int{35}
-		dp2 := []int{37}
-	*/
+	var genmv_list []int
 
 	if from == SQUARE_EMPTY {
 		panic(fmt.Errorf("GenControl has empty square"))
 	} else if OnHands(from) {
-		// どこに打てるか
-		var start_rank Square
-		var end_rank Square
+		// 打なら
+
+		nifuCheck := false
 
 		switch from {
-		case SQ_R1, SQ_B1, SQ_G1, SQ_S1, SQ_R2, SQ_B2, SQ_G2, SQ_S2: // 81マスに打てる
-			start_rank = 1
-			end_rank = 10
-		case SQ_N1: // 3～9段目に打てる
-			start_rank = 3
-			end_rank = 10
-		case SQ_L1, SQ_P1: // 2～9段目に打てる
-			start_rank = 2
-			end_rank = 10
-		case SQ_N2: // 1～7段目に打てる
-			start_rank = 1
-			end_rank = 8
-		case SQ_L2, SQ_P2: // 1～8段目に打てる
-			start_rank = 1
-			end_rank = 9
+		case SQ_R1:
+			genmv_list = genmv_dr1
+		case SQ_B1:
+			genmv_list = genmv_db1
+		case SQ_G1:
+			genmv_list = genmv_dg1
+		case SQ_S1:
+			genmv_list = genmv_ds1
+		case SQ_N1:
+			genmv_list = genmv_dn1
+		case SQ_L1:
+			genmv_list = genmv_dl1
+		case SQ_P1:
+			genmv_list = genmv_dp1
+		case SQ_R2:
+			genmv_list = genmv_dr1
+		case SQ_B2:
+			genmv_list = genmv_db1
+		case SQ_G2:
+			genmv_list = genmv_dg1
+		case SQ_S2:
+			genmv_list = genmv_ds1
+		case SQ_N2:
+			genmv_list = genmv_dn1
+		case SQ_L2:
+			genmv_list = genmv_dl2
+		case SQ_P2:
+			genmv_list = genmv_dp2
 		default:
 			panic(fmt.Errorf("Unknown hand from=%d", from))
 		}
 
-		switch from {
-		case SQ_P1:
-			// TODO 打ち歩詰め禁止
-			for rank := Square(start_rank); rank < end_rank; rank += 1 {
-				for file := Square(9); file > 0; file-- {
-					if !NifuFirst(pPos, file) { // ２歩禁止
-						to := SquareFrom(file, rank)
-						ValidateSq(to)
-						moveEnd := NewMoveEndValue2(to, false)
-						moveEndList = append(moveEndList, moveEnd)
-					}
-				}
-			}
-		case SQ_P2:
-			// TODO 打ち歩詰め禁止
-			for rank := Square(start_rank); rank < end_rank; rank += 1 {
-				for file := Square(9); file > 0; file-- {
-					if !NifuSecond(pPos, file) { // ２歩禁止
-						to := SquareFrom(file, rank)
-						ValidateSq(to)
-						moveEnd := NewMoveEndValue2(to, false)
-						moveEndList = append(moveEndList, moveEnd)
-					}
-				}
-			}
-		default:
-			for rank := Square(start_rank); rank < end_rank; rank += 1 {
-				for file := Square(9); file > 0; file-- {
-					to := SquareFrom(file, rank)
-					ValidateSq(to)
-					moveEnd := NewMoveEndValue2(to, false)
-					moveEndList = append(moveEndList, moveEnd)
-				}
+		for _, step := range genmv_list {
+			switch step {
+			case 24:
+				makeDrop(pPos, 1, moveEndList, nifuCheck)
+			case 25:
+				makeDrop(pPos, 2, moveEndList, nifuCheck)
+			case 26:
+				makeDrop(pPos, 3, moveEndList, nifuCheck)
+			case 27:
+				makeDrop(pPos, 4, moveEndList, nifuCheck)
+				makeDrop(pPos, 5, moveEndList, nifuCheck)
+				makeDrop(pPos, 6, moveEndList, nifuCheck)
+			case 28:
+				makeDrop(pPos, 7, moveEndList, nifuCheck)
+			case 29:
+				makeDrop(pPos, 8, moveEndList, nifuCheck)
+			case 30:
+				makeDrop(pPos, 9, moveEndList, nifuCheck)
+			case 31:
+				genmv_list = append(genmv_list, 24)
+				genmv_list = append(genmv_list, 25)
+				genmv_list = append(genmv_list, 26)
+				genmv_list = append(genmv_list, 27)
+				genmv_list = append(genmv_list, 28)
+				genmv_list = append(genmv_list, 29)
+				genmv_list = append(genmv_list, 30)
+			case 32:
+				genmv_list = append(genmv_list, 26)
+				genmv_list = append(genmv_list, 27)
+				genmv_list = append(genmv_list, 28)
+				genmv_list = append(genmv_list, 29)
+				genmv_list = append(genmv_list, 30)
+			case 33:
+				genmv_list = append(genmv_list, 24)
+				genmv_list = append(genmv_list, 25)
+				genmv_list = append(genmv_list, 26)
+				genmv_list = append(genmv_list, 27)
+				genmv_list = append(genmv_list, 28)
+			case 34:
+				genmv_list = append(genmv_list, 25)
+				genmv_list = append(genmv_list, 26)
+				genmv_list = append(genmv_list, 27)
+				genmv_list = append(genmv_list, 28)
+				genmv_list = append(genmv_list, 29)
+				genmv_list = append(genmv_list, 30)
+			case 35:
+				genmv_list = append(genmv_list, 24)
+				genmv_list = append(genmv_list, 25)
+				genmv_list = append(genmv_list, 26)
+				genmv_list = append(genmv_list, 27)
+				genmv_list = append(genmv_list, 28)
+				genmv_list = append(genmv_list, 29)
+			case 36:
+				genmv_list = append(genmv_list, 34)
+			case 37:
+				genmv_list = append(genmv_list, 35)
+			default:
+				panic(fmt.Errorf("Unknown step=%d", step))
 			}
 		}
+
+	} else {
+
+	}
+
+	if from == SQUARE_EMPTY {
+		panic(fmt.Errorf("GenControl has empty square"))
+	} else if OnHands(from) {
+		// Obsoleted
+
 	} else {
 		// 盤上の駒の利き
 		piece := pPos.Board[from]
@@ -411,6 +459,17 @@ func GenControl(pPos *Position, from Square) []MoveEnd {
 	}
 
 	return moveEndList
+}
+
+func makeDrop(pPos *Position, rank Square, moveEndList []MoveEnd, nifuCheck bool) {
+	for file := Square(9); file > 0; file-- {
+		if nifuCheck && NifuFirst(pPos, file) { // ２歩禁止
+			continue
+		}
+		to := SquareFrom(file, rank)
+		ValidateSq(to)
+		moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+	}
 }
 
 // NifuFirst - 先手で二歩になるか筋調べ
