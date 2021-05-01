@@ -99,19 +99,19 @@ func NewControlBoardSystem() *ControlBoardSystem {
 }
 
 // ClearControlLayer - 利きボードのクリアー
-func (pControlBoardSys *ControlBoardSystem) ClearControlLayer1(ph1_c ControlLayerT, ph2_c ControlLayerT) {
-	pControlBoardSys.Boards[ph1_c].Clear()
-	pControlBoardSys.Boards[ph2_c].Clear()
+func (pCtrlBrdSys *ControlBoardSystem) ClearControlLayer1(ph1_c ControlLayerT, ph2_c ControlLayerT) {
+	pCtrlBrdSys.Boards[ph1_c].Clear()
+	pCtrlBrdSys.Boards[ph2_c].Clear()
 }
 
 // DiffControl - 利きテーブルの差分計算
-func (pControlBoardSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c3 ControlLayerT) {
+func (pCtrlBrdSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 ControlLayerT, c3 ControlLayerT) {
 
-	pControlBoardSys.Boards[c3].Clear()
+	pCtrlBrdSys.Boards[c3].Clear()
 
-	cb3 := pControlBoardSys.Boards[c3]
-	cb1 := pControlBoardSys.Boards[c1]
-	cb2 := pControlBoardSys.Boards[c2]
+	cb3 := pCtrlBrdSys.Boards[c3]
+	cb1 := pCtrlBrdSys.Boards[c1]
+	cb2 := pCtrlBrdSys.Boards[c2]
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 {
 
@@ -122,11 +122,11 @@ func (pControlBoardSys *ControlBoardSystem) DiffControl(c1 ControlLayerT, c2 Con
 }
 
 // RecalculateControl - 利きの再計算
-func (pControlBoardSys *ControlBoardSystem) RecalculateControl(
+func (pCtrlBrdSys *ControlBoardSystem) RecalculateControl(
 	pPos *Position, ph1_c1 ControlLayerT, ph2_c1 ControlLayerT) {
 
-	pControlBoardSys.Boards[ph1_c1].Clear()
-	pControlBoardSys.Boards[ph2_c1].Clear()
+	pCtrlBrdSys.Boards[ph1_c1].Clear()
+	pCtrlBrdSys.Boards[ph2_c1].Clear()
 
 	for from := Square(11); from < BOARD_SIZE; from += 1 {
 		if File(from) != 0 && Rank(from) != 0 && !pPos.IsEmptySq(from) {
@@ -134,15 +134,7 @@ func (pControlBoardSys *ControlBoardSystem) RecalculateControl(
 			phase := Who(piece)
 			sq_list := GenControl(pPos, from)
 
-			var pCB *ControlBoard
-			switch phase {
-			case FIRST:
-				pCB = pControlBoardSys.Boards[ph1_c1]
-			case SECOND:
-				pCB = pControlBoardSys.Boards[ph2_c1]
-			default:
-				panic(fmt.Errorf("Unknown phase=%d", phase))
-			}
+			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c1], pCtrlBrdSys.Boards[ph2_c1])
 
 			for _, to := range sq_list {
 				pCB.Board1[to] += 1
@@ -152,35 +144,35 @@ func (pControlBoardSys *ControlBoardSystem) RecalculateControl(
 }
 
 // MergeControlDiff - 利きの差分を解消するぜ（＾～＾）
-func (pControlBoardSys *ControlBoardSystem) MergeControlDiff() {
-	cb0sum := pControlBoardSys.Boards[CONTROL_LAYER_SUM1]
-	cb1sum := pControlBoardSys.Boards[CONTROL_LAYER_SUM2]
+func (pCtrlBrdSys *ControlBoardSystem) MergeControlDiff() {
+	cb0sum := pCtrlBrdSys.Boards[CONTROL_LAYER_SUM1]
+	cb1sum := pCtrlBrdSys.Boards[CONTROL_LAYER_SUM2]
 	for sq := Square(11); sq < BOARD_SIZE; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// c=0 を除く
 			for c1 := CONTROL_LAYER_DIFF1_START; c1 < CONTROL_LAYER_DIFF1_END; c1 += 1 {
-				cb0sum.Board1[sq] += pControlBoardSys.Boards[c1].Board1[sq]
+				cb0sum.Board1[sq] += pCtrlBrdSys.Boards[c1].Board1[sq]
 			}
 			for c2 := CONTROL_LAYER_DIFF2_START; c2 < CONTROL_LAYER_DIFF2_END; c2 += 1 {
-				cb1sum.Board1[sq] += pControlBoardSys.Boards[c2].Board1[sq]
+				cb1sum.Board1[sq] += pCtrlBrdSys.Boards[c2].Board1[sq]
 			}
 		}
 	}
 }
 
 // ClearControlDiff - 利きの差分テーブルをクリアーするぜ（＾～＾）
-func (pControlBoardSys *ControlBoardSystem) ClearControlDiff() {
+func (pCtrlBrdSys *ControlBoardSystem) ClearControlDiff() {
 	// c=0 を除く
 	for c1 := CONTROL_LAYER_DIFF1_START; c1 < CONTROL_LAYER_DIFF1_END; c1 += 1 {
-		pControlBoardSys.Boards[c1].Clear()
+		pCtrlBrdSys.Boards[c1].Clear()
 	}
 	for c2 := CONTROL_LAYER_DIFF2_START; c2 < CONTROL_LAYER_DIFF2_END; c2 += 1 {
-		pControlBoardSys.Boards[c2].Clear()
+		pCtrlBrdSys.Boards[c2].Clear()
 	}
 }
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pControlBoardSys *ControlBoardSystem) AddControlDiff(pPos *Position,
+func (pCtrlBrdSys *ControlBoardSystem) AddControlDiff(pPos *Position,
 	pCB *ControlBoard, from Square, sign int16) {
 
 	if from > 99 {
@@ -189,22 +181,6 @@ func (pControlBoardSys *ControlBoardSystem) AddControlDiff(pPos *Position,
 	}
 
 	sq_list := GenControl(pPos, from)
-
-	/*
-		ValidateThereArePieceIn(pPos, from)
-		phase := Who(piece)
-		// fmt.Printf("Debug: ph=%d\n", ph)
-			var pCB *ControlBoard
-			switch phase {
-			case FIRST:
-				pCB = pControlBoardSys.Boards[ph1_c]
-			case SECOND:
-				pCB = pControlBoardSys.Boards[ph2_c]
-			default:
-				panic(fmt.Errorf("Unknown phase=%d", phase))
-			}
-	*/
-
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
 		// 差分の方のテーブルを更新（＾～＾）
@@ -213,7 +189,7 @@ func (pControlBoardSys *ControlBoardSystem) AddControlDiff(pPos *Position,
 }
 
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pControlBoardSys *ControlBoardSystem) AddControlLance(pPos *Position,
+func (pCtrlBrdSys *ControlBoardSystem) AddControlLance(pPos *Position,
 	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
 	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
 		from := pPos.PieceLocations[i]
@@ -225,24 +201,14 @@ func (pControlBoardSys *ControlBoardSystem) AddControlLance(pPos *Position,
 			piece := pPos.Board[from]
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
-			// fmt.Printf("Debug: ph=%d\n", ph)
-			var pCB *ControlBoard
-			switch phase {
-			case FIRST:
-				pCB = pControlBoardSys.Boards[ph1_c]
-			case SECOND:
-				pCB = pControlBoardSys.Boards[ph2_c]
-			default:
-				panic(fmt.Errorf("Unknown phase=%d", phase))
-			}
-
-			pControlBoardSys.AddControlDiff(pPos, pCB, from, sign)
+			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
+			pCtrlBrdSys.AddControlDiff(pPos, pCB, from, sign)
 		}
 	}
 }
 
 // AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pControlBoardSys *ControlBoardSystem) AddControlBishop(pPos *Position,
+func (pCtrlBrdSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
 	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
 		from := pPos.PieceLocations[i]
@@ -253,24 +219,14 @@ func (pControlBoardSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 			piece := pPos.Board[from]
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
-			// fmt.Printf("Debug: ph=%d\n", ph)
-			var pCB *ControlBoard
-			switch phase {
-			case FIRST:
-				pCB = pControlBoardSys.Boards[ph1_c]
-			case SECOND:
-				pCB = pControlBoardSys.Boards[ph2_c]
-			default:
-				panic(fmt.Errorf("Unknown phase=%d", phase))
-			}
-
-			pControlBoardSys.AddControlDiff(pPos, pCB, from, sign)
+			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
+			pCtrlBrdSys.AddControlDiff(pPos, pCB, from, sign)
 		}
 	}
 }
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pControlBoardSys *ControlBoardSystem) AddControlRook(pPos *Position,
+func (pCtrlBrdSys *ControlBoardSystem) AddControlRook(pPos *Position,
 	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
 		from := pPos.PieceLocations[i]
@@ -281,18 +237,22 @@ func (pControlBoardSys *ControlBoardSystem) AddControlRook(pPos *Position,
 			piece := pPos.Board[from]
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
-			// fmt.Printf("Debug: ph=%d\n", ph)
-			var pCB *ControlBoard
-			switch phase {
-			case FIRST:
-				pCB = pControlBoardSys.Boards[ph1_c]
-			case SECOND:
-				pCB = pControlBoardSys.Boards[ph2_c]
-			default:
-				panic(fmt.Errorf("Unknown phase=%d", phase))
-			}
-
-			pControlBoardSys.AddControlDiff(pPos, pCB, from, sign)
+			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
+			pCtrlBrdSys.AddControlDiff(pPos, pCB, from, sign)
 		}
+	}
+}
+
+func ControllBoardFromPhase(
+	phase Phase, pPh1_CB *ControlBoard, pPh2_CB *ControlBoard) *ControlBoard {
+
+	// fmt.Printf("Debug: phase=%d\n", phase)
+	switch phase {
+	case FIRST:
+		return pPh1_CB
+	case SECOND:
+		return pPh2_CB
+	default:
+		panic(fmt.Errorf("Unknown phase=%d", phase))
 	}
 }
