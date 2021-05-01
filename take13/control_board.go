@@ -37,14 +37,14 @@ func (pCB *ControlBoard) Clear() {
 }
 
 // AddControlDiff - 盤上のマスを指定することで、そこにある駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pCB *ControlBoard) AddControlDiff(pPos *Position, from Square, sign int16) {
+func (pCB *ControlBoard) AddControlDiff(sq_list []Square, from Square, sign int16) {
 
-	if from > 99 {
-		// 持ち駒は無視します
-		return
-	}
+	// if from > 99 {
+	// 	// 持ち駒は無視します
+	// 	return
+	// }
 
-	sq_list := GenControl(pPos, from)
+	//sq_list := GenControl(pPos, from)
 	for _, to := range sq_list {
 		// fmt.Printf("Debug: ph=%d c=%d to=%d\n", ph, c, to)
 		// 差分の方のテーブルを更新（＾～＾）

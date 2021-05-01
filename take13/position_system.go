@@ -729,7 +729,7 @@ func (pPosSys *PositionSystem) ReadPosition(pPos *Position, command string) {
 					panic(fmt.Errorf("Unknown phase=%d", phase))
 				}
 
-				pCB.AddControlDiff(pPos, sq, 1)
+				pCB.AddControlDiff(GenControl(pPos, sq), sq, 1)
 			}
 		}
 	}
@@ -958,7 +958,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pCB.AddControlDiff(pPos, mov_dst_sq, 1)
+		pCB.AddControlDiff(GenControl(pPos, mov_dst_sq), mov_dst_sq, 1)
 		mov_piece_type = What(piece)
 	} else {
 		// 打でないなら
@@ -986,7 +986,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 					panic(fmt.Errorf("Unknown phase=%d", phase))
 				}
 
-				pCB.AddControlDiff(pPos, mov_dst_sq, -1)
+				pCB.AddControlDiff(GenControl(pPos, mov_dst_sq), mov_dst_sq, -1)
 			}
 			cap_piece_type = What(captured)
 			cap_src_sq = mov_dst_sq
@@ -1007,7 +1007,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 		}
 
 		// 元位置の駒の利きを除去
-		pCB.AddControlDiff(pPos, mov_src_sq, -1)
+		pCB.AddControlDiff(GenControl(pPos, mov_src_sq), mov_src_sq, -1)
 
 		// 行き先の駒の上書き
 		if move.GetPromotion() {
@@ -1033,7 +1033,7 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pCB.AddControlDiff(pPos, mov_dst_sq, 1)
+		pCB.AddControlDiff(GenControl(pPos, mov_dst_sq), mov_dst_sq, 1)
 
 		switch captured {
 		case PIECE_EMPTY: // Ignored
@@ -1212,7 +1212,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pCB.AddControlDiff(pPos, mov_dst_sq, -1)
+		pCB.AddControlDiff(GenControl(pPos, mov_dst_sq), mov_dst_sq, -1)
 		pPos.Board[mov_dst_sq] = PIECE_EMPTY
 
 		// 駒台に駒を戻します
@@ -1237,7 +1237,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 			panic(fmt.Errorf("Unknown phase=%d", phase))
 		}
 
-		pCB.AddControlDiff(pPos, mov_dst_sq, -1)
+		pCB.AddControlDiff(GenControl(pPos, mov_dst_sq), mov_dst_sq, -1)
 
 		// 自駒を移動元へ戻します
 		if move.GetPromotion() {
@@ -1263,7 +1263,7 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 		}
 
 		// 元の場所に戻した自駒の利きを復元します
-		pCB.AddControlDiff(pPos, mov_src_sq, 1)
+		pCB.AddControlDiff(GenControl(pPos, mov_src_sq), mov_src_sq, 1)
 	}
 
 	// 玉と、長い利きの駒が動いたときは、位置情報更新
@@ -1425,7 +1425,7 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 			// 取った駒は盤上になかったので、ここで利きを復元させます
 			// 行き先にある取られていた駒の利きの復元
-			pCB.AddControlDiff(pPos, mov_dst_sq, 1)
+			pCB.AddControlDiff(GenControl(pPos, mov_dst_sq), mov_dst_sq, 1)
 		}
 	}
 

@@ -185,7 +185,7 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlLance(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
-			pCB.AddControlDiff(pPos, from, sign)
+			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
 		}
 	}
 }
@@ -203,7 +203,7 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
-			pCB.AddControlDiff(pPos, from, sign)
+			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
 		}
 	}
 }
@@ -221,7 +221,7 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlRook(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControlDiff(pPos, from, sign)
+			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
 		}
 	}
 }
