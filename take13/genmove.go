@@ -13,6 +13,7 @@ func Rank(sq Square) Square {
 }
 
 // GenControl - 利いているマスの一覧を返します。動けるマスではありません。
+// TODO 成る、成らないも入れたいぜ（＾～＾）
 func GenControl(pPos *Position, from Square) []Square {
 	sq_list := []Square{}
 
