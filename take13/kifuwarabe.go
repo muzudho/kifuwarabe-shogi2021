@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	l "github.com/muzudho/go-logger"
 )
@@ -93,7 +95,9 @@ MainLoop:
 		case "usi":
 			G.Chat.Print("id name %s\n", config.Profile.Name)
 			G.Chat.Print("id author %s\n", config.Profile.Author)
-			pPosSys.Development = false
+			pPosSys.BuildType = BUILD_RELEASE
+			// 乱数のタネを変更するぜ（＾～＾）
+			rand.Seed(time.Now().UnixNano())
 			G.Chat.Print("usiok\n")
 		case "isready":
 			G.Chat.Print("readyok\n")
@@ -282,7 +286,9 @@ MainLoop:
 			G.Chat.Debug("---------------\n%s", pPosSys.Dump())
 		case "playout":
 			// とにかく手を進めるぜ（＾～＾）
+			// 時間の計測は リリース・モードでやれだぜ（＾～＾）
 			G.Chat.Debug("Playout start\n")
+			start := time.Now()
 
 		PlayoutLoop:
 			// 棋譜を書き直してさらに多く続けるぜ（＾～＾）
@@ -316,7 +322,8 @@ MainLoop:
 				// pPosSys.StartMovesNum = 0
 			}
 
-			G.Chat.Debug("Playout finished\n")
+			end := time.Now()
+			G.Chat.Debug("Playout finished。%f seconds\n", (end.Sub(start)).Seconds())
 		case "shuffle":
 			ShuffleBoard(pPosSys, pPosSys.PPosition[POS_LAYER_MAIN])
 		case "count":

@@ -1,9 +1,6 @@
 package main
 
 import (
-	"math/rand"
-	"time"
-
 	"github.com/muzudho/kifuwarabe-shogi2021/take13"
 )
 
@@ -18,8 +15,8 @@ func main() {
 	// take4.MainLoop()
 	// take5.MainLoop()
 
-	// ゲーム向けの軽い乱数のタネ
-	rand.Seed(time.Now().UnixNano())
+	// ゲーム向けの軽い乱数のタネ (take6～12)
+	// rand.Seed(time.Now().UnixNano())
 
 	// take6.MainLoop()
 	// take7.MainLoop()

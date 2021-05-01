@@ -4,6 +4,16 @@
 
 次は深さ２を目指すかだぜ（＾～＾）  
 １手詰めも欲しいけど（＾～＾）  
+処理時間を計測したいぜ（＾～＾）  
+
+## 計測
+
+```plain
+usi
+position startpos
+playout
+# 36.898604 seconds
+```
 
 ## Test
 

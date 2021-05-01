@@ -11,23 +11,25 @@ const (
 	CONTROL_LAYER_DIFF1_ROOK_OFF   = ControlLayerT(1) // 飛の利き 負(差分)
 	CONTROL_LAYER_DIFF1_BISHOP_OFF = ControlLayerT(2) // 角の利き 負(差分)
 	CONTROL_LAYER_DIFF1_LANCE_OFF  = ControlLayerT(3) // 香の利き 負(差分)
-	CONTROL_LAYER_DIFF1_PUT        = ControlLayerT(4) // 打とか指すとか
-	CONTROL_LAYER_DIFF1_REMOVE     = ControlLayerT(5)
-	CONTROL_LAYER_DIFF1_CAPTURED   = ControlLayerT(6)
-	CONTROL_LAYER_DIFF1_LANCE_ON   = ControlLayerT(7) // 香の利き 正(差分)
-	CONTROL_LAYER_DIFF1_BISHOP_ON  = ControlLayerT(8) // 角の利き 正(差分)
-	CONTROL_LAYER_DIFF1_ROOK_ON    = ControlLayerT(9) // 飛の利き 正(差分)
+	CONTROL_LAYER_DIFF1_LANCE_ON   = ControlLayerT(4) // 香の利き 正(差分)
+	CONTROL_LAYER_DIFF1_BISHOP_ON  = ControlLayerT(5) // 角の利き 正(差分)
+	CONTROL_LAYER_DIFF1_ROOK_ON    = ControlLayerT(6) // 飛の利き 正(差分)
+	// 先手用/開発時のみ
+	CONTROL_LAYER_DIFF1_PUT      = ControlLayerT(7) // 打とか指すとか
+	CONTROL_LAYER_DIFF1_REMOVE   = ControlLayerT(8)
+	CONTROL_LAYER_DIFF1_CAPTURED = ControlLayerT(9)
 	// 後手用
 	CONTROL_LAYER_SUM2             = ControlLayerT(10) // 後手の利きボード
 	CONTROL_LAYER_DIFF2_ROOK_OFF   = ControlLayerT(11)
 	CONTROL_LAYER_DIFF2_BISHOP_OFF = ControlLayerT(12)
 	CONTROL_LAYER_DIFF2_LANCE_OFF  = ControlLayerT(13)
-	CONTROL_LAYER_DIFF2_PUT        = ControlLayerT(14) // 打とか指すとか
-	CONTROL_LAYER_DIFF2_REMOVE     = ControlLayerT(15)
-	CONTROL_LAYER_DIFF2_CAPTURED   = ControlLayerT(16)
-	CONTROL_LAYER_DIFF2_LANCE_ON   = ControlLayerT(17)
-	CONTROL_LAYER_DIFF2_BISHOP_ON  = ControlLayerT(18)
-	CONTROL_LAYER_DIFF2_ROOK_ON    = ControlLayerT(19)
+	CONTROL_LAYER_DIFF2_LANCE_ON   = ControlLayerT(14)
+	CONTROL_LAYER_DIFF2_BISHOP_ON  = ControlLayerT(15)
+	CONTROL_LAYER_DIFF2_ROOK_ON    = ControlLayerT(16)
+	// 後手用/開発時のみ
+	CONTROL_LAYER_DIFF2_PUT      = ControlLayerT(17) // 打とか指すとか
+	CONTROL_LAYER_DIFF2_REMOVE   = ControlLayerT(18)
+	CONTROL_LAYER_DIFF2_CAPTURED = ControlLayerT(19)
 	// テスト（先手用）
 	CONTROL_LAYER_TEST_COPY1          = ControlLayerT(20) // テスト用
 	CONTROL_LAYER_TEST_ERROR1         = ControlLayerT(21) // テスト用
@@ -41,12 +43,15 @@ const (
 	CONTROL_LAYER_EVAL2 = ControlLayerT(27) // 評価関数用
 	CONTROL_LAYER_EVAL3 = ControlLayerT(28) // 評価関数用
 	// 計測
-	CONTROL_LAYER_DIFF_TYPE_SIZE = ControlLayerT(9)
-	CONTROL_LAYER_DIFF1_START    = ControlLayerT(1)
-	CONTROL_LAYER_DIFF1_END      = CONTROL_LAYER_DIFF1_START + CONTROL_LAYER_DIFF_TYPE_SIZE // この数を含まない。テスト用も含まない
-	CONTROL_LAYER_DIFF2_START    = ControlLayerT(11)
-	CONTROL_LAYER_DIFF2_END      = CONTROL_LAYER_DIFF2_START + CONTROL_LAYER_DIFF_TYPE_SIZE // この数を含まない。テスト用も含まない
-	CONTROL_LAYER_ALL_SIZE       = ControlLayerT(29)                                        // この数を含まない
+	CONTROL_LAYER_DIFF_TYPE_SIZE_RELEASE = ControlLayerT(6)
+	CONTROL_LAYER_DIFF_TYPE_SIZE_DEV     = ControlLayerT(9)
+	CONTROL_LAYER_DIFF1_START            = ControlLayerT(1)
+	CONTROL_LAYER_DIFF1_END_RELEASE      = CONTROL_LAYER_DIFF1_START + CONTROL_LAYER_DIFF_TYPE_SIZE_RELEASE // この数を含まない。テスト用も含まない
+	CONTROL_LAYER_DIFF1_END_DEV          = CONTROL_LAYER_DIFF1_START + CONTROL_LAYER_DIFF_TYPE_SIZE_DEV     // この数を含まない。テスト用も含まない
+	CONTROL_LAYER_DIFF2_START            = ControlLayerT(11)
+	CONTROL_LAYER_DIFF2_END_RELEASE      = CONTROL_LAYER_DIFF2_START + CONTROL_LAYER_DIFF_TYPE_SIZE_RELEASE // この数を含まない。テスト用も含まない
+	CONTROL_LAYER_DIFF2_END_DEV          = CONTROL_LAYER_DIFF2_START + CONTROL_LAYER_DIFF_TYPE_SIZE_DEV     // この数を含まない。テスト用も含まない
+	CONTROL_LAYER_ALL_SIZE               = ControlLayerT(29)                                                // この数を含まない
 )
 
 // ControlBoardSystem - 利きボード・システム
@@ -144,16 +149,27 @@ func (pCtrlBrdSys *ControlBoardSystem) RecalculateControl(
 }
 
 // MergeControlDiff - 利きの差分を解消するぜ（＾～＾）
-func (pCtrlBrdSys *ControlBoardSystem) MergeControlDiff() {
+func (pCtrlBrdSys *ControlBoardSystem) MergeControlDiff(buildType BuildT) {
 	cb0sum := pCtrlBrdSys.Boards[CONTROL_LAYER_SUM1]
 	cb1sum := pCtrlBrdSys.Boards[CONTROL_LAYER_SUM2]
+
+	var end1 ControlLayerT
+	var end2 ControlLayerT
+	if buildType == BUILD_DEV {
+		end1 = CONTROL_LAYER_DIFF1_END_DEV
+		end2 = CONTROL_LAYER_DIFF2_END_DEV
+	} else {
+		end1 = CONTROL_LAYER_DIFF1_END_RELEASE
+		end2 = CONTROL_LAYER_DIFF2_END_RELEASE
+	}
+
 	for sq := Square(11); sq < BOARD_SIZE; sq += 1 {
 		if File(sq) != 0 && Rank(sq) != 0 {
 			// c=0 を除く
-			for c1 := CONTROL_LAYER_DIFF1_START; c1 < CONTROL_LAYER_DIFF1_END; c1 += 1 {
+			for c1 := CONTROL_LAYER_DIFF1_START; c1 < end1; c1 += 1 {
 				cb0sum.Board1[sq] += pCtrlBrdSys.Boards[c1].Board1[sq]
 			}
-			for c2 := CONTROL_LAYER_DIFF2_START; c2 < CONTROL_LAYER_DIFF2_END; c2 += 1 {
+			for c2 := CONTROL_LAYER_DIFF2_START; c2 < end2; c2 += 1 {
 				cb1sum.Board1[sq] += pCtrlBrdSys.Boards[c2].Board1[sq]
 			}
 		}
@@ -161,12 +177,23 @@ func (pCtrlBrdSys *ControlBoardSystem) MergeControlDiff() {
 }
 
 // ClearControlDiff - 利きの差分テーブルをクリアーするぜ（＾～＾）
-func (pCtrlBrdSys *ControlBoardSystem) ClearControlDiff() {
+func (pCtrlBrdSys *ControlBoardSystem) ClearControlDiff(buildType BuildT) {
+
+	var end1 ControlLayerT
+	var end2 ControlLayerT
+	if buildType == BUILD_DEV {
+		end1 = CONTROL_LAYER_DIFF1_END_DEV
+		end2 = CONTROL_LAYER_DIFF2_END_DEV
+	} else {
+		end1 = CONTROL_LAYER_DIFF1_END_RELEASE
+		end2 = CONTROL_LAYER_DIFF2_END_RELEASE
+	}
+
 	// c=0 を除く
-	for c1 := CONTROL_LAYER_DIFF1_START; c1 < CONTROL_LAYER_DIFF1_END; c1 += 1 {
+	for c1 := CONTROL_LAYER_DIFF1_START; c1 < end1; c1 += 1 {
 		pCtrlBrdSys.Boards[c1].Clear()
 	}
-	for c2 := CONTROL_LAYER_DIFF2_START; c2 < CONTROL_LAYER_DIFF2_END; c2 += 1 {
+	for c2 := CONTROL_LAYER_DIFF2_START; c2 < end2; c2 += 1 {
 		pCtrlBrdSys.Boards[c2].Clear()
 	}
 }
@@ -185,7 +212,7 @@ func AddControlLance(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
+			pCB.AddControl(GenControl(pPos, from), from, sign)
 		}
 	}
 }
@@ -203,7 +230,7 @@ func AddControlBishop(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
+			pCB.AddControl(GenControl(pPos, from), from, sign)
 		}
 	}
 }
@@ -221,7 +248,7 @@ func AddControlRook(pPos *Position,
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
 			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
-			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
+			pCB.AddControl(GenControl(pPos, from), from, sign)
 		}
 	}
 }
