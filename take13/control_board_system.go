@@ -172,8 +172,8 @@ func (pCtrlBrdSys *ControlBoardSystem) ClearControlDiff() {
 }
 
 // AddControlLance - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pCtrlBrdSys *ControlBoardSystem) AddControlLance(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
+func AddControlLance(pPos *Position,
+	pPh1_CB *ControlBoard, pPh2_CB *ControlBoard, sign int16, excludeFrom Square) {
 	for i := PCLOC_L1; i < PCLOC_L4+1; i += 1 {
 		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -184,15 +184,15 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlLance(pPos *Position,
 			piece := pPos.Board[from]
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
-			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
+			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
 			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
 		}
 	}
 }
 
 // AddControlBishop - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pCtrlBrdSys *ControlBoardSystem) AddControlBishop(pPos *Position,
-	ph1_c ControlLayerT, ph2_c ControlLayerT, sign int16, excludeFrom Square) {
+func AddControlBishop(pPos *Position,
+	pPh1_CB *ControlBoard, pPh2_CB *ControlBoard, sign int16, excludeFrom Square) {
 	for i := PCLOC_B1; i < PCLOC_B2+1; i += 1 {
 		from := pPos.PieceLocations[i]
 		if !OnHands(from) && // 持ち駒は除外
@@ -202,14 +202,14 @@ func (pCtrlBrdSys *ControlBoardSystem) AddControlBishop(pPos *Position,
 			piece := pPos.Board[from]
 			ValidateThereArePieceIn(pPos, from)
 			phase := Who(piece)
-			pCB := ControllBoardFromPhase(phase, pCtrlBrdSys.Boards[ph1_c], pCtrlBrdSys.Boards[ph2_c])
+			pCB := ControllBoardFromPhase(phase, pPh1_CB, pPh2_CB)
 			pCB.AddControlDiff(GenControl(pPos, from), from, sign)
 		}
 	}
 }
 
 // AddControlRook - 長い利きの駒の利きを調べて、利きの差分テーブルの値を増減させます
-func (pCtrlBrdSys *ControlBoardSystem) AddControlRook(pPos *Position,
+func AddControlRook(pPos *Position,
 	pPh1_CB *ControlBoard, pPh2_CB *ControlBoard, sign int16, excludeFrom Square) {
 	for i := PCLOC_R1; i < PCLOC_R2+1; i += 1 {
 		from := pPos.PieceLocations[i]

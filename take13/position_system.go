@@ -886,13 +886,15 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	pPosSys.PControlBoardSystem.ClearControlDiff()
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただし今から動かす駒を除きます。
-	pPosSys.PControlBoardSystem.AddControlRook(
+	AddControlRook(
 		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
 		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], -1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(
-		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, -1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlLance(
-		pPos, CONTROL_LAYER_DIFF1_LANCE_OFF, CONTROL_LAYER_DIFF2_LANCE_OFF, -1, mov_src_sq)
+	AddControlBishop(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_OFF], -1, mov_src_sq)
+	AddControlLance(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_OFF], -1, mov_src_sq)
 
 	// まず、打かどうかで処理を分けます
 	sq_drop := mov_src_sq
@@ -1144,11 +1146,13 @@ func (pPosSys *PositionSystem) DoMove(pPos *Position, move Move) {
 	}
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし動かした駒を除きます
-	pPosSys.PControlBoardSystem.AddControlLance(
-		pPos, CONTROL_LAYER_DIFF1_LANCE_ON, CONTROL_LAYER_DIFF2_LANCE_ON, 1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(
-		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, 1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlRook(
+	AddControlLance(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_ON], 1, mov_dst_sq)
+	AddControlBishop(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_ON], 1, mov_dst_sq)
+	AddControlRook(
 		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
 		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], 1, mov_dst_sq)
 
@@ -1182,13 +1186,15 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlRook(
+	AddControlRook(
 		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
 		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(
-		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlLance(
-		pPos, CONTROL_LAYER_DIFF1_LANCE_ON, CONTROL_LAYER_DIFF2_LANCE_ON, -1, mov_dst_sq)
+	AddControlBishop(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_ON], -1, mov_dst_sq)
+	AddControlLance(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_ON], -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1306,11 +1312,13 @@ func (pPosSys *PositionSystem) UndoMove(pPos *Position) {
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlLance(
-		pPos, CONTROL_LAYER_DIFF1_LANCE_OFF, CONTROL_LAYER_DIFF2_LANCE_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(
-		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlRook(
+	AddControlLance(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_OFF], 1, mov_src_sq)
+	AddControlBishop(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_OFF], 1, mov_src_sq)
+	AddControlRook(
 		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
 		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
 
@@ -1346,13 +1354,15 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 作業前に、長い利きの駒の利きを -1 します。ただしこれから動かす駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlRook(
+	AddControlRook(
 		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_ON],
 		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_ON], -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(
-		pPos, CONTROL_LAYER_DIFF1_BISHOP_ON, CONTROL_LAYER_DIFF2_BISHOP_ON, -1, mov_dst_sq)
-	pPosSys.PControlBoardSystem.AddControlLance(
-		pPos, CONTROL_LAYER_DIFF1_LANCE_ON, CONTROL_LAYER_DIFF2_LANCE_ON, -1, mov_dst_sq)
+	AddControlBishop(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_ON], -1, mov_dst_sq)
+	AddControlLance(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_ON],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_ON], -1, mov_dst_sq)
 
 	// 打かどうかで分けます
 	switch mov_src_sq {
@@ -1471,11 +1481,13 @@ func (pPosSys *PositionSystem) undoCapture(pPos *Position) {
 
 	// 作業後に、長い利きの駒の利きをプラス１します。ただし、今動かした駒を除きます
 	// アンドゥなので逆さになっているぜ（＾～＾）
-	pPosSys.PControlBoardSystem.AddControlLance(
-		pPos, CONTROL_LAYER_DIFF1_LANCE_OFF, CONTROL_LAYER_DIFF2_LANCE_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlBishop(
-		pPos, CONTROL_LAYER_DIFF1_BISHOP_OFF, CONTROL_LAYER_DIFF2_BISHOP_OFF, 1, mov_src_sq)
-	pPosSys.PControlBoardSystem.AddControlRook(
+	AddControlLance(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_LANCE_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_LANCE_OFF], 1, mov_src_sq)
+	AddControlBishop(
+		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_BISHOP_OFF],
+		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_BISHOP_OFF], 1, mov_src_sq)
+	AddControlRook(
 		pPos, pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF1_ROOK_OFF],
 		pPosSys.PControlBoardSystem.Boards[CONTROL_LAYER_DIFF2_ROOK_OFF], 1, mov_src_sq)
 

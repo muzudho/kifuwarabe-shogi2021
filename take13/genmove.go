@@ -330,8 +330,11 @@ func GenMoveList(pPosSys *PositionSystem, pPos *Position) []Move {
 	}
 	hand_end = hand_start + HAND_TYPE_SIZE
 
-	// 相手の利きテーブルの自玉のマスに利きがあるか
-	if pOpponentSumCB.Board1[friendKingSq] > 0 {
+	if !OnBoard(friendKingSq) {
+		// 自玉が盤上にない場合は、指し手を返しません
+
+	} else if pOpponentSumCB.Board1[friendKingSq] > 0 {
+		// 相手の利きテーブルの自玉のマスに利きがあるか
 		// 王手されています
 		// fmt.Printf("Debug: Checked friendKingSq=%d opponentKingSq=%d friend=%d opponent=%d\n", friendKingSq, opponentKingSq, friend, opponent)
 		// TODO アタッカーがどの駒か調べたいが……。一手前に動かした駒か、空き王手のどちらかしかなくないか（＾～＾）？
