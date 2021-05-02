@@ -295,7 +295,7 @@ func GenControl(pPos *Position, from Square) []MoveEnd {
 				var promote = File(from) > 5         // 移動元または移動先が敵陣なら成れる
 				makeBack(from, promote, moveEndList) // 先手から見て１つ後ろへの利き
 			case 19:
-				makeFront(from, CAN_PROMOTE, moveEndList) // 先手から見て１つ上への利き
+				makeFront(from, moveEndList) // 先手から見て１つ上への利き
 				genmv_list = append(genmv_list, 13)
 			case 20:
 				makeBack(from, NOT_PROMOTE, moveEndList) // 先手から見て１つ後ろへの利き
@@ -524,8 +524,23 @@ func makeBackDiagonal(from Square, promote bool, moveEndList []MoveEnd) {
 	}
 }
 
-// 先手から見て１つ上への利き
-func makeFront(from Square, promote bool, moveEndList []MoveEnd) {
+// (17) 先手から見て１つ上への利き（成りの動き、移動元が２段目のときは必ずならなければならない）
+func makeFrontNotPromote(from Square, promote bool, moveEndList []MoveEnd) {
+	var keepGoing = File(from) != 2
+
+	if to := from - 1; Rank(to) != 0 { // 上
+		ValidateSq(to)
+		if keepGoing {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, false))
+		}
+		if promote {
+			moveEndList = append(moveEndList, NewMoveEndValue2(to, true))
+		}
+	}
+}
+
+// (19) 先手から見て１つ上への利き（成りの動き、制約なし）
+func makeFrontPromote(from Square, promote bool, moveEndList []MoveEnd) {
 	// 移動元が２段目のときは必ずならなければならない
 	var keepGoing = File(from) != 2
 

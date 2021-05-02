@@ -1,6 +1,6 @@
 package main
 
-import "github.com/muzudho/kifuwarabe-shogi2021/take14"
+import "github.com/muzudho/kifuwarabe-shogi2021/take13"
 
 // main - 最初に実行されます
 func main() {
@@ -24,6 +24,8 @@ func main() {
 	// take11.MainLoop()
 	// take12.MainLoop()
 
-	// take13.MainLoop()
-	take14.MainLoop()
+	// 大会は take13で行くか（＾～＾）
+	take13.MainLoop()
+	// take14は未完成
+	// take14.MainLoop()
 }
